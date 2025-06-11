@@ -30,6 +30,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "Students Management",
     "description":
         "Comprehensive student profiles with progress tracking and academic performance analytics.",
+    "route": "/students",
   },
   {
     "icon": Icon(Icons.group, color: Colors.blue),
