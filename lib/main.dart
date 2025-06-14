@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
             foregroundColor: WidgetStateProperty.all(Colors.white),
             shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
-                borderRadius: BorderRadiusGeometry.circular(7),
+                borderRadius: BorderRadiusGeometry.circular(6),
                 side: BorderSide.none,
               ),
             ),
