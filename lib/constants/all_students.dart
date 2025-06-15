@@ -1,0 +1,58 @@
+final List<Map<String, dynamic>> allStudents = [
+  {
+    'id': 1,
+    'name': 'John Doe',
+    'username': 'john_doe',
+    'email': 'john@example.com',
+    'joinDate': DateTime(2023, 1, 15),
+  },
+  {
+    'id': 2,
+    'name': 'Jane Smith',
+    'username': 'jane_smith',
+    'email': 'jane@example.com',
+    'joinDate': DateTime(2023, 3, 10),
+  },
+  {
+    'id': 3,
+    'name': 'Alex Johnson',
+    'username': 'alex_j',
+    'email': 'alex@example.com',
+    'joinDate': DateTime(2023, 2, 20),
+  },
+  {
+    'id': 4,
+    'name': 'Sarah Williams',
+    'username': 'sarah_w',
+    'email': 'sarah@example.com',
+    'joinDate': DateTime(2023, 4, 5),
+  },
+  {
+    'id': 5,
+    'name': 'Michael Brown',
+    'username': 'michael_b',
+    'email': 'michael@example.com',
+    'joinDate': DateTime(2023, 1, 30),
+  },
+  {
+    'id': 6,
+    'name': 'Emily Davis',
+    'username': 'emily_d',
+    'email': 'emily@example.com',
+    'joinDate': DateTime(2023, 5, 15),
+  },
+  {
+    'id': 7,
+    'name': 'David Wilson',
+    'username': 'david_w',
+    'email': 'david@example.com',
+    'joinDate': DateTime(2023, 6, 1),
+  },
+  {
+    'id': 8,
+    'name': 'Lisa Taylor',
+    'username': 'lisa_t',
+    'email': 'lisa@example.com',
+    'joinDate': DateTime(2023, 4, 20),
+  },
+];
