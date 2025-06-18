@@ -14,7 +14,7 @@ final List<Map<String, dynamic>> sections = [
         "Generate comprehensive administrative and financial reports for better decision making.",
   },
   {
-    "icon": Icon(Icons.menu_book, color: Colors.purpleAccent),
+    "icon": Icon(Icons.import_contacts, color: Colors.purpleAccent),
     "title": "Courses Management",
     "description":
         "Create, edit, and manage training courses with comprehensive curriculum planning tools.",
@@ -51,14 +51,14 @@ final List<Map<String, dynamic>> sections = [
         "Handle payment receipts and disbursement orders for comprehensive financial tracking.",
   },
   {
-    "icon": Icon(Icons.menu_book_outlined, color: Colors.teal),
+    "icon": Icon(Icons.menu_book, color: Colors.teal),
     "title": "Curriculum Management",
     "description":
         "Design and manage curriculum sections with structured learning pathways.",
   },
   {
     "icon": Icon(Icons.military_tech, color: Colors.yellow),
-    "title": "Curriculum Management",
+    "title": "Certificate Exporting",
     "description":
         "Generate and export certificates for course completion and achievements.",
   },

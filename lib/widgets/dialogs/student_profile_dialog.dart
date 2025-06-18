@@ -1,3 +1,7 @@
+import 'package:control_panel_2/widgets/students_section/nav_button.dart';
+import 'package:control_panel_2/widgets/students_section/overview_left.dart';
+import 'package:control_panel_2/widgets/students_section/overview_right.dart';
+import 'package:control_panel_2/widgets/students_section/statistic_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,241 +30,323 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        backgroundColor: Colors.white,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text("Student Profile", style: TextStyle()),
-            InkWell(
-              onTap: () => Navigator.pop(context),
-              child: Icon(Icons.close, size: 18),
-            ),
-          ],
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      backgroundColor: Colors.white,
+      insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 800,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(radius: 38, child: Icon(Icons.person, size: 40)),
-                SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.name,
-                      style: GoogleFonts.roboto(
-                        fontSize: 21,
+                      "Student Profile",
+                      style: TextStyle(
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      widget.username,
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.close, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
                     ),
                   ],
                 ),
+
+                SizedBox(height: 16),
+
+                // Profile Section
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      child: Icon(Icons.person, size: 42),
+                    ),
+                    SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.name,
+                          style: GoogleFonts.roboto(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          widget.username,
+                          style: GoogleFonts.roboto(
+                            fontSize: 15,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 16),
+                Divider(height: 1),
+                SizedBox(height: 16),
+
+                // Navigation Tabs
+                Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.blueGrey[50],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: NavButton(
+                          navkey: "Overview",
+                          isActive: _activeFilter == "Overview",
+                          onTap: () => _setFilter("Overview"),
+                        ),
+                      ),
+                      Expanded(
+                        child: NavButton(
+                          navkey: "Academic",
+                          isActive: _activeFilter == "Academic",
+                          onTap: () => _setFilter("Academic"),
+                        ),
+                      ),
+                      Expanded(
+                        child: NavButton(
+                          navkey: "Financial",
+                          isActive: _activeFilter == "Financial",
+                          onTap: () => _setFilter("Financial"),
+                        ),
+                      ),
+                      Expanded(
+                        child: NavButton(
+                          navkey: "Activity",
+                          isActive: _activeFilter == "Activity",
+                          onTap: () => _setFilter("Activity"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 24),
+
+                // Content Section
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth > 600) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: OverviewLeft(
+                              name: widget.name,
+                              username: widget.username,
+                              phone: '+963-994-387-970',
+                              gender: 'Male',
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Expanded(
+                            child: OverviewRight(
+                              university: "MIT",
+                              specialization: "Data Science",
+                              level: "Master Degree",
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          OverviewLeft(
+                            name: widget.name,
+                            username: widget.username,
+                            phone: '+963-994-387-970',
+                            gender: 'Male',
+                          ),
+                          SizedBox(height: 20),
+                          OverviewRight(
+                            university: "MIT",
+                            specialization: "Data Science",
+                            level: "Master Degree",
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
+                SizedBox(height: 10),
+                LayoutBuilder(
+                  builder: (context, constrains) {
+                    if (constrains.maxWidth > 700) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: StatisticCard(
+                              icon: Icon(
+                                Icons.import_contacts,
+                                color: Colors.blue[700],
+                                size: 27,
+                              ),
+                              number: "9",
+                              text: "Completed Courses",
+                              backgoundColor: Colors.blue.withValues(
+                                alpha: 0.1,
+                              ),
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: StatisticCard(
+                              icon: Icon(
+                                Icons.star_border,
+                                color: Colors.orange[700],
+                                size: 27,
+                              ),
+                              number: "4.9",
+                              text: "Average Rating",
+                              backgoundColor: Colors.orange.withValues(
+                                alpha: 0.1,
+                              ),
+                              color: Colors.orange.shade700,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: StatisticCard(
+                              icon: Icon(
+                                Icons.import_contacts,
+                                color: Colors.green[700],
+                                size: 27,
+                              ),
+                              number: "28",
+                              text: "Reviews Given",
+                              backgoundColor: Colors.green.withValues(
+                                alpha: 0.1,
+                              ),
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: StatisticCard(
+                              icon: Icon(
+                                Icons.import_contacts,
+                                color: Colors.purple[700],
+                                size: 27,
+                              ),
+                              number: "45",
+                              text: "Contributions",
+                              backgoundColor: Colors.purple.withValues(
+                                alpha: 0.1,
+                              ),
+                              color: Colors.purple.shade700,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: StatisticCard(
+                                  icon: Icon(
+                                    Icons.import_contacts,
+                                    color: Colors.blue[700],
+                                    size: 27,
+                                  ),
+                                  number: "9",
+                                  text: "Completed Courses",
+                                  backgoundColor: Colors.blue.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: StatisticCard(
+                                  icon: Icon(
+                                    Icons.star_border,
+                                    color: Colors.orange[700],
+                                    size: 27,
+                                  ),
+                                  number: "4.9",
+                                  text: "Average Rating",
+                                  backgoundColor: Colors.orange.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  color: Colors.orange.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: StatisticCard(
+                                  icon: Icon(
+                                    Icons.import_contacts,
+                                    color: Colors.green[700],
+                                    size: 27,
+                                  ),
+                                  number: "28",
+                                  text: "Reviews Given",
+                                  backgoundColor: Colors.green.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  color: Colors.green.shade700,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: StatisticCard(
+                                  icon: Icon(
+                                    Icons.import_contacts,
+                                    color: Colors.purple[700],
+                                    size: 27,
+                                  ),
+                                  number: "45",
+                                  text: "Contributions",
+                                  backgoundColor: Colors.purple.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  color: Colors.purple.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
               ],
             ),
-            SizedBox(height: 10),
-            Divider(),
-            SizedBox(height: 15),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                color: Colors.blueGrey[50],
-              ),
-              child: Row(
-                children: [
-                  NavButton(
-                    navkey: "Overview",
-                    isActive: _activeFilter == "Overview",
-                    onTap: () => _setFilter("Overview"),
-                  ),
-                  NavButton(
-                    navkey: "Academic",
-                    isActive: _activeFilter == "Academic",
-                    onTap: () => _setFilter("Academic"),
-                  ),
-                  NavButton(
-                    navkey: "Financial",
-                    isActive: _activeFilter == "Financial",
-                    onTap: () => _setFilter("Financial"),
-                  ),
-                  NavButton(
-                    navkey: "Activity",
-                    isActive: _activeFilter == "Activity",
-                    onTap: () => _setFilter("Activity"),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            OverviewLeft(
-              name: widget.name,
-              username: widget.username,
-              phone: '+963-994-387-970',
-              gender: 'Male',
-            ),
-            OverviewRight(
-              university: "MIT",
-              specialization: "Data Science",
-              level: "Master Degree",
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class NavButton extends StatelessWidget {
-  final String navkey;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const NavButton({
-    super.key,
-    required this.navkey,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 75, vertical: 7.5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(3),
-          color: isActive ? Colors.white : Colors.transparent,
-        ),
-
-        child: Text(
-          navkey,
-          style: TextStyle(
-            color: isActive ? Colors.black : Colors.black54,
-            fontWeight: FontWeight.bold,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class OverviewLeft extends StatelessWidget {
-  final String name;
-  final String username;
-  final String phone;
-  final String gender;
-
-  const OverviewLeft({
-    super.key,
-    required this.name,
-    required this.username,
-    required this.phone,
-    required this.gender,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.person_outline),
-              SizedBox(width: 6),
-              Text(
-                "Personal Information",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          OverviewRow(left: "Full Name:", right: name),
-          OverviewRow(left: "Username:", right: username),
-          OverviewRow(left: "phone:", right: phone),
-          OverviewRow(left: "Gender:", right: gender),
-        ],
-      ),
-    );
-  }
-}
-
-class OverviewRight extends StatelessWidget {
-  final String university;
-  final String specialization;
-  final String level;
-
-  const OverviewRight({
-    super.key,
-    required this.university,
-    required this.specialization,
-    required this.level,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.school_outlined),
-              SizedBox(width: 6),
-              Text(
-                "Education",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          OverviewRow(left: "University:", right: university),
-          OverviewRow(left: "Specialization:", right: specialization),
-          OverviewRow(left: "Education level:", right: level),
-        ],
-      ),
-    );
-  }
-}
-
-class OverviewRow extends StatelessWidget {
-  final String left;
-  final String right;
-
-  const OverviewRow({super.key, required this.left, required this.right});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.25, horizontal: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(left, style: TextStyle(color: Colors.grey)),
-          Text(right, style: TextStyle(fontWeight: FontWeight.bold)),
-        ],
       ),
     );
   }

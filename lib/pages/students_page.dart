@@ -1,7 +1,7 @@
 import 'package:control_panel_2/constants/all_students.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
-import 'package:control_panel_2/widgets/student_profile.dart';
+import 'package:control_panel_2/widgets/students_section/student_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
