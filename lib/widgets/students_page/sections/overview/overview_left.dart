@@ -1,16 +1,18 @@
-import 'package:control_panel_2/widgets/students_section/overview_row.dart';
+import 'package:control_panel_2/widgets/students_page/sections/overview/overview_row.dart';
 import 'package:flutter/material.dart';
 
-class OverviewRight extends StatelessWidget {
-  final String university;
-  final String specialization;
-  final String level;
+class OverviewLeft extends StatelessWidget {
+  final String name;
+  final String username;
+  final String phone;
+  final String gender;
 
-  const OverviewRight({
+  const OverviewLeft({
     super.key,
-    required this.university,
-    required this.specialization,
-    required this.level,
+    required this.name,
+    required this.username,
+    required this.phone,
+    required this.gender,
   });
 
   @override
@@ -25,18 +27,19 @@ class OverviewRight extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.school_outlined),
+              Icon(Icons.person_outline),
               SizedBox(width: 6),
               Text(
-                "Education",
+                "Personal Information",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           SizedBox(height: 5),
-          OverviewRow(left: "University:", right: university),
-          OverviewRow(left: "Specialization:", right: specialization),
-          OverviewRow(left: "Education level:", right: level),
+          OverviewRow(left: "Full Name:", right: name),
+          OverviewRow(left: "Username:", right: username),
+          OverviewRow(left: "phone:", right: phone),
+          OverviewRow(left: "Gender:", right: gender),
         ],
       ),
     );

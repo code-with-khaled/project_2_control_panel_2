@@ -1,7 +1,8 @@
-import 'package:control_panel_2/widgets/students_section/nav_button.dart';
-import 'package:control_panel_2/widgets/students_section/overview_left.dart';
-import 'package:control_panel_2/widgets/students_section/overview_right.dart';
-import 'package:control_panel_2/widgets/students_section/statistic_card.dart';
+import 'package:control_panel_2/widgets/students_page/nav_button.dart';
+import 'package:control_panel_2/widgets/students_page/sections/discounts/discounts_section.dart';
+import 'package:control_panel_2/widgets/students_page/sections/overview/overview_section.dart';
+import 'package:control_panel_2/widgets/students_page/sections/receipts/receipts_section.dart';
+import 'package:control_panel_2/widgets/students_page/sections/reviews/reviews_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -122,23 +123,23 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
                       ),
                       Expanded(
                         child: NavButton(
-                          navkey: "Academic",
-                          isActive: _activeFilter == "Academic",
-                          onTap: () => _setFilter("Academic"),
+                          navkey: "Receipts",
+                          isActive: _activeFilter == "Receipts",
+                          onTap: () => _setFilter("Receipts"),
                         ),
                       ),
                       Expanded(
                         child: NavButton(
-                          navkey: "Financial",
-                          isActive: _activeFilter == "Financial",
-                          onTap: () => _setFilter("Financial"),
+                          navkey: "Discounts",
+                          isActive: _activeFilter == "Discounts",
+                          onTap: () => _setFilter("Discounts"),
                         ),
                       ),
                       Expanded(
                         child: NavButton(
-                          navkey: "Activity",
-                          isActive: _activeFilter == "Activity",
-                          onTap: () => _setFilter("Activity"),
+                          navkey: "Reviews",
+                          isActive: _activeFilter == "Reviews",
+                          onTap: () => _setFilter("Reviews"),
                         ),
                       ),
                     ],
@@ -147,207 +148,26 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
 
                 SizedBox(height: 24),
 
-                // Content Section
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth > 600) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: OverviewLeft(
-                              name: widget.name,
-                              username: widget.username,
-                              phone: '+963-994-387-970',
-                              gender: 'Male',
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                          Expanded(
-                            child: OverviewRight(
-                              university: "MIT",
-                              specialization: "Data Science",
-                              level: "Master Degree",
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          OverviewLeft(
-                            name: widget.name,
-                            username: widget.username,
-                            phone: '+963-994-387-970',
-                            gender: 'Male',
-                          ),
-                          SizedBox(height: 20),
-                          OverviewRight(
-                            university: "MIT",
-                            specialization: "Data Science",
-                            level: "Master Degree",
-                          ),
-                        ],
-                      );
-                    }
-                  },
-                ),
-                SizedBox(height: 10),
-                LayoutBuilder(
-                  builder: (context, constrains) {
-                    if (constrains.maxWidth > 700) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: StatisticCard(
-                              icon: Icon(
-                                Icons.import_contacts,
-                                color: Colors.blue[700],
-                                size: 27,
-                              ),
-                              number: "9",
-                              text: "Completed Courses",
-                              backgoundColor: Colors.blue.withValues(
-                                alpha: 0.1,
-                              ),
-                              color: Colors.blue.shade700,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: StatisticCard(
-                              icon: Icon(
-                                Icons.star_border,
-                                color: Colors.orange[700],
-                                size: 27,
-                              ),
-                              number: "4.9",
-                              text: "Average Rating",
-                              backgoundColor: Colors.orange.withValues(
-                                alpha: 0.1,
-                              ),
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: StatisticCard(
-                              icon: Icon(
-                                Icons.import_contacts,
-                                color: Colors.green[700],
-                                size: 27,
-                              ),
-                              number: "28",
-                              text: "Reviews Given",
-                              backgoundColor: Colors.green.withValues(
-                                alpha: 0.1,
-                              ),
-                              color: Colors.green.shade700,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: StatisticCard(
-                              icon: Icon(
-                                Icons.import_contacts,
-                                color: Colors.purple[700],
-                                size: 27,
-                              ),
-                              number: "45",
-                              text: "Contributions",
-                              backgoundColor: Colors.purple.withValues(
-                                alpha: 0.1,
-                              ),
-                              color: Colors.purple.shade700,
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: StatisticCard(
-                                  icon: Icon(
-                                    Icons.import_contacts,
-                                    color: Colors.blue[700],
-                                    size: 27,
-                                  ),
-                                  number: "9",
-                                  text: "Completed Courses",
-                                  backgoundColor: Colors.blue.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  color: Colors.blue.shade700,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: StatisticCard(
-                                  icon: Icon(
-                                    Icons.star_border,
-                                    color: Colors.orange[700],
-                                    size: 27,
-                                  ),
-                                  number: "4.9",
-                                  text: "Average Rating",
-                                  backgoundColor: Colors.orange.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  color: Colors.orange.shade700,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: StatisticCard(
-                                  icon: Icon(
-                                    Icons.import_contacts,
-                                    color: Colors.green[700],
-                                    size: 27,
-                                  ),
-                                  number: "28",
-                                  text: "Reviews Given",
-                                  backgoundColor: Colors.green.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  color: Colors.green.shade700,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: StatisticCard(
-                                  icon: Icon(
-                                    Icons.import_contacts,
-                                    color: Colors.purple[700],
-                                    size: 27,
-                                  ),
-                                  number: "45",
-                                  text: "Contributions",
-                                  backgoundColor: Colors.purple.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  color: Colors.purple.shade700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    }
-                  },
-                ),
+                // Content Section:
+                _buildCurrentSection(),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildCurrentSection() {
+    switch (_activeFilter) {
+      case "Receipts":
+        return ReceiptsSection();
+      case "Discounts":
+        return DiscountsSection();
+      case "Reviews":
+        return ReviewsSection();
+      default:
+        return OverviewSection(name: widget.name, username: widget.username);
+    }
   }
 }
