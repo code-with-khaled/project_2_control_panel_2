@@ -1,4 +1,4 @@
-import 'package:control_panel_2/widgets/dialogs/student_profile_dialog.dart';
+import 'package:control_panel_2/widgets/students_page/dialogs/student_profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -155,9 +155,18 @@ class _StudentProfileState extends State<StudentProfile> {
               SizedBox(height: 10),
               Divider(color: Colors.black12),
               SizedBox(height: 10),
-              Text(
-                "Joined: $formattedDate",
-                style: TextStyle(color: Colors.black87, fontSize: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Joined: $formattedDate",
+                    style: TextStyle(color: Colors.black87, fontSize: 12),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.delete_outline, color: Colors.red),
+                  ),
+                ],
               ),
             ],
           ),

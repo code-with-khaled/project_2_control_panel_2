@@ -1,3 +1,5 @@
+import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_student_dialog.dart';
+import 'package:control_panel_2/widgets/students_page/dialogs/send_notification_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/nav_button.dart';
 import 'package:control_panel_2/widgets/students_page/sections/discounts/discounts_section.dart';
 import 'package:control_panel_2/widgets/students_page/sections/overview/overview_section.dart';
@@ -37,7 +39,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 1000,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -50,7 +52,9 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Title
                     Text(
                       "Student Profile",
                       style: TextStyle(
@@ -58,11 +62,95 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.close, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
+
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Buttons
+                          Flexible(
+                            child: Wrap(
+                              spacing: 5,
+                              runSpacing: 5,
+                              runAlignment: WrapAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          SendNotificationDialog(),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.notifications_outlined),
+                                        SizedBox(width: 10),
+                                        Flexible(
+                                          child: Text(
+                                            "Send Notification",
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => EnrollStudentDialog(
+                                        name: widget.name,
+                                        username: widget.username,
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      side: BorderSide(color: Colors.black12),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.person_add_alt),
+                                        SizedBox(width: 10),
+                                        Flexible(
+                                          child: Text(
+                                            "Enroll in Course",
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          IconButton(
+                            icon: Icon(Icons.close, size: 20),
+                            onPressed: () => Navigator.pop(context),
+                            padding: EdgeInsets.zero,
+                            constraints: BoxConstraints(),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
