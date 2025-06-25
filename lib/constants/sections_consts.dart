@@ -37,6 +37,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "Teachers Management",
     "description":
         "Manage teachers profiles, courses assignments, and performance evaluations.",
+    "route": "/teachers",
   },
   {
     "icon": Icon(Icons.campaign_outlined, color: Colors.red),

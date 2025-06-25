@@ -1,5 +1,6 @@
 import 'package:control_panel_2/pages/home_page.dart';
 import 'package:control_panel_2/pages/students_page.dart';
+import 'package:control_panel_2/pages/teachers_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,7 +35,10 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const MyHomePage(),
-      routes: {'/students': (context) => StudentsPage()},
+      routes: {
+        '/students': (context) => StudentsPage(),
+        '/teachers': (context) => TeachersPage(),
+      },
     );
   }
 }
