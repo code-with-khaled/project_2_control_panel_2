@@ -2,6 +2,9 @@ import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_in_course_table.dart';
 import 'package:flutter/material.dart';
 
+/// Dialog for enrolling a student in available courses
+///
+/// Requires [name] and [username] of the student to be enrolled
 class EnrollStudentDialog extends StatefulWidget {
   final String name;
   final String username;
@@ -17,11 +20,12 @@ class EnrollStudentDialog extends StatefulWidget {
 }
 
 class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
+  // Controller for course search functionality
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchController.dispose(); // Clean up controller
     super.dispose();
   }
 
@@ -33,8 +37,9 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
+          maxWidth: 800, // Dialog max width
+          maxHeight:
+              MediaQuery.of(context).size.height * 0.8, // 80% of screen height
         ),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -43,58 +48,22 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Enroll Student in Course",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.close, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Select a course to enroll ",
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    Text(
-                      widget.name,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
+                // Dialog header with close button
+                _buildDialogHeader(),
+
+                // Student name display
+                _buildStudentInfoRow(),
                 SizedBox(height: 10),
+
+                // Course search field
                 SearchField(
                   controller: _searchController,
                   hintText: "Search courses by name, category, or teacher...",
                 ),
                 SizedBox(height: 16),
 
-                CoursesTable(
-                  onEnroll: () {
-                    showCustomToast(
-                      context,
-                      'Enrollment Updated!',
-                      '${widget.name} has been enrolled in the course successfully!',
-                    );
-                  },
-                ),
+                // Courses table with enrollment capability
+                CoursesTable(onEnroll: () => _showEnrollmentSuccessToast()),
               ],
             ),
           ),
@@ -103,6 +72,56 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
     );
   }
 
+  // Builds dialog header with title and close button
+  Widget _buildDialogHeader() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Enroll Student in Course",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Spacer(),
+        IconButton(
+          icon: Icon(Icons.close, size: 20),
+          onPressed: () => Navigator.pop(context),
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(),
+        ),
+      ],
+    );
+  }
+
+  // Displays student name being enrolled
+  Widget _buildStudentInfoRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "Select a course to enroll ",
+          style: TextStyle(color: Colors.black54),
+        ),
+        Text(
+          widget.name,
+          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w900),
+        ),
+      ],
+    );
+  }
+
+  // Shows toast notification when enrollment succeeds
+  void _showEnrollmentSuccessToast() {
+    showCustomToast(
+      context,
+      'Enrollment Updated!',
+      '${widget.name} has been enrolled in the course successfully!',
+    );
+  }
+
+  /// Displays a custom toast notification
+  ///
+  /// [title] - Notification header text
+  /// [message] - Detailed notification message
   void showCustomToast(BuildContext context, String title, String message) {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
@@ -112,7 +131,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: 380, // Fixed width
+            width: 380, // Fixed width for consistency
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,

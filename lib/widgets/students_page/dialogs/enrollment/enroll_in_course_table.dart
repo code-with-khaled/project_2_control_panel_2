@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Displays a table of available courses with enrollment capability
+///
+/// Takes an [onEnroll] callback that triggers when enrollment is initiated
 class CoursesTable extends StatelessWidget {
   final void Function() onEnroll;
 
@@ -7,7 +10,9 @@ class CoursesTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Generate mock course data (in real app, this would come from API/database)
     final List<Map<String, dynamic>> courses = List.generate(5, (index) {
+      // Course data template
       String courseName = "React - Advanced";
       Widget category = Container(
         padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
@@ -29,7 +34,7 @@ class CoursesTable extends StatelessWidget {
         'teacher': teacher,
         'date': date,
         'action': ElevatedButton(
-          onPressed: () => onEnroll(),
+          onPressed: () => onEnroll(), // Trigger enrollment callback
           child: Text("Enroll"),
         ),
       };
@@ -44,93 +49,98 @@ class CoursesTable extends StatelessWidget {
       child: SingleChildScrollView(
         child: Table(
           border: TableBorder(
-            horizontalInside: BorderSide(color: Colors.grey[300]!),
+            horizontalInside: BorderSide(
+              color: Colors.grey[300]!,
+            ), // Row dividers
           ),
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           columnWidths: const {
-            0: FlexColumnWidth(),
-            1: FlexColumnWidth(),
-            2: FlexColumnWidth(),
-            3: IntrinsicColumnWidth(),
+            0: FlexColumnWidth(), // Course name (flexible)
+            1: FlexColumnWidth(), // Category (flexible)
+            2: FlexColumnWidth(), // Teacher (flexible)
+            3: IntrinsicColumnWidth(), // Action (fits content)
           },
           children: [
+            // Table header row
             TableRow(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
               ),
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  child: Text(
-                    'Course Name',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  child: Text(
-                    'Category',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  child: Text(
-                    'Teacher',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  child: Text(
-                    'Action',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
+                _buildHeaderCell('Course Name'),
+                _buildHeaderCell('Category'),
+                _buildHeaderCell('Teacher'),
+                _buildHeaderCell('Action'),
               ],
             ),
 
+            // Course data rows
             ...courses.map(
               (course) => TableRow(
                 decoration: BoxDecoration(color: Colors.white),
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.menu_book, size: 12, color: Colors.black87),
-                        SizedBox(width: 7),
-                        Flexible(
-                          child: Text(
-                            course['name'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                    child: Row(children: [course['category']]),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                    child: Text(course['teacher']),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                    child: course['action'],
-                  ),
+                  _buildCourseNameCell(course['name']),
+                  _buildCategoryCell(course['category']),
+                  _buildTeacherCell(course['teacher']),
+                  _buildActionCell(course['action']),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // Builds a standardized header cell
+  Widget _buildHeaderCell(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Text(text, style: TextStyle(fontWeight: FontWeight.w600)),
+    );
+  }
+
+  // Builds course name cell with icon
+  Widget _buildCourseNameCell(String name) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.menu_book, size: 12, color: Colors.black87),
+          SizedBox(width: 7),
+          Flexible(
+            child: Text(
+              name,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Builds category cell
+  Widget _buildCategoryCell(Widget category) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Row(children: [category]),
+    );
+  }
+
+  // Builds teacher cell
+  Widget _buildTeacherCell(String teacher) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Text(teacher),
+    );
+  }
+
+  // Builds action/enroll button cell
+  Widget _buildActionCell(Widget action) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: action,
     );
   }
 }
