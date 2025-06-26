@@ -16,7 +16,7 @@ class ReceiptsSection extends StatelessWidget {
             Icon(Icons.receipt),
             SizedBox(width: 6),
             Text(
-              "Student Receipts",
+              "فواتير الطلاب",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],

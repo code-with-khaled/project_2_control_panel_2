@@ -28,15 +28,16 @@ class OverviewSection extends StatelessWidget {
                       name: name,
                       username: username,
                       phone: '+963-994-387-970',
-                      gender: 'Male',
+                      gender: 'ذكر', // Male → ذكر
                     ),
                   ),
                   SizedBox(width: 20),
                   Expanded(
                     child: OverviewRight(
                       university: "MIT",
-                      specialization: "Data Science",
-                      level: "Master Degree",
+                      specialization:
+                          "علم البيانات", // Data Science → علم البيانات
+                      level: "درجة الماجستير", // Master Degree → درجة الماجستير
                     ),
                   ),
                 ],
@@ -48,13 +49,13 @@ class OverviewSection extends StatelessWidget {
                     name: name,
                     username: username,
                     phone: '+963-994-387-970',
-                    gender: 'Male',
+                    gender: 'ذكر',
                   ),
                   SizedBox(height: 20),
                   OverviewRight(
                     university: "MIT",
-                    specialization: "Data Science",
-                    level: "Master Degree",
+                    specialization: "علم البيانات",
+                    level: "درجة الماجستير",
                   ),
                 ],
               );
@@ -77,28 +78,28 @@ class OverviewSection extends StatelessWidget {
                 icon: Icons.import_contacts,
                 color: Colors.blue,
                 number: "9",
-                text: "Completed Courses",
+                text: "الدورات المكتملة", // Completed Courses
               ),
               SizedBox(width: 10),
               _buildStatCard(
                 icon: Icons.star_border,
                 color: Colors.orange,
                 number: "4.9",
-                text: "Average Rating",
+                text: "متوسط التقييم", // Average Rating
               ),
               SizedBox(width: 10),
               _buildStatCard(
                 icon: Icons.import_contacts,
                 color: Colors.green,
                 number: "28",
-                text: "Reviews Given",
+                text: "التقييمات المقدمة", // Reviews Given
               ),
               SizedBox(width: 10),
               _buildStatCard(
                 icon: Icons.import_contacts,
                 color: Colors.purple,
                 number: "45",
-                text: "Contributions",
+                text: "المساهمات", // Contributions
               ),
             ],
           );
@@ -111,14 +112,14 @@ class OverviewSection extends StatelessWidget {
                     icon: Icons.import_contacts,
                     color: Colors.blue,
                     number: "9",
-                    text: "Completed Courses",
+                    text: "الدورات المكتملة",
                   ),
                   SizedBox(width: 10),
                   _buildStatCard(
                     icon: Icons.star_border,
                     color: Colors.orange,
                     number: "4.9",
-                    text: "Average Rating",
+                    text: "متوسط التقييم",
                   ),
                 ],
               ),
@@ -129,14 +130,14 @@ class OverviewSection extends StatelessWidget {
                     icon: Icons.import_contacts,
                     color: Colors.green,
                     number: "28",
-                    text: "Reviews Given",
+                    text: "التقييمات المقدمة",
                   ),
                   SizedBox(width: 10),
                   _buildStatCard(
                     icon: Icons.import_contacts,
                     color: Colors.purple,
                     number: "45",
-                    text: "Contributions",
+                    text: "المساهمات",
                   ),
                 ],
               ),

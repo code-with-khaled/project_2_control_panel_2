@@ -30,16 +30,16 @@ class OverviewLeft extends StatelessWidget {
               Icon(Icons.person_outline),
               SizedBox(width: 6),
               Text(
-                "Personal Information",
+                "المعلومات الشخصية", // "Personal Information"
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           SizedBox(height: 5),
-          OverviewRow(left: "Full Name:", right: name),
-          OverviewRow(left: "Username:", right: username),
-          OverviewRow(left: "phone:", right: phone),
-          OverviewRow(left: "Gender:", right: gender),
+          OverviewRow(left: "الاسم الكامل:", right: name), // "Full Name:"
+          OverviewRow(left: "اسم المستخدم:", right: username), // "Username:"
+          OverviewRow(left: "رقم الهاتف:", right: phone), // "phone:"
+          OverviewRow(left: "الجنس:", right: gender), // "Gender:"
         ],
       ),
     );

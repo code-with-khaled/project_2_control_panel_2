@@ -42,8 +42,9 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
               MediaQuery.of(context).size.height * 0.8, // 80% of screen height
         ),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 2),
           child: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +59,8 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
                 // Course search field
                 SearchField(
                   controller: _searchController,
-                  hintText: "Search courses by name, category, or teacher...",
+                  hintText:
+                      "ابحث عن الدورة بالاسم، التصنيف، أو المعلم...", // Translated
                 ),
                 SizedBox(height: 16),
 
@@ -78,7 +80,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Enroll Student in Course",
+          "تسجيل الطالب في دورة", // "Enroll Student in Course"
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         Spacer(),
@@ -98,7 +100,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          "Select a course to enroll ",
+          "اختر دورة لتسجيل ", // "Select a course to enroll "
           style: TextStyle(color: Colors.black54),
         ),
         Text(
@@ -113,8 +115,8 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
   void _showEnrollmentSuccessToast() {
     showCustomToast(
       context,
-      'Enrollment Updated!',
-      '${widget.name} has been enrolled in the course successfully!',
+      'تم تحديث التسجيل!', // 'Enrollment Updated!'
+      'تم تسجيل ${widget.name} في الدورة بنجاح!', // Success message
     );
   }
 
@@ -127,11 +129,11 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         bottom: 20,
-        right: 20,
+        left: 20, // Changed to left for RTL
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: 380, // Fixed width for consistency
+            width: 380,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -140,14 +142,18 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
               border: Border.all(color: Colors.grey[300]!),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end, // Right-align for RTL
               children: [
                 Text(
                   title,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  textAlign: TextAlign.right, // Right-align text
                 ),
                 SizedBox(height: 4),
-                Text(message),
+                Text(
+                  message,
+                  textAlign: TextAlign.right, // Right-align text
+                ),
               ],
             ),
           ),

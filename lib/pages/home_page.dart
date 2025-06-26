@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Icon(Icons.school_outlined, size: 40),
                   SizedBox(width: 10),
                   Text(
-                    "MasarEdu Control Panel",
+                    "لوحة تحكم مسار التعليم", // "MasarEdu Control Panel"
                     style: GoogleFonts.montserrat(
                       color: Colors.black,
                       fontSize: 32,
@@ -43,11 +43,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: 500),
                 child: Text(
-                  "Comprehensive management system for educational intitutions. Monitor students, manage teachers, and track progress all at one place",
+                  "نظام إدارة شامل للمؤسسات التعليمية. راقب الطلاب، وأدر المدرسين، وتتبع التقدم كلها في مكان واحد", // Translated description
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
                   textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl, // Right-align Arabic text
                 ),
               ),
               SizedBox(height: 30),

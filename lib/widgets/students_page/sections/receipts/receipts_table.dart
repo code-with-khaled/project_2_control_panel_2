@@ -7,13 +7,13 @@ class ReceiptsTable extends StatelessWidget {
     int date = Random().nextInt(29) + 1;
     int month = Random().nextInt(12) + 1;
     int amount = Random().nextInt(200) + 50;
-    String type = Random().nextBool() ? 'Payment' : 'Withdrawal';
+    String type = Random().nextBool() ? 'دفع' : 'سحب'; // Translated to Arabic
 
     return {
       'receipt': 'RW$receiptCode',
       'date': '$date/${month.toString().padLeft(2, '0')}/2025',
       'type': type,
-      'amount': '\$$amount',
+      'amount': '$amount  ل.س', // Changed to Syrian Pound symbol
     };
   });
 
@@ -42,29 +42,33 @@ class ReceiptsTable extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               child: Text(
-                'Receipt',
+                'الإيصال', // 'Receipt'
                 style: TextStyle(fontWeight: FontWeight.w600),
+                textDirection: TextDirection.rtl,
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               child: Text(
-                'Date',
+                'التاريخ', // 'Date'
                 style: TextStyle(fontWeight: FontWeight.w600),
+                textDirection: TextDirection.rtl,
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               child: Text(
-                'Type',
+                'النوع', // 'Type'
                 style: TextStyle(fontWeight: FontWeight.w600),
+                textDirection: TextDirection.rtl,
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               child: Text(
-                'Amount',
+                'المبلغ', // 'Amount'
                 style: TextStyle(fontWeight: FontWeight.w600),
+                textDirection: TextDirection.rtl,
               ),
             ),
           ],

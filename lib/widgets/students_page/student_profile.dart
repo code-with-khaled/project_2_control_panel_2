@@ -31,7 +31,10 @@ class _StudentProfileState extends State<StudentProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('MMM dd, yyyy').format(widget.joinDate);
+    final formattedDate = DateFormat(
+      'MMM dd, yyyy',
+      'ar',
+    ).format(widget.joinDate);
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
@@ -146,7 +149,7 @@ class _StudentProfileState extends State<StudentProfile> {
             Icon(Icons.school_outlined, color: Colors.black87, size: 17),
             SizedBox(width: 7),
             Text(
-              "Field of Study",
+              "المجال الدراسي",
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -154,7 +157,7 @@ class _StudentProfileState extends State<StudentProfile> {
           ],
         ),
         Text(
-          "university/school",
+          "جامعة/مدرسة",
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -173,7 +176,7 @@ class _StudentProfileState extends State<StudentProfile> {
           children: [
             Icon(Icons.menu_book, color: Colors.blue, size: 17),
             SizedBox(width: 8),
-            Text("Courses"),
+            Text("الكورسات"),
           ],
         ),
         Column(
@@ -182,7 +185,7 @@ class _StudentProfileState extends State<StudentProfile> {
           children: [
             Text("4/8", style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
-              "50% complete",
+              "50% اكتمال",
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -203,7 +206,7 @@ class _StudentProfileState extends State<StudentProfile> {
           children: [
             Icon(Icons.star_border, size: 17, color: Colors.yellow),
             SizedBox(width: 8),
-            Text("Avg Rating"),
+            Text("متوسط التقييم"),
           ],
         ),
         Text("4.6", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -217,7 +220,7 @@ class _StudentProfileState extends State<StudentProfile> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "Joined: $formattedDate",
+          "انضم في: $formattedDate",
           style: TextStyle(color: Colors.black87, fontSize: 12),
         ),
         IconButton(

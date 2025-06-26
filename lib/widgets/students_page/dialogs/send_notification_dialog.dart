@@ -28,8 +28,9 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
               MediaQuery.of(context).size.height * 0.8, // 80% of screen height
         ),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 2),
           child: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +69,7 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
 
         // Dialog title
         Text(
-          "Send Notification",
+          "إرسال إشعار", // "Send Notification"
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         Spacer(),
@@ -98,7 +99,7 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
         children: [
           // Section title
           Text(
-            "Notification Content",
+            "محتوى الإشعار", // "Notification Content"
             style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 25),
@@ -120,14 +121,16 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Title",
+          "العنوان", // "Title"
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
+        SizedBox(height: 2),
         TextField(
           controller: _titleController,
           cursorColor: Colors.blue,
+          textDirection: TextDirection.rtl, // Right-align Arabic text
           decoration: InputDecoration(
-            hintText: "Enter notification title",
+            hintText: "أدخل عنوان الإشعار", // "Enter notification title"
             hintStyle: const TextStyle(color: Colors.grey),
             enabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.black26),
@@ -149,15 +152,17 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Message",
+          "الرسالة", // "Message"
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
+        SizedBox(height: 2),
         TextField(
           controller: _messageController,
           cursorColor: Colors.blue,
           maxLines: 3, // Allow multiline input
+          textDirection: TextDirection.rtl, // Right-align Arabic text
           decoration: InputDecoration(
-            hintText: "Enter notification message",
+            hintText: "أدخل محتوى الإشعار", // "Enter notification message"
             hintStyle: const TextStyle(color: Colors.grey),
             enabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.black26),
@@ -191,7 +196,7 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
               children: [
                 Icon(Icons.send_outlined),
                 SizedBox(width: 10),
-                Text("Send Notification"),
+                Text("إرسال الإشعار"), // "Send Notification"
               ],
             ),
           ),

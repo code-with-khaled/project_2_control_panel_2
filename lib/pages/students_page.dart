@@ -22,7 +22,7 @@ class StudentsPage extends StatefulWidget {
 class _StudentsPageState extends State<StudentsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String _activeFilter = 'All Students'; // Current active filter type
+  String _activeFilter = 'كل الطلاب'; // Current active filter type
 
   /// Filters and sorts students based on search query and active filter
   List<Map<String, dynamic>> get _filteredStudents {
@@ -36,13 +36,13 @@ class _StudentsPageState extends State<StudentsPage> {
 
     // Apply additional sorting based on active filter
     switch (_activeFilter) {
-      case 'Newest':
+      case 'الأحدث':
         results.sort((a, b) => b['joinDate'].compareTo(a['joinDate']));
         break;
-      case 'Alphabetical':
+      case 'أبجدي':
         results.sort((a, b) => a['name'].compareTo(b['name']));
         break;
-      default: // 'All Students' - no additional sorting
+      default: // 'كل الطلاب' - no additional sorting
         break;
     }
 
@@ -114,7 +114,7 @@ class _StudentsPageState extends State<StudentsPage> {
           children: [
             Flexible(
               child: Text(
-                "Students Management",
+                "إدارة الطلاب",
                 style: GoogleFonts.montserrat(
                   color: Colors.black,
                   fontSize: 32,
@@ -132,7 +132,7 @@ class _StudentsPageState extends State<StudentsPage> {
                     children: [
                       Icon(Icons.add),
                       SizedBox(width: 10),
-                      Text("Create Student Account"),
+                      Text("إنشاء حساب طالب"),
                     ],
                   ),
                 ),
@@ -141,7 +141,7 @@ class _StudentsPageState extends State<StudentsPage> {
           ],
         ),
         Text(
-          "Manage and monitor students progress and information",
+          "إدارة ومتابعة تقدم ومعلومات الطلاب",
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
@@ -173,7 +173,7 @@ class _StudentsPageState extends State<StudentsPage> {
                 Expanded(
                   child: SearchField(
                     controller: _searchController,
-                    hintText: "Search students by name, or username",
+                    hintText: "ابحث عن الطلاب بالاسم أو اسم المستخدم",
                   ),
                 ),
                 SizedBox(width: 20),
@@ -186,7 +186,7 @@ class _StudentsPageState extends State<StudentsPage> {
               children: [
                 SearchField(
                   controller: _searchController,
-                  hintText: "Search students by name, or username",
+                  hintText: "ابحث عن الطلاب بالاسم أو اسم المستخدم",
                 ),
                 SizedBox(height: 15),
                 _buildFilterButtons(),
@@ -205,19 +205,19 @@ class _StudentsPageState extends State<StudentsPage> {
       runSpacing: 10,
       children: [
         SearchFilterButton(
-          text: "All Students",
-          isActive: _activeFilter == "All Students",
-          onPressed: () => _setFilter("All Students"),
+          text: "كل الطلاب",
+          isActive: _activeFilter == "كل الطلاب",
+          onPressed: () => _setFilter("كل الطلاب"),
         ),
         SearchFilterButton(
-          text: "Newest",
-          isActive: _activeFilter == "Newest",
-          onPressed: () => _setFilter("Newest"),
+          text: "الأحدث",
+          isActive: _activeFilter == "الأحدث",
+          onPressed: () => _setFilter("الأحدث"),
         ),
         SearchFilterButton(
-          text: "Alphabetical",
-          isActive: _activeFilter == "Alphabetical",
-          onPressed: () => _setFilter("Alphabetical"),
+          text: "أبجدي",
+          isActive: _activeFilter == "أبجدي",
+          onPressed: () => _setFilter("أبجدي"),
         ),
       ],
     );
@@ -266,7 +266,7 @@ class _StudentsPageState extends State<StudentsPage> {
       child: Padding(
         padding: EdgeInsets.all(40),
         child: Text(
-          'No students found',
+          'لا توجد نتائج',
           style: TextStyle(fontSize: 18, color: Colors.grey),
         ),
       ),

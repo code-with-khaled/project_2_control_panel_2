@@ -15,7 +15,7 @@ class DiscountsSection extends StatelessWidget {
             Icon(Icons.discount_outlined),
             SizedBox(width: 6),
             Text(
-              "Discounts & Savings",
+              "الخصومات والتوفير", // "Discounts & Savings"
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
@@ -41,11 +41,11 @@ class DiscountsSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Summer20",
+                          "خصم الصيف20", // "Summer20"
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "React - Advanced",
+                          "رياكت - متقدم", // "React - Advanced"
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -60,7 +60,7 @@ class DiscountsSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "\$60 saved",
+                          "وفر 60 ر.س", // "\$60 saved" (changed to Saudi Riyal)
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
@@ -68,7 +68,7 @@ class DiscountsSection extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "Used",
+                          "تم الاستخدام", // "Used"
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -95,7 +95,7 @@ class DiscountsSection extends StatelessWidget {
               Icon(Icons.attach_money, size: 18, color: Colors.green),
               SizedBox(width: 5),
               Text(
-                "Total Savings",
+                "إجمالي التوفير", // "Total Savings"
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.green[900],
@@ -103,7 +103,7 @@ class DiscountsSection extends StatelessWidget {
               ),
               Spacer(),
               Text(
-                "\$210",
+                "210 ل.س", // "\$210" (changed to Syrian Pound)
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,

@@ -26,7 +26,7 @@ class StudentProfileDialog extends StatefulWidget {
 }
 
 class _StudentProfileDialogState extends State<StudentProfileDialog> {
-  String _activeFilter = 'Overview'; // Currently selected section
+  String _activeFilter = 'نظرة عامة'; // Currently selected section
 
   /// Updates the active section filter
   void _setFilter(String filter) {
@@ -48,8 +48,9 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
               MediaQuery.of(context).size.height * 0.8, // 80% screen height
         ),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 2),
           child: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +88,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       children: [
         // Dialog title
         Text(
-          "Student Profile",
+          "الملف الشخصي للطالب",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
@@ -145,10 +146,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
             Icon(Icons.notifications_outlined),
             SizedBox(width: 10),
             Flexible(
-              child: Text(
-                "Send Notification",
-                overflow: TextOverflow.ellipsis, // Handle overflow gracefully
-              ),
+              child: Text("إرسال إشعار", overflow: TextOverflow.ellipsis),
             ),
           ],
         ),
@@ -182,7 +180,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
             Icon(Icons.person_add_alt),
             SizedBox(width: 10),
             Flexible(
-              child: Text("Enroll in Course", overflow: TextOverflow.ellipsis),
+              child: Text("تسجيل في دورة", overflow: TextOverflow.ellipsis),
             ),
           ],
         ),
@@ -193,7 +191,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
   // Builds student profile summary section
   Widget _buildProfileSummary() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Profile avatar
         CircleAvatar(radius: 40, child: Icon(Icons.person, size: 42)),
@@ -227,43 +225,43 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       padding: EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: Colors.blueGrey[50], // Subtle background for tabs
+        color: Colors.blueGrey[50],
       ),
       child: Row(
         children: [
           // Overview tab
           Expanded(
             child: NavButton(
-              navkey: "Overview",
-              isActive: _activeFilter == "Overview",
-              onTap: () => _setFilter("Overview"),
+              navkey: "نظرة عامة",
+              isActive: _activeFilter == "نظرة عامة",
+              onTap: () => _setFilter("نظرة عامة"),
             ),
           ),
 
           // Receipts tab
           Expanded(
             child: NavButton(
-              navkey: "Receipts",
-              isActive: _activeFilter == "Receipts",
-              onTap: () => _setFilter("Receipts"),
+              navkey: "الفواتير",
+              isActive: _activeFilter == "الفواتير",
+              onTap: () => _setFilter("الفواتير"),
             ),
           ),
 
           // Discounts tab
           Expanded(
             child: NavButton(
-              navkey: "Discounts",
-              isActive: _activeFilter == "Discounts",
-              onTap: () => _setFilter("Discounts"),
+              navkey: "الخصومات",
+              isActive: _activeFilter == "الخصومات",
+              onTap: () => _setFilter("الخصومات"),
             ),
           ),
 
           // Reviews tab
           Expanded(
             child: NavButton(
-              navkey: "Reviews",
-              isActive: _activeFilter == "Reviews",
-              onTap: () => _setFilter("Reviews"),
+              navkey: "التقييمات",
+              isActive: _activeFilter == "التقييمات",
+              onTap: () => _setFilter("التقييمات"),
             ),
           ),
         ],
@@ -274,11 +272,11 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
   /// Returns the appropriate content section based on active filter
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
-      case "Receipts":
+      case "الفواتير":
         return ReceiptsSection();
-      case "Discounts":
+      case "الخصومات":
         return DiscountsSection();
-      case "Reviews":
+      case "التقييمات":
         return ReviewsSection();
       default:
         return OverviewSection(name: widget.name, username: widget.username);

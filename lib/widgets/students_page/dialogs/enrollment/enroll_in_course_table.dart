@@ -13,7 +13,7 @@ class CoursesTable extends StatelessWidget {
     // Generate mock course data (in real app, this would come from API/database)
     final List<Map<String, dynamic>> courses = List.generate(5, (index) {
       // Course data template
-      String courseName = "React - Advanced";
+      String courseName = "رياكت - المستوى المتقدم"; // "React - Advanced"
       Widget category = Container(
         padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
         decoration: BoxDecoration(
@@ -21,12 +21,12 @@ class CoursesTable extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          "Programming",
+          "برمجة", // "Programming"
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
         ),
       );
-      String teacher = "John Smith";
-      String date = "6/5/2024";
+      String teacher = "أحمد محمد"; // "John Smith"
+      String date = "٦/٥/٢٠٢٤"; // Arabic numerals for date
 
       return {
         'name': courseName,
@@ -35,7 +35,7 @@ class CoursesTable extends StatelessWidget {
         'date': date,
         'action': ElevatedButton(
           onPressed: () => onEnroll(), // Trigger enrollment callback
-          child: Text("Enroll"),
+          child: Text("تسجيل"), // "Enroll"
         ),
       };
     });
@@ -67,10 +67,10 @@ class CoursesTable extends StatelessWidget {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
               ),
               children: [
-                _buildHeaderCell('Course Name'),
-                _buildHeaderCell('Category'),
-                _buildHeaderCell('Teacher'),
-                _buildHeaderCell('Action'),
+                _buildHeaderCell('اسم الدورة'), // "Course Name"
+                _buildHeaderCell('التصنيف'), // "Category"
+                _buildHeaderCell('المعلم'), // "Teacher"
+                _buildHeaderCell('إجراء'), // "Action"
               ],
             ),
 
@@ -96,7 +96,11 @@ class CoursesTable extends StatelessWidget {
   Widget _buildHeaderCell(String text) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.w600)),
+      child: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.w600),
+        textDirection: TextDirection.rtl, // Right-align Arabic headers
+      ),
     );
   }
 
@@ -113,6 +117,7 @@ class CoursesTable extends StatelessWidget {
             child: Text(
               name,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              textDirection: TextDirection.rtl, // Right-align Arabic text
             ),
           ),
         ],
@@ -124,7 +129,10 @@ class CoursesTable extends StatelessWidget {
   Widget _buildCategoryCell(Widget category) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      child: Row(children: [category]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start, // Right-align category
+        children: [category],
+      ),
     );
   }
 
@@ -132,7 +140,10 @@ class CoursesTable extends StatelessWidget {
   Widget _buildTeacherCell(String teacher) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      child: Text(teacher),
+      child: Text(
+        teacher,
+        textDirection: TextDirection.rtl, // Right-align Arabic text
+      ),
     );
   }
 

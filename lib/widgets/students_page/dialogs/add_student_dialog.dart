@@ -30,7 +30,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   String? _selectedGender;
   DateTime? _selectedDate;
   Uint8List? _imageBytes;
-  String _fileName = "No file chosen";
+  String _fileName = "لم يتم اختيار ملف";
 
   // Date picker function
   Future<void> _selectDate(BuildContext context) async {
@@ -80,48 +80,48 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   // Validation functions
   String? _validateNotEmpty(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return '$fieldName is required';
+      return 'مطلوب $fieldName';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'كلمة المرور مطلوبة';
     }
     if (value.length < 8) {
-      return 'Password must be at least 8 characters';
+      return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل';
     }
     return null;
   }
 
   String? _validateConfirmPassword(String? value) {
     if (value == null || value != _passwordController.text) {
-      return 'Passwords do not match';
+      return 'كلمات المرور غير متطابقة';
     }
     return null;
   }
 
   String? _validateMobileNumber(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Mobile number is required';
+      return 'رقم الجوال مطلوب';
     }
     if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
-      return 'Enter a valid mobile number';
+      return 'أدخل رقم جوال صحيح';
     }
     return null;
   }
 
   String? _validateDate(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Date of birth is required';
+      return 'تاريخ الميلاد مطلوب';
     }
     return null;
   }
 
   String? _validateGender(String? value) {
     if (value == null) {
-      return 'Gender is required';
+      return 'الجنس مطلوب';
     }
     return null;
   }
@@ -138,10 +138,11 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 2),
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
+              padding: EdgeInsets.all(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +152,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Create New Student Account",
+                        "إنشاء حساب طالب جديد",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -230,15 +231,15 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     );
   }
 
-  // Field builder methods (kept as reference - actual implementation remains unchanged)
   Widget _buildFirstNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("First Name *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الاسم الأول *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Enter first name",
+        hintText: "أدخل الاسم الأول",
         controller: _firstNameController,
-        validator: (value) => _validateNotEmpty(value, "First name"),
+        validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
       ),
     ],
   );
@@ -246,11 +247,12 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildLastNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Last Name *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الاسم الأخير *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Enter last name",
+        hintText: "أدخل الاسم الأخير",
         controller: _lastNameController,
-        validator: (value) => _validateNotEmpty(value, "Last name"),
+        validator: (value) => _validateNotEmpty(value, "الاسم الأخير"),
       ),
     ],
   );
@@ -258,11 +260,12 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildFatherNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Father's Name *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("اسم الأب *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Enter father's name",
+        hintText: "أدخل اسم الأب",
         controller: _fatherNameController,
-        validator: (value) => _validateNotEmpty(value, "Father's name"),
+        validator: (value) => _validateNotEmpty(value, "اسم الأب"),
       ),
     ],
   );
@@ -270,11 +273,12 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildUsernameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Username *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("اسم المستخدم *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Enter username",
+        hintText: "أدخل اسم المستخدم",
         controller: _usernameController,
-        validator: (value) => _validateNotEmpty(value, "Username"),
+        validator: (value) => _validateNotEmpty(value, "اسم المستخدم"),
       ),
     ],
   );
@@ -282,9 +286,10 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildMobileNumberField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Mobile Number *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("رقم الجوال *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Enter mobile number",
+        hintText: "أدخل رقم الجوال",
         controller: _mobileNumberController,
         validator: _validateMobileNumber,
       ),
@@ -294,12 +299,13 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildGenderField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Gender *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الجنس *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       DropdownButtonFormField<String>(
         value: _selectedGender,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'Select gender',
+          hintText: 'اختر الجنس',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -310,7 +316,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['Male', 'Female'].map((String value) {
+        items: ['ذكر', 'أنثى'].map((String value) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
@@ -324,7 +330,8 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildDateOfBirthField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Date of Birth *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("تاريخ الميلاد *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       TextFormField(
         controller: _dateController,
         decoration: InputDecoration(
@@ -351,7 +358,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        "Profile Image (Optional)",
+        "صورة الملف الشخصي (اختياري)",
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       Row(
@@ -367,12 +374,12 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildImagePickerButton() => InkWell(
     onTap: _pickImage,
     child: Stack(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.centerRight,
       children: [
         TextField(
           enabled: false,
           decoration: InputDecoration(
-            hintText: "Choose File ",
+            hintText: "اختر ملف",
             hintStyle: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -384,7 +391,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(left: 120, bottom: 2),
+          padding: EdgeInsets.only(right: 120, bottom: 2),
           child: Text(_fileName),
         ),
       ],
@@ -403,12 +410,11 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             : null,
       ),
       if (_imageBytes != null)
-        Positioned(
-          right: 0,
-          bottom: 0,
+        Padding(
+          padding: const EdgeInsets.only(right: 60, bottom: 60),
           child: IconButton(
             onPressed: () => setState(() => _imageBytes = null),
-            icon: Icon(Icons.cancel_outlined),
+            icon: Icon(Icons.cancel_outlined, color: Colors.red),
           ),
         ),
     ],
@@ -417,9 +423,10 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildPasswordField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Password *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("كلمة المرور *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Enter password",
+        hintText: "أدخل كلمة المرور",
         controller: _passwordController,
         obsecure: true,
         validator: _validatePassword,
@@ -430,9 +437,13 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildConfirmPasswordField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Confirm Password *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text(
+        "تأكيد كلمة المرور *",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 2),
       CustomTextField(
-        hintText: "Confirm password",
+        hintText: "أعد إدخال كلمة المرور",
         controller: _confirmPasswordController,
         obsecure: true,
         validator: _validateConfirmPassword,
@@ -443,12 +454,12 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildEducationLevelField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("Education Level *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("المستوى التعليمي *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
       DropdownButtonFormField<String>(
-        value: _selectedGender,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'Select education level',
+          hintText: 'اختر المستوى التعليمي',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -461,19 +472,19 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
         ),
         items:
             [
-              'High School',
-              'Associate Degree',
-              "Bachelor's Degree",
-              "Master's Degree",
-              "PhD",
-              'Other',
+              'الثانوية العامة',
+              'دبلوم',
+              'بكالوريوس',
+              'ماجستير',
+              'دكتوراه',
+              'أخرى',
             ].map((String value) {
               return DropdownMenuItem<String>(value: value, child: Text(value));
             }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedGender = newValue);
         },
-        validator: (value) => _validateNotEmpty(value, "Education level"),
+        validator: (value) => _validateNotEmpty(value, "المستوى التعليمي"),
       ),
     ],
   );
@@ -489,7 +500,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("Create Student"),
+          child: Text("إنشاء حساب الطالب"),
         ),
       ),
     ],

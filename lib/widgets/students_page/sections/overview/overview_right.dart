@@ -28,15 +28,21 @@ class OverviewRight extends StatelessWidget {
               Icon(Icons.school_outlined),
               SizedBox(width: 6),
               Text(
-                "Education",
+                "المعلومات التعليمية", // "Education"
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           SizedBox(height: 5),
-          OverviewRow(left: "University:", right: university),
-          OverviewRow(left: "Specialization:", right: specialization),
-          OverviewRow(left: "Education level:", right: level),
+          OverviewRow(left: "الجامعة:", right: university), // "University:"
+          OverviewRow(
+            left: "التخصص:",
+            right: specialization,
+          ), // "Specialization:"
+          OverviewRow(
+            left: "المستوى التعليمي:",
+            right: level,
+          ), // "Education level:"
         ],
       ),
     );

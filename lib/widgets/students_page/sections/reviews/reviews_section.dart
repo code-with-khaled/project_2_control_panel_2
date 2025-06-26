@@ -16,7 +16,7 @@ class ReviewsSection extends StatelessWidget {
             Icon(Icons.reviews_outlined),
             SizedBox(width: 6),
             Text(
-              "Courses Reviews",
+              "تقييمات الدورات", // "Courses Reviews"
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
@@ -41,11 +41,11 @@ class ReviewsSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "React Advanced",
+                          "رياكت المتقدم", // "React Advanced"
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "6/5/2025",
+                          "٦/٥/٢٠٢٥", // "6/5/2025" (Arabic numerals)
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 11,
@@ -54,7 +54,7 @@ class ReviewsSection extends StatelessWidget {
                         ),
                         SizedBox(height: 7),
                         Text(
-                          "Excellent course with great examples!",
+                          "دورة ممتازة مع أمثلة رائعة!", // "Excellent course with great examples!"
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
