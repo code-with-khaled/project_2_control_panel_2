@@ -1,4 +1,4 @@
-import 'package:control_panel_2/widgets/students_page/sections/reviews/rating_stars.dart';
+import 'package:control_panel_2/widgets/other/rating_stars.dart';
 import 'package:flutter/material.dart';
 
 class ReviewsSection extends StatelessWidget {

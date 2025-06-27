@@ -2,6 +2,7 @@ import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
 import 'package:control_panel_2/widgets/students_page/student_profile.dart';
+import 'package:control_panel_2/widgets/teachers_page/teacher_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,7 +16,7 @@ class TeachersPage extends StatefulWidget {
 class _TeachersPageState extends State<TeachersPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String _activeFilter = 'All Teachers'; // Current active filter type
+  String _activeFilter = 'جميع المعلمين'; // Current active filter type
 
   /// Filters and sorts teachers based on search query and active filter
   List<Map<String, dynamic>> get _filteredTeachers {
@@ -29,13 +30,13 @@ class _TeachersPageState extends State<TeachersPage> {
 
     // Apply additional sorting based on active filter
     switch (_activeFilter) {
-      case 'Newest':
+      case 'الأحدث':
         results.sort((a, b) => b['joinDate'].compareTo(a['joinDate']));
         break;
-      case 'Alphabetical':
+      case 'أبجدي':
         results.sort((a, b) => a['name'].compareTo(b['name']));
         break;
-      default: // 'All Teachers' - no additional sorting
+      default: // 'جميع المعلمين' - no additional sorting
         break;
     }
 
@@ -107,7 +108,7 @@ class _TeachersPageState extends State<TeachersPage> {
           children: [
             Flexible(
               child: Text(
-                "Teachers Management",
+                "إدارة المعلمين", // "Teachers Management"
                 style: GoogleFonts.montserrat(
                   color: Colors.black,
                   fontSize: 32,
@@ -118,7 +119,6 @@ class _TeachersPageState extends State<TeachersPage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ElevatedButton(
-                // onPressed: () => _showAddTeacherDialog(),
                 onPressed: () {},
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -126,7 +126,7 @@ class _TeachersPageState extends State<TeachersPage> {
                     children: [
                       Icon(Icons.add),
                       SizedBox(width: 10),
-                      Text("Create Teacher Account"),
+                      Text("إنشاء حساب معلم"), // "Create Teacher Account"
                     ],
                   ),
                 ),
@@ -135,7 +135,7 @@ class _TeachersPageState extends State<TeachersPage> {
           ],
         ),
         Text(
-          "Manage teachers accounts and profiles",
+          "إدارة حسابات وملفات المعلمين", // "Manage teachers accounts and profiles"
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
@@ -143,11 +143,6 @@ class _TeachersPageState extends State<TeachersPage> {
       ],
     );
   }
-
-  // Shows the add teacher dialog
-  // void _showAddTeacherDialog() {
-  //   showDialog(context: context, builder: (context) => AddTeacherDialog());
-  // }
 
   // Builds search and filter controls
   Widget _buildSearchSection() {
@@ -167,7 +162,8 @@ class _TeachersPageState extends State<TeachersPage> {
                 Expanded(
                   child: SearchField(
                     controller: _searchController,
-                    hintText: "Search teachers by name, or username",
+                    hintText:
+                        "ابحث عن المعلمين بالاسم أو اسم المستخدم", // Translated
                   ),
                 ),
                 SizedBox(width: 20),
@@ -180,7 +176,8 @@ class _TeachersPageState extends State<TeachersPage> {
               children: [
                 SearchField(
                   controller: _searchController,
-                  hintText: "Search teachers by name, or username",
+                  hintText:
+                      "ابحث عن المعلمين بالاسم أو اسم المستخدم", // Translated
                 ),
                 SizedBox(height: 15),
                 _buildFilterButtons(),
@@ -199,19 +196,19 @@ class _TeachersPageState extends State<TeachersPage> {
       runSpacing: 10,
       children: [
         SearchFilterButton(
-          text: "All Teachers",
-          isActive: _activeFilter == "All Teachers",
-          onPressed: () => _setFilter("All Teachers"),
+          text: "جميع المعلمين", // "All Teachers"
+          isActive: _activeFilter == "جميع المعلمين",
+          onPressed: () => _setFilter("جميع المعلمين"),
         ),
         SearchFilterButton(
-          text: "Newest",
-          isActive: _activeFilter == "Newest",
-          onPressed: () => _setFilter("Newest"),
+          text: "الأحدث", // "Newest"
+          isActive: _activeFilter == "الأحدث",
+          onPressed: () => _setFilter("الأحدث"),
         ),
         SearchFilterButton(
-          text: "Alphabetical",
-          isActive: _activeFilter == "Alphabetical",
-          onPressed: () => _setFilter("Alphabetical"),
+          text: "أبجدي", // "Alphabetical"
+          isActive: _activeFilter == "أبجدي",
+          onPressed: () => _setFilter("أبجدي"),
         ),
       ],
     );
@@ -241,7 +238,7 @@ class _TeachersPageState extends State<TeachersPage> {
                 width:
                     (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
                     itemsPerRow,
-                child: StudentProfile(
+                child: TeacherProfile(
                   name: teacher['name'],
                   username: teacher['username'],
                   email: teacher['email'],
@@ -254,13 +251,13 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
-  // Builds responsive teacher grid
+  // Builds empty state message
   Widget _buildEmptyState() {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(40),
         child: Text(
-          'No Teachers found',
+          'لا يوجد معلمون', // "No Teachers found"
           style: TextStyle(fontSize: 18, color: Colors.grey),
         ),
       ),

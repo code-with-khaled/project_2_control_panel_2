@@ -1,32 +1,29 @@
-import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_student_dialog.dart';
-import 'package:control_panel_2/widgets/students_page/dialogs/send_notification_dialog.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
-import 'package:control_panel_2/widgets/students_page/sections/discounts/discounts_section.dart';
-import 'package:control_panel_2/widgets/students_page/sections/overview/overview_section.dart';
-import 'package:control_panel_2/widgets/students_page/sections/receipts/receipts_section.dart';
-import 'package:control_panel_2/widgets/students_page/sections/reviews/reviews_section.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/courses/teacher_courses_section.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/info/teacher_info_section.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/reviews/teacher_reviews_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Dialog displaying comprehensive student profile information
+/// Dialog displaying comprehensive teacher profile information
 ///
 /// Shows [name] and [username] with tabbed sections for different profile aspects
-class StudentProfileDialog extends StatefulWidget {
+class TeacherProfileDialog extends StatefulWidget {
   final String name;
   final String username;
 
-  const StudentProfileDialog({
+  const TeacherProfileDialog({
     super.key,
     required this.name,
     required this.username,
   });
 
   @override
-  State<StudentProfileDialog> createState() => _StudentProfileDialogState();
+  State<TeacherProfileDialog> createState() => _TeacherProfileDialogState();
 }
 
-class _StudentProfileDialogState extends State<StudentProfileDialog> {
-  String _activeFilter = 'نظرة عامة'; // Currently selected section
+class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
+  String _activeFilter = 'المعلومات الشخصية'; // Currently selected section
 
   /// Updates the active section filter
   void _setFilter(String filter) {
@@ -68,7 +65,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
 
                 // Navigation tabs for different sections
                 _buildNavigationTabs(),
-                SizedBox(height: 24),
+                SizedBox(height: 10),
 
                 // Dynamic content section
                 _buildCurrentSection(),
@@ -88,7 +85,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       children: [
         // Dialog title
         Text(
-          "الملف الشخصي للطالب",
+          "الملف الشخصي للمدرس",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
@@ -132,12 +129,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
   // Builds notification action button
   Widget _buildNotificationButton() {
     return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => SendNotificationDialog(),
-        );
-      },
+      onPressed: () {},
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
@@ -157,13 +149,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
   // Builds enroll action button
   Widget _buildEnrollButton() {
     return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) =>
-              EnrollStudentDialog(name: widget.name, username: widget.username),
-        );
-      },
+      onPressed: () {},
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -232,36 +218,36 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
           // Overview tab
           Expanded(
             child: NavButton(
-              navkey: "نظرة عامة",
-              isActive: _activeFilter == "نظرة عامة",
-              onTap: () => _setFilter("نظرة عامة"),
+              navkey: "المعلومات الشخصية",
+              isActive: _activeFilter == "المعلومات الشخصية",
+              onTap: () => _setFilter("المعلومات الشخصية"),
             ),
           ),
 
           // Receipts tab
           Expanded(
             child: NavButton(
-              navkey: "الفواتير",
-              isActive: _activeFilter == "الفواتير",
-              onTap: () => _setFilter("الفواتير"),
+              navkey: "الكورسات",
+              isActive: _activeFilter == "الكورسات",
+              onTap: () => _setFilter("الكورسات"),
             ),
           ),
 
           // Discounts tab
           Expanded(
             child: NavButton(
-              navkey: "الخصومات",
-              isActive: _activeFilter == "الخصومات",
-              onTap: () => _setFilter("الخصومات"),
+              navkey: "المراجعات",
+              isActive: _activeFilter == "المراجعات",
+              onTap: () => _setFilter("المراجعات"),
             ),
           ),
 
           // Reviews tab
           Expanded(
             child: NavButton(
-              navkey: "التقييمات",
-              isActive: _activeFilter == "التقييمات",
-              onTap: () => _setFilter("التقييمات"),
+              navkey: "اللوحة الإحصائية",
+              isActive: _activeFilter == "اللوحة الإحصائية",
+              onTap: () => _setFilter("اللوحة الإحصائية"),
             ),
           ),
         ],
@@ -272,14 +258,23 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
   /// Returns the appropriate content section based on active filter
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
-      case "الفواتير":
-        return ReceiptsSection();
-      case "الخصومات":
-        return DiscountsSection();
-      case "التقييمات":
-        return ReviewsSection();
+      case "الكورسات":
+        return TeacherCoursesSection();
+      case "المراجعات":
+        return TeacherReviewsSection();
+      case "اللوحة الإحصائية":
+        return TeacherStatPanelSection();
       default:
-        return OverviewSection(name: widget.name, username: widget.username);
+        return TeacherInfoSection();
     }
+  }
+}
+
+class TeacherStatPanelSection extends StatelessWidget {
+  const TeacherStatPanelSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(mainAxisSize: MainAxisSize.min, children: []);
   }
 }

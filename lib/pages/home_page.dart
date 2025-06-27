@@ -1,6 +1,6 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/constants/sections_consts.dart';
-import 'package:control_panel_2/widgets/section_widget.dart';
+import 'package:control_panel_2/widgets/other/section_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
