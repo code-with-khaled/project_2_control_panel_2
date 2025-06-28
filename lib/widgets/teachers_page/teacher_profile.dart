@@ -1,4 +1,3 @@
-import 'package:control_panel_2/widgets/students_page/dialogs/student_profile_dialog.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/teacher_profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

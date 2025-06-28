@@ -1,7 +1,8 @@
 import 'package:control_panel_2/constants/all_teachers.dart';
+import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
-import 'package:control_panel_2/widgets/students_page/student_profile.dart';
+import 'package:control_panel_2/widgets/teachers_page/dialogs/add_teacher_dialog.dart';
 import 'package:control_panel_2/widgets/teachers_page/teacher_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -70,26 +71,31 @@ class _TeachersPageState extends State<TeachersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 1280), // Max content width
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Page header with title and create button
-                  _buildPageHeader(),
-                  SizedBox(height: 25),
+      body: Container(
+        color: CustomColors.homepageBg,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 1280,
+                ), // Max content width
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Page header with title and create button
+                    _buildPageHeader(),
+                    SizedBox(height: 25),
 
-                  // Search and filter section
-                  _buildSearchSection(),
-                  SizedBox(height: 25),
+                    // Search and filter section
+                    _buildSearchSection(),
+                    SizedBox(height: 25),
 
-                  // Responsive teacher grid
-                  _buildTeacherGrid(),
-                ],
+                    // Responsive teacher grid
+                    _buildTeacherGrid(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -119,7 +125,9 @@ class _TeachersPageState extends State<TeachersPage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showAddStudentDialog();
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(
@@ -144,6 +152,11 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
+  // Shows the add teacher dialog
+  void _showAddStudentDialog() {
+    showDialog(context: context, builder: (context) => AddTeacherDialog());
+  }
+
   // Builds search and filter controls
   Widget _buildSearchSection() {
     return Container(
@@ -151,6 +164,7 @@ class _TeachersPageState extends State<TeachersPage> {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black26),
         borderRadius: BorderRadius.circular(6),
+        color: Colors.white,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {

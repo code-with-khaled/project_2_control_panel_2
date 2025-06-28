@@ -2,6 +2,7 @@ import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/courses/teacher_courses_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/info/teacher_info_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/reviews/teacher_reviews_section.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/stat_panel/teacher_stat_panel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -40,7 +41,7 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 1000, // Wider dialog for profile content
+          maxWidth: 800, // Wider dialog for profile content
           maxHeight:
               MediaQuery.of(context).size.height * 0.8, // 80% screen height
         ),
@@ -88,89 +89,13 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
           "الملف الشخصي للمدرس",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-
-        // Action buttons container
-        Flexible(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Wrapped buttons for responsive layout
-              Flexible(
-                child: Wrap(
-                  spacing: 5,
-                  runSpacing: 5,
-                  runAlignment: WrapAlignment.end,
-                  children: [
-                    // Notification button
-                    _buildNotificationButton(),
-
-                    // Enroll button
-                    _buildEnrollButton(),
-                  ],
-                ),
-              ),
-              SizedBox(width: 10),
-
-              // Close button
-              IconButton(
-                icon: Icon(Icons.close, size: 20),
-                onPressed: () => Navigator.pop(context),
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints(),
-              ),
-            ],
-          ),
+        IconButton(
+          icon: Icon(Icons.close, size: 20),
+          onPressed: () => Navigator.pop(context),
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(),
         ),
       ],
-    );
-  }
-
-  // Builds notification action button
-  Widget _buildNotificationButton() {
-    return ElevatedButton(
-      onPressed: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.notifications_outlined),
-            SizedBox(width: 10),
-            Flexible(
-              child: Text("إرسال إشعار", overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Builds enroll action button
-  Widget _buildEnrollButton() {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-          side: BorderSide(color: Colors.black12),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.person_add_alt),
-            SizedBox(width: 10),
-            Flexible(
-              child: Text("تسجيل في دورة", overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -267,14 +192,5 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
       default:
         return TeacherInfoSection();
     }
-  }
-}
-
-class TeacherStatPanelSection extends StatelessWidget {
-  const TeacherStatPanelSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(mainAxisSize: MainAxisSize.min, children: []);
   }
 }

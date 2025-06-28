@@ -1,4 +1,5 @@
 import 'package:control_panel_2/constants/all_students.dart';
+import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/add_student_dialog.dart';
@@ -76,26 +77,31 @@ class _StudentsPageState extends State<StudentsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 1280), // Max content width
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Page header with title and create button
-                  _buildPageHeader(),
-                  SizedBox(height: 25),
+      body: Container(
+        color: CustomColors.homepageBg,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 1280,
+                ), // Max content width
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Page header with title and create button
+                    _buildPageHeader(),
+                    SizedBox(height: 25),
 
-                  // Search and filter section
-                  _buildSearchSection(),
-                  SizedBox(height: 25),
+                    // Search and filter section
+                    _buildSearchSection(),
+                    SizedBox(height: 25),
 
-                  // Responsive student grid
-                  _buildStudentGrid(),
-                ],
+                    // Responsive student grid
+                    _buildStudentGrid(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -162,6 +168,7 @@ class _StudentsPageState extends State<StudentsPage> {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black26),
         borderRadius: BorderRadius.circular(6),
+        color: Colors.white,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {

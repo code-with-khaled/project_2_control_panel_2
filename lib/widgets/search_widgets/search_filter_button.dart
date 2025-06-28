@@ -23,7 +23,7 @@ class SearchFilterButton extends StatelessWidget {
             color: isActive ? Colors.transparent : Colors.black26,
           ),
           borderRadius: BorderRadius.circular(6),
-          color: isActive ? Colors.blue : null,
+          color: isActive ? Colors.blue : Colors.white,
         ),
         child: Text(
           text,
