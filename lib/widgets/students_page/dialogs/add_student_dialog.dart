@@ -31,6 +31,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   DateTime? _selectedDate;
   Uint8List? _imageBytes;
   String _fileName = "لم يتم اختيار ملف";
+  String? _selectedEducationLevel;
 
   // Date picker function
   Future<void> _selectDate(BuildContext context) async {
@@ -457,6 +458,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       Text("المستوى التعليمي *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       DropdownButtonFormField<String>(
+        value: _selectedEducationLevel,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           hintText: 'اختر المستوى التعليمي',
@@ -482,7 +484,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
               return DropdownMenuItem<String>(value: value, child: Text(value));
             }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedGender = newValue);
+          setState(() => _selectedEducationLevel = newValue);
         },
         validator: (value) => _validateNotEmpty(value, "المستوى التعليمي"),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
+  final int? maxLines;
   final bool? obsecure;
   final String? Function(String?)? validator;
 
@@ -12,12 +13,14 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     this.obsecure,
     this.validator,
+    this.maxLines,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      maxLines: maxLines,
       cursorColor: Colors.blue,
       decoration: InputDecoration(
         hintText: hintText,
