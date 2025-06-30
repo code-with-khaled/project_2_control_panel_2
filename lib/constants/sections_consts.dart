@@ -44,6 +44,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "العروض الترويجية", // "Promotional Offers"
     "description":
         "إدارة الحملات الترويجية، إشعارات الإعلانات وبرامج الخصومات.", // Translated
+    "route": "/promotions",
   },
   {
     "icon": Icon(Icons.receipt_long_outlined, color: Colors.green),

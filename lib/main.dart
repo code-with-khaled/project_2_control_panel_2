@@ -1,4 +1,5 @@
 import 'package:control_panel_2/pages/home_page.dart';
+import 'package:control_panel_2/pages/promotions_page.dart';
 import 'package:control_panel_2/pages/students_page.dart';
 import 'package:control_panel_2/pages/teachers_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/students': (context) => StudentsPage(),
           '/teachers': (context) => TeachersPage(),
+          '/promotions': (context) => PromotionsPage(),
         },
       ),
     );
