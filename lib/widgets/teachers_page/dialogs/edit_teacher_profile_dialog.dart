@@ -1,70 +1,41 @@
 import 'dart:typed_data';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:file_picker/file_picker.dart';
 
-class AddStudentDialog extends StatefulWidget {
-  const AddStudentDialog({super.key});
+import 'package:control_panel_2/models/teacher_model.dart';
+import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+
+class EditTeacherProfileDialog extends StatefulWidget {
+  final Teacher teacher;
+
+  const EditTeacherProfileDialog({super.key, required this.teacher});
 
   @override
-  State<AddStudentDialog> createState() => _AddStudentDialogState();
+  State<EditTeacherProfileDialog> createState() =>
+      _EditTeacherProfileDialogState();
 }
 
-class _AddStudentDialogState extends State<AddStudentDialog> {
+class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   // Form key for validation control
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for all form fields
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _fatherNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _mobileNumberController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _specializationController =
       TextEditingController();
+  final TextEditingController _certificatesController = TextEditingController();
+  final TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
-  String? _selectedGender;
-  DateTime? _selectedDate;
   Uint8List? _imageBytes;
-  String _fileName = "لم يتم اختيار ملف";
   String? _selectedEducationLevel;
-
-  // Date picker function
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.grey[300]!,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: Colors.blue),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        _dateController.text = DateFormat('MM/dd/yyyy').format(picked);
-      });
-    }
-  }
 
   // Image picker function
   Future<void> _pickImage() async {
@@ -75,9 +46,49 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     if (result != null && result.files.single.bytes != null) {
       setState(() {
         _imageBytes = result.files.single.bytes;
-        _fileName = result.files.single.name;
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize controllers with teacher data
+    _firstNameController.text = widget.teacher.firstName;
+    _lastNameController.text = widget.teacher.lastName;
+    _usernameController.text = widget.teacher.username;
+    _mobileNumberController.text = widget.teacher.mobileNumber;
+
+    // Password fields are intentionally left empty for security
+    _passwordController.text = '';
+    _confirmPasswordController.text = '';
+
+    _specializationController.text = widget.teacher.specialization;
+    _certificatesController.text = widget.teacher.certificates;
+    _experienceController.text = widget.teacher.experience;
+    _descriptionController.text = widget.teacher.description;
+
+    // Set the education level dropdown value
+    _selectedEducationLevel = widget.teacher.educationLevel;
+
+    // Set the profile image if it exists
+    _imageBytes = widget.teacher.profileImage;
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _usernameController.dispose();
+    _mobileNumberController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _specializationController.dispose();
+    _certificatesController.dispose();
+    _experienceController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   // Validation functions
@@ -115,23 +126,30 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     return null;
   }
 
-  String? _validateDate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'تاريخ الميلاد مطلوب';
-    }
-    return null;
-  }
-
-  String? _validateGender(String? value) {
-    if (value == null) {
-      return 'الجنس مطلوب';
-    }
-    return null;
-  }
-
   String? _validateSpecialization(String? value) {
     if (value == null || value.isEmpty) {
       return 'التخصص مطلوب';
+    }
+    return null;
+  }
+
+  String? _validateCertifications(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الشهدات مطلوبة';
+    }
+    return null;
+  }
+
+  String? _validateExperience(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الخبرة مطلوبة';
+    }
+    return null;
+  }
+
+  String? _validateDescription(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الوصف مطلوب';
     }
     return null;
   }
@@ -162,7 +180,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "إنشاء حساب طالب جديد",
+                        "تعديل بيانات المدرس",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -179,7 +197,11 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   ),
                   SizedBox(height: 25),
 
-                  // First Name and Last Name fields
+                  // Profile Picture
+                  _buildProfilePicture(),
+                  SizedBox(height: 25),
+
+                  // First Name and last name fields
                   Row(
                     children: [
                       Expanded(child: _buildFirstNameField()),
@@ -189,32 +211,13 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   ),
                   SizedBox(height: 25),
 
-                  // Father's Name field
-                  _buildFatherNameField(),
+                  // Username field
+                  _buildUsernameField(),
                   SizedBox(height: 25),
 
-                  // Username and Mobile Number fields
-                  Row(
-                    children: [
-                      Expanded(child: _buildUsernameField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildMobileNumberField()),
-                    ],
-                  ),
+                  // Phone Number field
+                  _buildMobileNumberField(),
                   SizedBox(height: 25),
-
-                  // Gender and Date of Birth fields
-                  Row(
-                    children: [
-                      Expanded(child: _buildGenderField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildDateOfBirthField()),
-                    ],
-                  ),
-                  SizedBox(height: 25),
-
-                  // Profile Image section
-                  _buildProfileImageSection(),
 
                   // Password fields
                   Row(
@@ -226,7 +229,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   ),
                   SizedBox(height: 20),
 
-                  // Education Level field
+                  // Education Level and Specialization fields
                   Row(
                     children: [
                       Expanded(child: _buildEducationLevelField()),
@@ -236,6 +239,18 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   ),
                   SizedBox(height: 25),
 
+                  // Certificates field
+                  _buildCertificatesField(),
+                  SizedBox(height: 25),
+
+                  // Work Experience field
+                  _buildWorkExperienceField(),
+                  SizedBox(height: 25),
+
+                  // Short Description field
+                  _buildDescriptionField(),
+                  SizedBox(height: 25),
+
                   // Submit button
                   _buildSubmitButton(),
                 ],
@@ -243,6 +258,72 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfilePicture() {
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            "الصورة الشخصية (اختياري)",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: _imageBytes != null
+                    ? MemoryImage(_imageBytes!)
+                    : null,
+                child: _imageBytes == null
+                    ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
+                    : null,
+              ),
+              if (_imageBytes != null)
+                Positioned(
+                  top: 1,
+                  right: 1,
+                  child: IconButton(
+                    onPressed: () => setState(() => _imageBytes = null),
+                    icon: Icon(Icons.cancel_outlined, color: Colors.red),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 15),
+          ElevatedButton(
+            onPressed: () {
+              _pickImage();
+            },
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: BorderSide(color: Colors.black12),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.file_upload_outlined),
+                  SizedBox(width: 5),
+                  Text(
+                    "تحميل الصورة",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -273,19 +354,6 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     ],
   );
 
-  Widget _buildFatherNameField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("اسم الأب *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أدخل اسم الأب",
-        controller: _fatherNameController,
-        validator: (value) => _validateNotEmpty(value, "اسم الأب"),
-      ),
-    ],
-  );
-
   Widget _buildUsernameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -307,132 +375,8 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       CustomTextField(
         hintText: "أدخل رقم الجوال",
         controller: _mobileNumberController,
-        validator: _validateMobileNumber,
+        validator: (value) => _validateMobileNumber(value),
       ),
-    ],
-  );
-
-  Widget _buildGenderField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("الجنس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      DropdownButtonFormField<String>(
-        value: _selectedGender,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر الجنس',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        items: ['ذكر', 'أنثى'].map((String value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedGender = newValue);
-        },
-        validator: _validateGender,
-      ),
-    ],
-  );
-
-  Widget _buildDateOfBirthField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("تاريخ الميلاد *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      TextFormField(
-        controller: _dateController,
-        decoration: InputDecoration(
-          hintText: 'mm/dd/yyyy',
-          suffixIcon: Icon(Icons.calendar_today),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        readOnly: true,
-        onTap: () => _selectDate(context),
-        validator: _validateDate,
-      ),
-    ],
-  );
-
-  Widget _buildProfileImageSection() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "صورة الملف الشخصي (اختياري)",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      Row(
-        children: [
-          Expanded(child: _buildImagePickerButton()),
-          SizedBox(width: 15),
-          _buildImagePreview(),
-        ],
-      ),
-    ],
-  );
-
-  Widget _buildImagePickerButton() => InkWell(
-    onTap: _pickImage,
-    child: Stack(
-      alignment: Alignment.centerRight,
-      children: [
-        TextField(
-          enabled: false,
-          decoration: InputDecoration(
-            hintText: "اختر ملف",
-            hintStyle: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black26),
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(right: 120, bottom: 2),
-          child: Text(_fileName),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildImagePreview() => Stack(
-    alignment: Alignment.center,
-    children: [
-      CircleAvatar(
-        radius: 40,
-        backgroundColor: Colors.grey[200],
-        backgroundImage: _imageBytes != null ? MemoryImage(_imageBytes!) : null,
-        child: _imageBytes == null
-            ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
-            : null,
-      ),
-      if (_imageBytes != null)
-        Padding(
-          padding: const EdgeInsets.only(right: 60, bottom: 60),
-          child: IconButton(
-            onPressed: () => setState(() => _imageBytes = null),
-            icon: Icon(Icons.cancel_outlined, color: Colors.red),
-          ),
-        ),
     ],
   );
 
@@ -489,17 +433,11 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items:
-            [
-              'الثانوية العامة',
-              'دبلوم',
-              'بكالوريوس',
-              'ماجستير',
-              'دكتوراه',
-              'أخرى',
-            ].map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            }).toList(),
+        items: ['دبلوم', 'بكالوريوس', 'ماجستير', 'دكتوراه', 'أخرى'].map((
+          String value,
+        ) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
+        }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
         },
@@ -508,25 +446,59 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     ],
   );
 
-  Widget _buildSpecializationField() {
-    if (_selectedEducationLevel == 'الثانوية العامة' ||
-        _selectedEducationLevel == null) {
-      return Spacer();
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("التخصص *", style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 2),
-          CustomTextField(
-            hintText: "مثال: رياضيات، فنون، إعلام",
-            controller: _specializationController,
-            validator: _validateSpecialization,
-          ),
-        ],
-      );
-    }
-  }
+  Widget _buildSpecializationField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("التخصص الجامعي *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      CustomTextField(
+        hintText: "مثال: رياضيات، كيمياء",
+        controller: _specializationController,
+        validator: _validateSpecialization,
+      ),
+    ],
+  );
+
+  Widget _buildCertificatesField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("الشهادات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      CustomTextField(
+        hintText: "أدخل الشهادات ذات الصلة والمؤهلات",
+        controller: _certificatesController,
+        maxLines: 3,
+        validator: _validateCertifications,
+      ),
+    ],
+  );
+
+  Widget _buildWorkExperienceField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("سنوات الخبرة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      CustomTextField(
+        hintText: "مثال:  5 سنوات",
+        controller: _experienceController,
+        validator: _validateExperience,
+      ),
+    ],
+  );
+
+  Widget _buildDescriptionField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("وصف قصير *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      CustomTextField(
+        hintText: "شرح مختصر حول خلفية المدرس و خبرته",
+        maxLines: 4,
+        controller: _descriptionController,
+        validator: _validateDescription,
+      ),
+    ],
+  );
 
   Widget _buildSubmitButton() => Row(
     mainAxisAlignment: MainAxisAlignment.end,
@@ -539,7 +511,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء حساب الطالب"),
+          child: Text("حفظ التعديلات"),
         ),
       ),
     ],

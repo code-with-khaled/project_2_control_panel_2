@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TeacherCoursesSection extends StatefulWidget {
   const TeacherCoursesSection({super.key});
@@ -8,8 +9,79 @@ class TeacherCoursesSection extends StatefulWidget {
 }
 
 class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
-  String? dropdownValue = "جميع المدرسين";
+  String? dropdownValue = "جميع الكورسات";
   String? dropdownValue2 = "الأحدث";
+
+  // Date formatter instance
+  final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy', 'ar');
+
+  final List<Map<String, dynamic>> _courses = [
+    {
+      "title": "الفيزياء للمهندسين",
+      "isPublished": false,
+      "enrolledCount": 0,
+      "rating": 3.9,
+      "date": DateTime(2024, 1, 10), // Using DateTime instead of string
+    },
+    {
+      "title": "الدارات الكهربائية",
+      "isPublished": true,
+      "enrolledCount": 156,
+      "rating": 4.6,
+      "date": DateTime(2023, 6, 15),
+    },
+    {
+      "title": "الرياضيات المتقدمة",
+      "isPublished": true,
+      "enrolledCount": 89,
+      "rating": 4.8,
+      "date": DateTime(2024, 3, 5),
+    },
+    {
+      "title": "برمجة التطبيقات",
+      "isPublished": false,
+      "enrolledCount": 0,
+      "rating": null,
+      "date": DateTime(2024, 2, 20),
+    },
+    // Add more courses as needed
+  ];
+  List<Map<String, dynamic>> _filteredCourses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _applyFilters(); // Initialize filtered list
+  }
+
+  void _applyFilters() {
+    setState(() {
+      _filteredCourses = _courses.where((course) {
+        // Apply dropdown filter
+        return dropdownValue == "جميع الكورسات" ||
+            (dropdownValue == "المنشورة" && course['isPublished']) ||
+            (dropdownValue == "غير المنشورة" && !course['isPublished']);
+      }).toList();
+
+      // Apply sorting
+      if (dropdownValue2 == "الأعلى تقييم") {
+        _filteredCourses.sort((a, b) {
+          final aRating = a['rating'] ?? 0.0;
+          final bRating = b['rating'] ?? 0.0;
+          return (bRating as double).compareTo(aRating as double);
+        });
+      } else if (dropdownValue2 == "عدد الطلاب") {
+        _filteredCourses.sort(
+          (a, b) => (b['enrolledCount'] as double).compareTo(
+            a['enrolledCount'] as double,
+          ),
+        );
+      } else {
+        // Default sort by date (assuming newer dates come first)
+        _filteredCourses.sort((a, b) => b['date'].compareTo(a['date']));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +110,10 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                 onChanged: (String? newValue) {
                   setState(() {
                     dropdownValue = newValue;
+                    _applyFilters();
                   });
                 },
-                items: <String>['جميع المدرسين', 'المنشورة', 'غير المنشورة']
+                items: <String>['جميع الكورسات', 'المنشورة', 'غير المنشورة']
                     .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -70,6 +143,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                 onChanged: (String? newValue) {
                   setState(() {
                     dropdownValue2 = newValue;
+                    _applyFilters();
                   });
                 },
                 items: <String>['الأحدث', 'الأعلى تقييم', 'عدد الطلاب']
@@ -88,23 +162,20 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
 
         // Courses list
         Column(
-          children: [
-            _buildCourseCard(
-              title: "الفيزياء للمهندسين",
-              isPublished: false,
-              enrolledCount: 0,
-              rating: 3.9,
-              lastUpdated: "1/10/2024",
-            ),
-            SizedBox(height: 16),
-            _buildCourseCard(
-              title: "الدارات الكهربائية",
-              isPublished: true,
-              enrolledCount: 156,
-              rating: 4.6,
-              lastUpdated: "6/15/2023",
-            ),
-          ],
+          children: _filteredCourses.map((course) {
+            return Column(
+              children: [
+                _buildCourseCard(
+                  title: course['title'],
+                  isPublished: course['isPublished'],
+                  enrolledCount: course['enrolledCount'],
+                  rating: course['rating'],
+                  date: course['date'],
+                ),
+                SizedBox(height: 16),
+              ],
+            );
+          }).toList(),
         ),
       ],
     );
@@ -114,8 +185,8 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
     required String title,
     required bool isPublished,
     required int enrolledCount,
-    required dynamic rating, // Can be double or null
-    required String lastUpdated,
+    required dynamic rating,
+    required DateTime date,
   }) {
     return Container(
       padding: EdgeInsets.all(20),
@@ -179,7 +250,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                 children: [
                   Icon(Icons.star, size: 16, color: Colors.yellow),
                   SizedBox(width: 4),
-                  Text("$rating/5.0"),
+                  rating == null ? Text("لا يوجد تقييم") : Text("$rating/5.0"),
                 ],
               ),
               SizedBox(width: 16),
@@ -193,7 +264,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                     color: Colors.grey,
                   ),
                   SizedBox(width: 4),
-                  Text(lastUpdated),
+                  Text(_dateFormatter.format(date)),
                 ],
               ),
             ],

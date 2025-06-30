@@ -26,6 +26,8 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   final TextEditingController _specializationController =
       TextEditingController();
   final TextEditingController _certificatesController = TextEditingController();
+  final TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
   Uint8List? _imageBytes;
@@ -44,6 +46,69 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
         _fileName = result.files.single.name;
       });
     }
+  }
+
+  // Validation functions
+  String? _validateNotEmpty(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      return 'مطلوب $fieldName';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'كلمة المرور مطلوبة';
+    }
+    if (value.length < 8) {
+      return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value != _passwordController.text) {
+      return 'كلمات المرور غير متطابقة';
+    }
+    return null;
+  }
+
+  String? _validateMobileNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'رقم الجوال مطلوب';
+    }
+    if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
+      return 'أدخل رقم جوال صحيح';
+    }
+    return null;
+  }
+
+  String? _validateSpecialization(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'التخصص مطلوب';
+    }
+    return null;
+  }
+
+  String? _validateCertifications(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الشهدات مطلوبة';
+    }
+    return null;
+  }
+
+  String? _validateExperience(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الخبرة مطلوبة';
+    }
+    return null;
+  }
+
+  String? _validateDescription(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الوصف مطلوب';
+    }
+    return null;
   }
 
   @override
@@ -228,7 +293,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "أدخل الاسم الأول",
         controller: _firstNameController,
-        // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+        validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
       ),
     ],
   );
@@ -241,7 +306,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "أدخل الاسم الأخير",
         controller: _lastNameController,
-        // validator: (value) => _validateNotEmpty(value, "الاسم الأخير"),
+        validator: (value) => _validateNotEmpty(value, "الاسم الأخير"),
       ),
     ],
   );
@@ -254,7 +319,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "أدخل اسم المستخدم",
         controller: _usernameController,
-        // validator: (value) => _validateNotEmpty(value, "اسم المستخدم"),
+        validator: (value) => _validateNotEmpty(value, "اسم المستخدم"),
       ),
     ],
   );
@@ -267,7 +332,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "أدخل رقم الجوال",
         controller: _mobileNumberController,
-        // validator: (value) => _validateNotEmpty(value, "رقم الجوال"),
+        validator: (value) => _validateMobileNumber(value),
       ),
     ],
   );
@@ -282,7 +347,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
         controller: _passwordController,
         maxLines: 1,
         obsecure: true,
-        // validator: _validatePassword,
+        validator: _validatePassword,
       ),
     ],
   );
@@ -300,7 +365,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
         controller: _confirmPasswordController,
         maxLines: 1,
         obsecure: true,
-        // validator: _validateConfirmPassword,
+        validator: _validateConfirmPassword,
       ),
     ],
   );
@@ -333,7 +398,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
         },
-        // validator: (value) => _validateNotEmpty(value, "المستوى التعليمي"),
+        validator: (value) => _validateNotEmpty(value, "المستوى التعليمي"),
       ),
     ],
   );
@@ -346,7 +411,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "مثال: رياضيات، كيمياء",
         controller: _specializationController,
-        // validator: _validateConfirmPassword,
+        validator: _validateSpecialization,
       ),
     ],
   );
@@ -354,13 +419,13 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   Widget _buildCertificatesField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الشهادات", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الشهادات *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       CustomTextField(
         hintText: "أدخل الشهادات ذات الصلة والمؤهلات",
         controller: _certificatesController,
         maxLines: 3,
-        // validator: _validateConfirmPassword,
+        validator: _validateCertifications,
       ),
     ],
   );
@@ -372,8 +437,8 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       SizedBox(height: 2),
       CustomTextField(
         hintText: "مثال:  5 سنوات",
-        controller: _specializationController,
-        // validator: _validateConfirmPassword,
+        controller: _experienceController,
+        validator: _validateExperience,
       ),
     ],
   );
@@ -381,13 +446,13 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   Widget _buildDescriptionField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("وصف قصير", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("وصف قصير *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       CustomTextField(
         hintText: "شرح مختصر حول خلفية المدرس و خبرته",
         maxLines: 4,
-        controller: _specializationController,
-        // validator: _validateConfirmPassword,
+        controller: _descriptionController,
+        validator: _validateDescription,
       ),
     ],
   );

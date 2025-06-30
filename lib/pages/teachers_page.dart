@@ -1,5 +1,6 @@
 import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
+import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/add_teacher_dialog.dart';
@@ -17,14 +18,14 @@ class TeachersPage extends StatefulWidget {
 class _TeachersPageState extends State<TeachersPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String _activeFilter = 'جميع المعلمين'; // Current active filter type
+  String _activeFilter = 'جميع المعلمين';
 
   /// Filters and sorts teachers based on search query and active filter
-  List<Map<String, dynamic>> get _filteredTeachers {
+  List<Teacher> get _filteredTeachers {
     // Initial filtering by search query
-    List<Map<String, dynamic>> results = allTeachers.where((teacher) {
-      final name = teacher['name'].toString().toLowerCase();
-      final username = teacher['username'].toString().toLowerCase();
+    List<Teacher> results = allTeachers.where((teacher) {
+      final name = teacher.fullName.toLowerCase();
+      final username = teacher.username.toLowerCase();
       final query = _searchQuery.toLowerCase();
       return name.contains(query) || username.contains(query);
     }).toList();
@@ -32,10 +33,10 @@ class _TeachersPageState extends State<TeachersPage> {
     // Apply additional sorting based on active filter
     switch (_activeFilter) {
       case 'الأحدث':
-        results.sort((a, b) => b['joinDate'].compareTo(a['joinDate']));
+        results.sort((a, b) => b.joinDate.compareTo(a.joinDate));
         break;
       case 'أبجدي':
-        results.sort((a, b) => a['name'].compareTo(b['name']));
+        results.sort((a, b) => a.fullName.compareTo(b.fullName));
         break;
       default: // 'جميع المعلمين' - no additional sorting
         break;
@@ -60,7 +61,6 @@ class _TeachersPageState extends State<TeachersPage> {
   @override
   void initState() {
     super.initState();
-    // Listen for search query changes
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text;
@@ -78,21 +78,14 @@ class _TeachersPageState extends State<TeachersPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 1280,
-                ), // Max content width
+                constraints: const BoxConstraints(maxWidth: 1280),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Page header with title and create button
                     _buildPageHeader(),
-                    SizedBox(height: 25),
-
-                    // Search and filter section
+                    const SizedBox(height: 25),
                     _buildSearchSection(),
-                    SizedBox(height: 25),
-
-                    // Responsive teacher grid
+                    const SizedBox(height: 25),
                     _buildTeacherGrid(),
                   ],
                 ),
@@ -104,7 +97,6 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
-  // Builds page header with title and create button
   Widget _buildPageHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +106,7 @@ class _TeachersPageState extends State<TeachersPage> {
           children: [
             Flexible(
               child: Text(
-                "إدارة المعلمين", // "Teachers Management"
+                "إدارة المعلمين",
                 style: GoogleFonts.montserrat(
                   color: Colors.black,
                   fontSize: 32,
@@ -125,16 +117,14 @@ class _TeachersPageState extends State<TeachersPage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ElevatedButton(
-                onPressed: () {
-                  _showAddStudentDialog();
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                onPressed: _showAddTeacherDialog,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
                   child: Row(
                     children: [
                       Icon(Icons.add),
                       SizedBox(width: 10),
-                      Text("إنشاء حساب معلم"), // "Create Teacher Account"
+                      Text("إنشاء حساب معلم"),
                     ],
                   ),
                 ),
@@ -143,7 +133,7 @@ class _TeachersPageState extends State<TeachersPage> {
           ],
         ),
         Text(
-          "إدارة حسابات وملفات المعلمين", // "Manage teachers accounts and profiles"
+          "إدارة حسابات وملفات المعلمين",
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
@@ -152,15 +142,16 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
-  // Shows the add teacher dialog
-  void _showAddStudentDialog() {
-    showDialog(context: context, builder: (context) => AddTeacherDialog());
+  void _showAddTeacherDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const AddTeacherDialog(),
+    );
   }
 
-  // Builds search and filter controls
   Widget _buildSearchSection() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black26),
         borderRadius: BorderRadius.circular(6),
@@ -168,32 +159,27 @@ class _TeachersPageState extends State<TeachersPage> {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Responsive layout switching
           if (constraints.maxWidth > 600) {
-            // Wide layout - horizontal arrangement
             return Row(
               children: [
                 Expanded(
                   child: SearchField(
                     controller: _searchController,
-                    hintText:
-                        "ابحث عن المعلمين بالاسم أو اسم المستخدم", // Translated
+                    hintText: "ابحث عن المعلمين بالاسم أو اسم المستخدم",
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 _buildFilterButtons(),
               ],
             );
           } else {
-            // Narrow layout - vertical arrangement
             return Column(
               children: [
                 SearchField(
                   controller: _searchController,
-                  hintText:
-                      "ابحث عن المعلمين بالاسم أو اسم المستخدم", // Translated
+                  hintText: "ابحث عن المعلمين بالاسم أو اسم المستخدم",
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 _buildFilterButtons(),
               ],
             );
@@ -203,24 +189,23 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
-  // Builds filter button set
   Widget _buildFilterButtons() {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
       children: [
         SearchFilterButton(
-          text: "جميع المعلمين", // "All Teachers"
+          text: "جميع المعلمين",
           isActive: _activeFilter == "جميع المعلمين",
           onPressed: () => _setFilter("جميع المعلمين"),
         ),
         SearchFilterButton(
-          text: "الأحدث", // "Newest"
+          text: "الأحدث",
           isActive: _activeFilter == "الأحدث",
           onPressed: () => _setFilter("الأحدث"),
         ),
         SearchFilterButton(
-          text: "أبجدي", // "Alphabetical"
+          text: "أبجدي",
           isActive: _activeFilter == "أبجدي",
           onPressed: () => _setFilter("أبجدي"),
         ),
@@ -228,14 +213,12 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
-  // Builds responsive teacher grid
   Widget _buildTeacherGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate responsive column count
-        const double itemWidth = 270; // Minimum card width
+        const double itemWidth = 270;
         int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
-        itemsPerRow = itemsPerRow.clamp(1, 4); // Limit between 1-4 columns
+        itemsPerRow = itemsPerRow.clamp(1, 4);
 
         final teachers = _filteredTeachers;
 
@@ -252,12 +235,7 @@ class _TeachersPageState extends State<TeachersPage> {
                 width:
                     (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
                     itemsPerRow,
-                child: TeacherProfile(
-                  name: teacher['name'],
-                  username: teacher['username'],
-                  email: teacher['email'],
-                  joinDate: teacher['joinDate'],
-                ),
+                child: TeacherProfile(teacher: teacher),
               ),
           ],
         );
@@ -265,13 +243,12 @@ class _TeachersPageState extends State<TeachersPage> {
     );
   }
 
-  // Builds empty state message
   Widget _buildEmptyState() {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(40),
         child: Text(
-          'لا يوجد معلمون', // "No Teachers found"
+          'لا يوجد معلمون',
           style: TextStyle(fontSize: 18, color: Colors.grey),
         ),
       ),
