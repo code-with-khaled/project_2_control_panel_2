@@ -275,7 +275,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       case "الفواتير":
         return ReceiptsSection();
       case "الخصومات":
-        return DiscountsSection();
+        return StudentDiscountsSection();
       case "التقييمات":
         return ReviewsSection();
       default:

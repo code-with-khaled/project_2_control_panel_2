@@ -1,6 +1,7 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
-import 'package:control_panel_2/widgets/promotions_page/sections/advertisement_section.dart';
+import 'package:control_panel_2/widgets/promotions_page/sections/advertisements/advertisement_section.dart';
+import 'package:control_panel_2/widgets/promotions_page/sections/discounts/discounts_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -90,7 +91,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
       ),
       child: Row(
         children: [
-          // Overview tab
+          // Advertisements tab
           Expanded(
             child: NavButton(
               navkey: "الإعلانات",
@@ -99,12 +100,21 @@ class _PromotionsPageState extends State<PromotionsPage> {
             ),
           ),
 
-          // Receipts tab
+          // Discounts tab
           Expanded(
             child: NavButton(
               navkey: "الحسومات",
               isActive: _activeFilter == "الحسومات",
               onTap: () => _setFilter("الحسومات"),
+            ),
+          ),
+
+          // Notifications tab
+          Expanded(
+            child: NavButton(
+              navkey: "الإشعارات",
+              isActive: _activeFilter == "الإشعارات",
+              onTap: () => _setFilter("الإشعارات"),
             ),
           ),
         ],
@@ -116,7 +126,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
       case "الحسومات":
-      // return DiscountsSection();
+        return DiscountsSection();
+      case "الإشعارات":
+      // return NotificationsSection();
       default:
         return AdvertisementSection();
     }
