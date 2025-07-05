@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class AddAdvertisementDialog extends StatefulWidget {
@@ -16,8 +19,26 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
+  // Advertisement Image
+  Uint8List? _imageBytes;
+  String? _fileName;
+
   // Checkbox Value
   bool _isChecked = true; // Default value
+
+  // Image picker function
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null && result.files.single.bytes != null) {
+      setState(() {
+        _imageBytes = result.files.single.bytes;
+        _fileName = result.files.single.name;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +162,9 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       Text("صورة الإعلان *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       InkWell(
-        onTap: () {},
+        onTap: () {
+          _pickImage();
+        },
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 50),
@@ -149,17 +172,32 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
             border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.file_upload_outlined, color: Colors.grey, size: 40),
-              Text(
-                "اضغط لتحميل الصورة",
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-            ],
-          ),
+          child: _imageBytes == null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.file_upload_outlined,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                    Text(
+                      "اضغط لتحميل الصورة",
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ],
+                )
+              : Row(
+                  // mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.photo, color: Colors.black54),
+                    SizedBox(width: 10),
+                    Text(_fileName!),
+                  ],
+                ),
         ),
       ),
     ],
