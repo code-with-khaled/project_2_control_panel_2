@@ -81,7 +81,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
     );
   }
 
-  // Builds navigation tabs for profile sections
+  // Builds navigation tabs for sections
   Widget _buildNavigationTabs() {
     return Container(
       padding: EdgeInsets.all(4),

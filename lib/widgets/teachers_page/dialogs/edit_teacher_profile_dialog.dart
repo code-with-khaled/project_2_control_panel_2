@@ -5,6 +5,7 @@ import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+/// Dialog for editing teacher profile information
 class EditTeacherProfileDialog extends StatefulWidget {
   final Teacher teacher;
 
@@ -34,10 +35,10 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
-  Uint8List? _imageBytes;
-  String? _selectedEducationLevel;
+  Uint8List? _imageBytes; // Stores profile image data
+  String? _selectedEducationLevel; // Selected dropdown value
 
-  // Image picker function
+  /// Handles image selection from device
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -54,7 +55,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   void initState() {
     super.initState();
 
-    // Initialize controllers with teacher data
+    // Initialize form with teacher data
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
     _usernameController.text = widget.teacher.username;
@@ -78,6 +79,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
 
   @override
   void dispose() {
+    // Clean up controllers
     _firstNameController.dispose();
     _lastNameController.dispose();
     _usernameController.dispose();
@@ -91,7 +93,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     super.dispose();
   }
 
-  // Validation functions
+  // --- Validation Methods ---
   String? _validateNotEmpty(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
       return 'مطلوب $fieldName';
@@ -154,6 +156,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     return null;
   }
 
+  // --- UI Building Methods ---
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -176,25 +179,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header section with close button
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "تعديل بيانات المدرس",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.close, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                      ),
-                    ],
-                  ),
+                  _buildHeader(),
                   SizedBox(height: 25),
 
                   // Profile Picture
@@ -262,6 +247,27 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     );
   }
 
+  /// Builds the dialog header with title and close button
+  Widget _buildHeader() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "تعديل بيانات المدرس",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Spacer(),
+        IconButton(
+          icon: Icon(Icons.close, size: 20),
+          onPressed: () => Navigator.pop(context),
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(),
+        ),
+      ],
+    );
+  }
+
+  /// Profile picture section with upload/remove functionality
   Widget _buildProfilePicture() {
     return Center(
       child: Column(
@@ -500,6 +506,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     ],
   );
 
+  /// Form submission button
   Widget _buildSubmitButton() => Row(
     mainAxisAlignment: MainAxisAlignment.end,
     children: [

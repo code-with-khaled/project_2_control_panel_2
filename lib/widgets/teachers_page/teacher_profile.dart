@@ -4,7 +4,10 @@ import 'package:control_panel_2/widgets/teachers_page/dialogs/teacher_profile_di
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-/// Compact teacher profile card that expands to full dialog on tap
+/// Compact teacher profile card that:
+/// - Displays key teacher information
+/// - Expands to full dialog on tap
+/// - Supports edit and delete actions
 class TeacherProfile extends StatefulWidget {
   final Teacher teacher;
 
@@ -15,7 +18,7 @@ class TeacherProfile extends StatefulWidget {
 }
 
 class _TeacherProfileState extends State<TeacherProfile> {
-  bool isHovered = false;
+  bool isHovered = false; // Tracks hover state for visual feedback
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +62,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
     );
   }
 
+  /// Shows detailed teacher profile dialog
   void _showProfileDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -69,6 +73,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
     );
   }
 
+  /// Builds card decoration with hover effect
   BoxDecoration _buildCardDecoration() {
     return BoxDecoration(
       color: Colors.white,
@@ -87,6 +92,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
     );
   }
 
+  /// Builds profile header with avatar and name
   Widget _buildProfileHeader() {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -121,6 +127,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
     );
   }
 
+  /// Builds education level and specialization section
   Widget _buildFieldOfStudy() {
     return Row(
       children: [
@@ -135,20 +142,22 @@ class _TeacherProfileState extends State<TeacherProfile> {
     );
   }
 
+  /// Builds teaching statistics section
   Widget _buildCourseProgress() {
     return Row(
       children: [
         Icon(Icons.menu_book),
         SizedBox(width: 8),
-        Text("6 كورسات"), // You might want to make this dynamic later
+        Text("6 كورسات"),
         SizedBox(width: 8),
         Text("•"),
         SizedBox(width: 8),
-        Text("178 طالب"), // You might want to make this dynamic later
+        Text("178 طالب"),
       ],
     );
   }
 
+  /// Builds rating display section
   Widget _buildRatingSection() {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -162,9 +171,11 @@ class _TeacherProfileState extends State<TeacherProfile> {
     );
   }
 
+  /// Builds footer with actions and join date
   Widget _buildFooter(String formattedDate) {
     return Row(
       children: [
+        // View details button
         Expanded(
           child: ElevatedButton(
             onPressed: () => _showProfileDialog(context),
@@ -182,6 +193,8 @@ class _TeacherProfileState extends State<TeacherProfile> {
           ),
         ),
         SizedBox(width: 7.5),
+
+        // Edit button
         InkWell(
           onTap: () {
             showDialog(
@@ -200,8 +213,10 @@ class _TeacherProfileState extends State<TeacherProfile> {
           ),
         ),
         SizedBox(width: 7.5),
+
+        // Delete button
         InkWell(
-          onTap: () {}, // Add delete functionality later
+          onTap: () {}, // TODO: Implement delete functionality
           child: Container(
             padding: EdgeInsets.all(7.5),
             decoration: BoxDecoration(

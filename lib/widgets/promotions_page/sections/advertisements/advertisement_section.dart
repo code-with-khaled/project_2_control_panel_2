@@ -1,6 +1,12 @@
 import 'package:control_panel_2/widgets/promotions_page/dialogs/add_advertisement_dialog.dart';
 import 'package:flutter/material.dart';
 
+/// A widget that displays and manages advertisements in a grid layout
+///
+/// Features:
+/// - Header with "Manage Advertisements" title and create button
+/// - Grid of advertisement cards
+/// - Each card shows placeholder image, title, description, and action buttons
 class AdvertisementSection extends StatelessWidget {
   const AdvertisementSection({super.key});
 
@@ -11,6 +17,7 @@ class AdvertisementSection extends StatelessWidget {
     );
   }
 
+  /// Builds the section header with title and create button
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -39,10 +46,11 @@ class AdvertisementSection extends StatelessWidget {
     );
   }
 
+  /// Builds the grid of advertisement cards
   Widget _buildAds() {
     return Wrap(
-      spacing: 20,
-      runSpacing: 20,
+      spacing: 20, // Horizontal space between cards
+      runSpacing: 20, // Vertical space between rows
       children: [
         for (int i = 0; i < 4; i++)
           ConstrainedBox(
@@ -50,6 +58,7 @@ class AdvertisementSection extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Advertisement image placeholder
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 75),
                   decoration: BoxDecoration(
@@ -67,6 +76,8 @@ class AdvertisementSection extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // Advertisement details
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -90,8 +101,8 @@ class AdvertisementSection extends StatelessWidget {
                       ),
                       SizedBox(height: 20),
 
-                      // Actions:
-                      _buildFotter(),
+                      // Action buttons
+                      _buildFooter(),
                     ],
                   ),
                 ),
@@ -102,18 +113,20 @@ class AdvertisementSection extends StatelessWidget {
     );
   }
 
-  // Builds Actions (edit / delete)
-  Widget _buildFotter() {
+  /// Builds the action buttons footer (edit/delete)
+  Widget _buildFooter() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [_buildEditButton(), SizedBox(width: 5), _buildDeleteButton()],
     );
   }
 
-  // Builds edit ad button
+  /// Builds the edit advertisement button
   Widget _buildEditButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        // Open AddAdvertisementDialog but with existing data
+      },
       style: ElevatedButton.styleFrom(
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -138,10 +151,12 @@ class AdvertisementSection extends StatelessWidget {
     );
   }
 
-  // Builds delete ad button
+  /// Builds the delete advertisement button
   Widget _buildDeleteButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        // Add confirmation dialog before deletion
+      },
       style: ElevatedButton.styleFrom(
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: 10),

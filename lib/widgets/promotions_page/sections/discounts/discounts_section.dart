@@ -1,5 +1,10 @@
+import 'package:control_panel_2/widgets/promotions_page/dialogs/add_discount_dialog.dart';
 import 'package:flutter/material.dart';
 
+/// Displays and manages discount coupons with:
+/// - Responsive grid layout
+/// - Discount details and statistics
+/// - Edit and deactivation functionality
 class DiscountsSection extends StatelessWidget {
   const DiscountsSection({super.key});
 
@@ -7,14 +12,14 @@ class DiscountsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader(context),
+        _buildHeader(context), // Section header with create button
         SizedBox(height: 20),
-
-        _buildDiscounts(context),
+        _buildDiscounts(context), // Discount cards grid
       ],
     );
   }
 
+  /// Builds section header with title and create button
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -24,7 +29,12 @@ class DiscountsSection extends StatelessWidget {
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AddDiscountDialog(),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
@@ -40,9 +50,11 @@ class DiscountsSection extends StatelessWidget {
     );
   }
 
+  /// Builds responsive grid of discount cards
   Widget _buildDiscounts(BuildContext context) {
     return MediaQuery.of(context).size.width >= 885
         ? Wrap(
+            // Wide screen layout (3 columns)
             spacing: 25,
             runSpacing: 25,
             children: [
@@ -54,11 +66,13 @@ class DiscountsSection extends StatelessWidget {
             ],
           )
         : Wrap(
+            // Narrow screen layout (1 column)
             runSpacing: 25,
             children: [for (int i = 0; i < 6; i++) _buildDiscount()],
           );
   }
 
+  /// Builds individual discount card
   Widget _buildDiscount() {
     return Container(
       padding: EdgeInsets.all(20),
@@ -70,21 +84,19 @@ class DiscountsSection extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildDiscountHeader(),
+          _buildDiscountHeader(), // Discount title and status
           SizedBox(height: 10),
-
-          _buildDiscountValueAndUsage(),
+          _buildDiscountValueAndUsage(), // Value and usage stats
           SizedBox(height: 10),
-
-          _buildDiscountInfo(),
+          _buildDiscountInfo(), // Additional info (dates, target etc.)
           SizedBox(height: 10),
-
-          _buildFotter(),
+          _buildFooter(), // Action buttons
         ],
       ),
     );
   }
 
+  /// Builds discount header with title and active status
   Widget _buildDiscountHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -118,10 +130,12 @@ class DiscountsSection extends StatelessWidget {
     );
   }
 
+  /// Builds discount value and usage statistics
   Widget _buildDiscountValueAndUsage() {
     return Row(
       children: [
         Expanded(
+          // Discount value card
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
@@ -150,6 +164,7 @@ class DiscountsSection extends StatelessWidget {
         ),
         SizedBox(width: 10),
         Expanded(
+          // Usage stats card
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
@@ -180,10 +195,12 @@ class DiscountsSection extends StatelessWidget {
     );
   }
 
+  /// Builds additional discount information
   Widget _buildDiscountInfo() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Expiry date
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -199,6 +216,8 @@ class DiscountsSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 5),
+
+        // Revenue generated
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -214,6 +233,8 @@ class DiscountsSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 5),
+
+        // Target audience
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -232,18 +253,18 @@ class DiscountsSection extends StatelessWidget {
     );
   }
 
-  // Builds Actions (edit / delete)
-  Widget _buildFotter() {
+  /// Builds action buttons (edit and deactivate)
+  Widget _buildFooter() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [_buildEditButton(), SizedBox(width: 5), _buildDeleteButton()],
     );
   }
 
-  // Builds edit ad button
+  /// Builds edit discount button
   Widget _buildEditButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {}, // TODO: Implement edit functionality
       style: ElevatedButton.styleFrom(
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -268,10 +289,10 @@ class DiscountsSection extends StatelessWidget {
     );
   }
 
-  // Builds delete ad button
+  /// Builds deactivate discount button
   Widget _buildDeleteButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {}, // TODO: Implement deactivation functionality
       style: ElevatedButton.styleFrom(
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: 10),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Displays teacher information in two organized sections:
+/// 1. Personal information (email, phone, education, experience)
+/// 2. Additional information (join date, detailed experience, description)
 class TeacherInfoSection extends StatelessWidget {
   const TeacherInfoSection({super.key});
 
@@ -8,13 +11,18 @@ class TeacherInfoSection extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildPersonalInfo(),
+        _buildPersonalInfo(), // Personal details section
         SizedBox(height: 20),
-        _buildAdditionalInfo(),
+        _buildAdditionalInfo(), // Additional information section
       ],
     );
   }
 
+  /// Builds the personal information card with:
+  /// - Email
+  /// - Phone number
+  /// - Education level
+  /// - Years of experience
   Widget _buildPersonalInfo() {
     return Container(
       padding: EdgeInsets.all(15),
@@ -26,6 +34,7 @@ class TeacherInfoSection extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Section header with icon
           Row(
             children: [
               Icon(Icons.person_outline),
@@ -37,10 +46,13 @@ class TeacherInfoSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 15),
+
+          // Email and phone row
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
+                // Email field
                 child: Row(
                   children: [
                     Icon(Icons.mail_outline, size: 18, color: Colors.black54),
@@ -50,6 +62,7 @@ class TeacherInfoSection extends StatelessWidget {
                 ),
               ),
               Expanded(
+                // Phone field
                 child: Row(
                   children: [
                     Icon(Icons.phone_outlined, size: 18, color: Colors.black54),
@@ -61,10 +74,13 @@ class TeacherInfoSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 10),
+
+          // Education and experience row
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
+                // Education field
                 child: Row(
                   children: [
                     Icon(
@@ -78,6 +94,7 @@ class TeacherInfoSection extends StatelessWidget {
                 ),
               ),
               Expanded(
+                // Experience field
                 child: Row(
                   children: [
                     Icon(
@@ -97,6 +114,10 @@ class TeacherInfoSection extends StatelessWidget {
     );
   }
 
+  /// Builds the additional information card with:
+  /// - Join date
+  /// - Detailed experience
+  /// - Professional description
   Widget _buildAdditionalInfo() {
     return Container(
       padding: EdgeInsets.all(15),
@@ -108,11 +129,14 @@ class TeacherInfoSection extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Section header
           Text(
             "معلومات إضافية",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 15),
+
+          // Join date
           Row(
             children: [
               Text(
@@ -124,6 +148,8 @@ class TeacherInfoSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 10),
+
+          // Detailed experience
           Row(
             children: [
               Text("الخبرات: ", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -134,6 +160,8 @@ class TeacherInfoSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 10),
+
+          // Professional description
           Row(
             children: [
               Text("الوصف: ", style: TextStyle(fontWeight: FontWeight.bold)),

@@ -4,6 +4,13 @@ import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+/// A dialog widget for creating new advertisements
+///
+/// This dialog contains form fields for advertisement details including:
+/// - Title
+/// - Content
+/// - Image upload
+/// - Target audience selection
 class AddAdvertisementDialog extends StatefulWidget {
   const AddAdvertisementDialog({super.key});
 
@@ -12,26 +19,30 @@ class AddAdvertisementDialog extends StatefulWidget {
 }
 
 class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
-  // Form key for validation control
+  // Form key for validation and form state management
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers for all form fields
+  // Controllers for managing text input fields
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
-  // Advertisement Image
-  Uint8List? _imageBytes;
-  String? _fileName;
+  // Variables for storing the advertisement image
+  Uint8List? _imageBytes; // Stores the image bytes when uploaded
+  String? _fileName; // Stores the name of the uploaded file
 
-  // Checkbox Value
-  bool _isChecked = true; // Default value
+  // Tracks whether the advertisement targets all users
+  bool _isChecked = true; // Default value is true (target all users)
 
-  // Image picker function
+  /// Opens file picker to select an image for the advertisement
+  ///
+  /// Sets [_imageBytes] and [_fileName] when a file is selected
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
-      withData: true,
+      withData: true, // Ensures we get the file bytes
     );
+
+    // Check if file was selected and contains data
     if (result != null && result.files.single.bytes != null) {
       setState(() {
         _imageBytes = result.files.single.bytes;
@@ -65,15 +76,15 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
                   _buildHeader(),
                   SizedBox(height: 25),
 
-                  // Details
+                  // Advertisement details section
                   _buildAdvertisementDetails(),
                   SizedBox(height: 25),
 
-                  // Target Audiance
-                  _buildTargetAudiance(),
+                  // Target audience selection section
+                  _buildTargetAudience(),
                   SizedBox(height: 25),
 
-                  // Submit button
+                  // Form submission button
                   _buildCreateButton(),
                 ],
               ),
@@ -84,6 +95,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     );
   }
 
+  /// Builds the dialog header with title and close button
   Widget _buildHeader() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,6 +115,10 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     );
   }
 
+  /// Builds the advertisement details section containing:
+  /// - Title field
+  /// - Content field
+  /// - Image upload section
   Widget _buildAdvertisementDetails() {
     return Container(
       padding: EdgeInsets.all(20),
@@ -129,6 +145,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     );
   }
 
+  /// Builds the title input field
   Widget _buildTitleField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -142,6 +159,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     ],
   );
 
+  /// Builds the content input field with multiple lines
   Widget _buildContentField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -149,22 +167,21 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       SizedBox(height: 2),
       CustomTextField(
         hintText: "أدخل مضمون الإعلان",
-        maxLines: 3,
+        maxLines: 3, // Allows for multiline input
         controller: _contentController,
         // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
       ),
     ],
   );
 
+  /// Builds the image upload section with preview capability
   Widget _buildImageSection() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("صورة الإعلان *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       InkWell(
-        onTap: () {
-          _pickImage();
-        },
+        onTap: _pickImage,
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 50),
@@ -189,13 +206,12 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
                   ],
                 )
               : Row(
-                  // mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.photo, color: Colors.black54),
                     SizedBox(width: 10),
-                    Text(_fileName!),
+                    Text(_fileName!, overflow: TextOverflow.ellipsis),
                   ],
                 ),
         ),
@@ -203,7 +219,8 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     ],
   );
 
-  Widget _buildTargetAudiance() {
+  /// Builds the target audience selection section
+  Widget _buildTargetAudience() {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -232,7 +249,6 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
                   });
                 },
               ),
-
               Text("جميع المستخدمين"),
             ],
           ),
@@ -241,13 +257,14 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     );
   }
 
+  /// Builds the form submission button
   Widget _buildCreateButton() => Row(
     mainAxisAlignment: MainAxisAlignment.end,
     children: [
       ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Form is valid - process data
+            // Add form submission logic here
           }
         },
         child: Padding(

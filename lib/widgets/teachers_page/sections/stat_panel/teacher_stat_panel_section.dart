@@ -1,6 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+/// Displays teacher statistics dashboard including:
+/// - Enrollment metrics cards (responsive layout)
+/// - Enrollment trends visualization
+/// - Revenue chart with monthly breakdown
 class TeacherStatPanelSection extends StatelessWidget {
   const TeacherStatPanelSection({super.key});
 
@@ -10,11 +14,11 @@ class TeacherStatPanelSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Responsive metrics cards section
         LayoutBuilder(
           builder: (context, constraints) {
-            // Responsive layout switching
+            // Switch between horizontal (wide) and vertical (narrow) layout
             if (constraints.maxWidth > 600) {
-              // Wide layout - horizontal arrangement
               return Row(
                 children: [
                   Expanded(child: _buildTotalEnrollments()),
@@ -40,8 +44,8 @@ class TeacherStatPanelSection extends StatelessWidget {
         ),
 
         SizedBox(height: 10),
-        _buildEnrollmentTrends(),
-
+        _buildEnrollmentTrends(), // Enrollment trends visualization
+        // Revenue chart section
         SizedBox(height: 20),
         Container(
           padding: EdgeInsets.all(20),
@@ -53,6 +57,7 @@ class TeacherStatPanelSection extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Revenue header
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -65,6 +70,8 @@ class TeacherStatPanelSection extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 15),
+
+              // Revenue summary
               Text(
                 "\$5000",
                 style: TextStyle(
@@ -78,14 +85,14 @@ class TeacherStatPanelSection extends StatelessWidget {
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
               SizedBox(height: 10),
+
+              // Monthly revenue bar chart
               SizedBox(
                 height: 300,
                 child: BarChart(
                   BarChartData(
-                    // 1. Add axis bounds
                     minY: 0,
                     maxY: 2500,
-                    // 2. Configure titles properly
                     titlesData: FlTitlesData(
                       show: true,
                       rightTitles: AxisTitles(
@@ -104,14 +111,10 @@ class TeacherStatPanelSection extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // 3. Add border/grid config
                     borderData: FlBorderData(
                       show: true,
                       border: Border.all(color: Colors.grey[300]!),
                     ),
-
-                    // 4. Bar groups with proper spacing
                     barGroups: [
                       for (int i = 0; i < 4; i++)
                         BarChartGroupData(
@@ -127,7 +130,6 @@ class TeacherStatPanelSection extends StatelessWidget {
                           barsSpace: 4,
                         ),
                     ],
-                    // 5. Add baseline (optional)
                     baselineY: 0,
                   ),
                 ),
@@ -139,6 +141,7 @@ class TeacherStatPanelSection extends StatelessWidget {
     );
   }
 
+  /// Builds total enrollments metric card
   Widget _buildTotalEnrollments() {
     return Container(
       padding: EdgeInsets.all(20),
@@ -179,6 +182,7 @@ class TeacherStatPanelSection extends StatelessWidget {
     );
   }
 
+  /// Builds registered students metric card
   Widget _buildRegisteredStudents() {
     return Container(
       padding: EdgeInsets.all(20),
@@ -219,6 +223,7 @@ class TeacherStatPanelSection extends StatelessWidget {
     );
   }
 
+  /// Builds dropout students metric card
   Widget _buildDropoutStudents() {
     return Container(
       padding: EdgeInsets.all(20),
@@ -236,7 +241,7 @@ class TeacherStatPanelSection extends StatelessWidget {
               Icon(Icons.person_remove_outlined, size: 20, color: Colors.red),
               SizedBox(width: 7),
               Text(
-                "الطلاب المثبتة",
+                "الطلاب المنسحبين",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
             ],
@@ -259,6 +264,7 @@ class TeacherStatPanelSection extends StatelessWidget {
     );
   }
 
+  /// Builds enrollment trends visualization
   Widget _buildEnrollmentTrends() {
     return Container(
       padding: EdgeInsets.all(15),
@@ -299,6 +305,7 @@ class TeacherStatPanelSection extends StatelessWidget {
   }
 }
 
+/// Custom progress bar for visualizing enrollment trends
 class EvaluationBar extends StatefulWidget {
   final double? rating;
 
@@ -309,13 +316,13 @@ class EvaluationBar extends StatefulWidget {
 }
 
 class EvaluationBarState extends State<EvaluationBar> {
-  double maxRating = 8; // Maximum possible value
+  double maxRating = 8; // Maximum possible value for normalization
 
   @override
   Widget build(BuildContext context) {
     return LinearProgressIndicator(
       borderRadius: BorderRadius.circular(5),
-      value: widget.rating! / maxRating, // Convert to 0-1 range
+      value: widget.rating! / maxRating, // Normalize to 0-1 range
       minHeight: 8,
       backgroundColor: Colors.grey[200],
       valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
