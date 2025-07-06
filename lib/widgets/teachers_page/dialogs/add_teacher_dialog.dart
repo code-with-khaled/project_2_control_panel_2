@@ -51,7 +51,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   // Validation functions
   String? _validateNotEmpty(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return 'مطلوب $fieldName';
+      return '$fieldName مطلوب';
     }
     return null;
   }

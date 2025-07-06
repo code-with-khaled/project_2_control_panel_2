@@ -51,6 +51,14 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     }
   }
 
+  // Validation functions
+  String? _validateNotEmpty(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      return '$fieldName مطلوب';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -154,7 +162,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       CustomTextField(
         hintText: "أدخل عنوان الإعلان",
         controller: _titleController,
-        // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+        validator: (value) => _validateNotEmpty(value, "عنوان الإعلان"),
       ),
     ],
   );
@@ -169,7 +177,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
         hintText: "أدخل مضمون الإعلان",
         maxLines: 3, // Allows for multiline input
         controller: _contentController,
-        // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+        validator: (value) => _validateNotEmpty(value, "مضمون الإعلان"),
       ),
     ],
   );
