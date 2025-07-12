@@ -1,3 +1,4 @@
+import 'package:control_panel_2/models/discount_model.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/advanced_analysis.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/basic_filters.dart';
@@ -6,14 +7,16 @@ import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AddDiscountDialog extends StatefulWidget {
-  const AddDiscountDialog({super.key});
+class EditDiscountDialog extends StatefulWidget {
+  final Discount discount;
+
+  const EditDiscountDialog({super.key, required this.discount});
 
   @override
-  State<AddDiscountDialog> createState() => _AddDiscountDialogState();
+  State<EditDiscountDialog> createState() => _EditDiscountDialogState();
 }
 
-class _AddDiscountDialogState extends State<AddDiscountDialog> {
+class _EditDiscountDialogState extends State<EditDiscountDialog> {
   // Form key for validation and form state management
   final _formKey = GlobalKey<FormState>();
 
@@ -65,6 +68,28 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
     setState(() {
       _activeFilter = filter;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize form with original discount data
+    _titleController.text = widget.discount.title;
+    _descriptionController.text = widget.discount.description;
+    _valueController.text = widget.discount.value.toString();
+    _quantityController.text = widget.discount.quantity.toString();
+    _dateController.text = widget.discount.date;
+    _isChecked = widget.discount.allUsers;
+  }
+
+  @override
+  void dispose() {
+    // Clean up controllers
+    _titleController.dispose();
+    _dateController.dispose();
+
+    super.dispose();
   }
 
   // Date picker function
@@ -471,7 +496,7 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء الحسم"),
+          child: Text("تعديل الحسم"),
         ),
       ),
     ],

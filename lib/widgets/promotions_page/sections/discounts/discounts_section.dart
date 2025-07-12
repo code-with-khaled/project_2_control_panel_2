@@ -1,4 +1,6 @@
+import 'package:control_panel_2/models/discount_model.dart';
 import 'package:control_panel_2/widgets/promotions_page/dialogs/add_discount_dialog.dart';
+import 'package:control_panel_2/widgets/promotions_page/dialogs/edit_discount_dialog.dart';
 import 'package:flutter/material.dart';
 
 /// Displays and manages discount coupons with:
@@ -61,19 +63,19 @@ class DiscountsSection extends StatelessWidget {
               for (int i = 0; i < 6; i++)
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: 410),
-                  child: _buildDiscount(),
+                  child: _buildDiscount(context),
                 ),
             ],
           )
         : Wrap(
             // Narrow screen layout (1 column)
             runSpacing: 25,
-            children: [for (int i = 0; i < 6; i++) _buildDiscount()],
+            children: [for (int i = 0; i < 6; i++) _buildDiscount(context)],
           );
   }
 
   /// Builds individual discount card
-  Widget _buildDiscount() {
+  Widget _buildDiscount(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -90,7 +92,7 @@ class DiscountsSection extends StatelessWidget {
           SizedBox(height: 10),
           _buildDiscountInfo(), // Additional info (dates, target etc.)
           SizedBox(height: 10),
-          _buildFooter(), // Action buttons
+          _buildFooter(context), // Action buttons
         ],
       ),
     );
@@ -254,17 +256,35 @@ class DiscountsSection extends StatelessWidget {
   }
 
   /// Builds action buttons (edit and deactivate)
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: [_buildEditButton(), SizedBox(width: 5), _buildDeleteButton()],
+      children: [
+        _buildEditButton(context),
+        SizedBox(width: 5),
+        _buildDeleteButton(),
+      ],
     );
   }
 
   /// Builds edit discount button
-  Widget _buildEditButton() {
+  Widget _buildEditButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {}, // TODO: Implement edit functionality
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => EditDiscountDialog(
+            discount: Discount(
+              title: "عرض شتاء 2025",
+              description: "حسم خاص على جميع كورسات البرمجة",
+              value: 75,
+              quantity: 50,
+              date: "2024-01-25",
+              allUsers: true,
+            ),
+          ),
+        );
+      },
       style: ElevatedButton.styleFrom(
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: 10),
