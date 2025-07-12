@@ -2,6 +2,7 @@ import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/advertisements/advertisement_section.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/discounts_section.dart';
+import 'package:control_panel_2/widgets/promotions_page/sections/notifications/notifications_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -128,7 +129,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
       case "الحسومات":
         return DiscountsSection();
       case "الإشعارات":
-      // return NotificationsSection();
+        return NotificationsSection();
       default:
         return AdvertisementSection();
     }
