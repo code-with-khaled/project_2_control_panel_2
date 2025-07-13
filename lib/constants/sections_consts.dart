@@ -18,6 +18,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "إدارة الدورات", // "Courses Management"
     "description":
         "إنشاء وتعديل وإدارة الدورات التدريبية مع أدوات تخطيط منهجية شاملة.", // Translated
+    "route": "/courses",
   },
   {
     "icon": Icon(Icons.local_offer_outlined, color: Colors.orangeAccent),

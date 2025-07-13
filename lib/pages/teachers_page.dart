@@ -71,24 +71,22 @@ class _TeachersPageState extends State<TeachersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: CustomColors.homepageBg,
-        child: SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1280),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPageHeader(),
-                    const SizedBox(height: 25),
-                    _buildSearchSection(),
-                    const SizedBox(height: 25),
-                    _buildTeacherGrid(),
-                  ],
-                ),
+      backgroundColor: CustomColors.homepageBg,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1280),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildPageHeader(),
+                  const SizedBox(height: 25),
+                  _buildSearchSection(),
+                  const SizedBox(height: 25),
+                  _buildTeacherGrid(),
+                ],
               ),
             ),
           ),

@@ -77,31 +77,27 @@ class _StudentsPageState extends State<StudentsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: CustomColors.homepageBg,
-        child: SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 1280,
-                ), // Max content width
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Page header with title and create button
-                    _buildPageHeader(),
-                    SizedBox(height: 25),
+      backgroundColor: CustomColors.homepageBg,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 1280), // Max content width
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Page header with title and create button
+                  _buildPageHeader(),
+                  SizedBox(height: 25),
 
-                    // Search and filter section
-                    _buildSearchSection(),
-                    SizedBox(height: 25),
+                  // Search and filter section
+                  _buildSearchSection(),
+                  SizedBox(height: 25),
 
-                    // Responsive student grid
-                    _buildStudentGrid(),
-                  ],
-                ),
+                  // Responsive student grid
+                  _buildStudentGrid(),
+                ],
               ),
             ),
           ),

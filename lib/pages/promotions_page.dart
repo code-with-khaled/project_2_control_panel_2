@@ -26,26 +26,24 @@ class _PromotionsPageState extends State<PromotionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: CustomColors.homepageBg,
-        child: SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 1280),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPageHeader(), // Navigation tabs for different sections
-                    SizedBox(height: 25),
+      backgroundColor: CustomColors.homepageBg,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 1280),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildPageHeader(), // Navigation tabs for different sections
+                  SizedBox(height: 25),
 
-                    _buildNavigationTabs(),
-                    SizedBox(height: 20),
+                  _buildNavigationTabs(),
+                  SizedBox(height: 20),
 
-                    _buildCurrentSection(),
-                  ],
-                ),
+                  _buildCurrentSection(),
+                ],
               ),
             ),
           ),

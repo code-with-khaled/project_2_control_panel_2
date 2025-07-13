@@ -1,3 +1,4 @@
+import 'package:control_panel_2/pages/courses_page.dart';
 import 'package:control_panel_2/pages/home_page.dart';
 import 'package:control_panel_2/pages/promotions_page.dart';
 import 'package:control_panel_2/pages/students_page.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
           '/students': (context) => StudentsPage(),
           '/teachers': (context) => TeachersPage(),
           '/promotions': (context) => PromotionsPage(),
+          '/courses': (context) => CoursesPage(),
         },
       ),
     );
