@@ -34,6 +34,9 @@ class MyApp extends StatelessWidget {
             bodyMedium: TextStyle(color: Colors.black),
             bodyLarge: TextStyle(color: Colors.black),
           ),
+          textSelectionTheme: TextSelectionThemeData(
+            selectionColor: Colors.blue.withValues(alpha: 0.2),
+          ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.black87),

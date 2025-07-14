@@ -2,6 +2,7 @@ import 'package:control_panel_2/constants/all_courses.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/courses_page/course_card.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/new_course_dialog.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -103,7 +104,10 @@ class _CoursesPageState extends State<CoursesPage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => NewCourseDialog(),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(

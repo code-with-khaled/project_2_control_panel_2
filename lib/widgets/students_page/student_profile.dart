@@ -39,7 +39,7 @@ class _StudentProfileState extends State<StudentProfile> {
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
+      child: InkWell(
         onTap: () => _showProfileDialog(context),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
