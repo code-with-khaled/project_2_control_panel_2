@@ -141,11 +141,9 @@ class _CoursesPageState extends State<CoursesPage> {
         borderRadius: BorderRadius.circular(6),
         color: Colors.white,
       ),
-      child: Expanded(
-        child: SearchField(
-          controller: _searchController,
-          hintText: "ابحث عن الكورس بالاسم أو اسم المدرس أو التصنيف",
-        ),
+      child: SearchField(
+        controller: _searchController,
+        hintText: "ابحث عن الكورس بالاسم أو اسم المدرس أو التصنيف",
       ),
     );
   }

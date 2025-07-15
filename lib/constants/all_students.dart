@@ -4,6 +4,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'أحمد محمد',
     'username': 'ahmed_mohamed',
     'email': 'ahmed@example.com',
+    'status': 'تثبيت',
     'joinDate': DateTime(2023, 1, 15),
   },
   {
@@ -11,6 +12,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'فاطمة علي',
     'username': 'fatima_ali',
     'email': 'fatima@example.com',
+    'status': 'تسجيل',
     'joinDate': DateTime(2023, 3, 10),
   },
   {
@@ -18,6 +20,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'خالد حسن',
     'username': 'khaled_hassan',
     'email': 'khaled@example.com',
+    'status': 'تسجيل',
     'joinDate': DateTime(2023, 2, 20),
   },
   {
@@ -25,6 +28,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'نورا عبدالله',
     'username': 'nora_abdullah',
     'email': 'nora@example.com',
+    'status': 'انسحاب',
     'joinDate': DateTime(2023, 4, 5),
   },
   {
@@ -32,6 +36,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'عمر إبراهيم',
     'username': 'omar_ibrahim',
     'email': 'omar@example.com',
+    'status': 'تثبيت',
     'joinDate': DateTime(2023, 1, 30),
   },
   {
@@ -39,6 +44,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'ياسمين محمود',
     'username': 'yasmin_mahmoud',
     'email': 'yasmin@example.com',
+    'status': 'تسجيل',
     'joinDate': DateTime(2023, 5, 15),
   },
   {
@@ -46,6 +52,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'محمود رشيد',
     'username': 'mahmoud_rashid',
     'email': 'mahmoud@example.com',
+    'status': 'تسجيل',
     'joinDate': DateTime(2023, 6, 1),
   },
   {
@@ -53,6 +60,7 @@ final List<Map<String, dynamic>> allStudents = [
     'name': 'سارة كمال',
     'username': 'sara_kamal',
     'email': 'sara@example.com',
+    'status': 'انسحاب',
     'joinDate': DateTime(2023, 4, 20),
   },
 ];

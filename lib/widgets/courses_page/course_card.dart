@@ -1,5 +1,6 @@
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/course_details_dialog.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/course_enrollments_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/edit_course_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +76,11 @@ class _CourseCardState extends State<CourseCard> {
                         icon: Icon(Icons.file_upload_outlined),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) =>
+                              CourseEnrollmentsDialog(course: widget.course),
+                        ),
                         icon: Icon(Icons.group_add_outlined),
                       ),
                       IconButton(
