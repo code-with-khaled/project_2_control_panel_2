@@ -1,5 +1,7 @@
 import 'package:control_panel_2/models/course_model.dart';
-import 'package:control_panel_2/widgets/courses_page/tables/attendance_and_absence_table.dart';
+import 'package:control_panel_2/widgets/courses_page/sections/attendance_section.dart';
+import 'package:control_panel_2/widgets/courses_page/sections/exams_section.dart';
+import 'package:control_panel_2/widgets/courses_page/sections/students_receipts_section.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:flutter/material.dart';
 
@@ -134,14 +136,14 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
   /// Returns the appropriate content section based on active filter
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
-      case "الحضور":
-        return AttendanceAndAbsenceTable();
+      case "الاختبارات":
+        return ExamsSection();
       case "الإيصالات":
-        return Text('');
+        return StudentsReceiptsSection();
       case "الاستبيانات والمراجعات":
         return Text('');
       default:
-        return Text('');
+        return AttendanceSection();
     }
   }
 }

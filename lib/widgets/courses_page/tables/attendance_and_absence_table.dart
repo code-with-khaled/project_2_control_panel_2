@@ -75,40 +75,37 @@ class _AttendanceAndAbsenceTableState extends State<AttendanceAndAbsenceTable> {
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Scrollbar(
-            thumbVisibility: true,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  // Date and Time
-                  SizedBox(
-                    width: 300,
-                    height: 248,
-                    child: ScrollConfiguration(
-                      behavior: ScrollBehavior().copyWith(scrollbars: false),
-                      child: SingleChildScrollView(
-                        controller: _scrollController1,
-                        child: AttendanceDateTable(),
-                      ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                // Date and Time
+                SizedBox(
+                  width: 300,
+                  height: 248,
+                  child: ScrollConfiguration(
+                    behavior: ScrollBehavior().copyWith(scrollbars: false),
+                    child: SingleChildScrollView(
+                      controller: _scrollController1,
+                      child: AttendanceDateTable(),
                     ),
                   ),
-                  // Attendance
-                  SizedBox(
-                    height: 248,
-                    child: Scrollbar(
+                ),
+                // Attendance
+                SizedBox(
+                  height: 248,
+                  child: Scrollbar(
+                    controller: _scrollController2,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(left: 10),
                       controller: _scrollController2,
-                      thumbVisibility: true,
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.only(left: 10),
-                        controller: _scrollController2,
-                        scrollDirection: Axis.vertical,
-                        child: AttendanceTable(page: _currentPage),
-                      ),
+                      scrollDirection: Axis.vertical,
+                      child: AttendanceTable(page: _currentPage),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
