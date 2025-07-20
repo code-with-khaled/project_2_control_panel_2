@@ -73,7 +73,7 @@ class _CoursesPageState extends State<CoursesPage> {
                   SizedBox(height: 25),
 
                   // Responsive courses list
-                  _buildStudentGrid(),
+                  _buildCoursesGrid(),
                 ],
               ),
             ),
@@ -148,7 +148,7 @@ class _CoursesPageState extends State<CoursesPage> {
     );
   }
 
-  Widget _buildStudentGrid() {
+  Widget _buildCoursesGrid() {
     if (_filteredCourses.isEmpty) {
       return Center(
         child: Padding(

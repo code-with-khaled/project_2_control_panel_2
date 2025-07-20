@@ -153,7 +153,7 @@ class AttendanceDateTableState extends State<AttendanceDateTable> {
   @override
   Widget build(BuildContext context) {
     return DataTable(
-      headingRowColor: WidgetStateProperty.all(Colors.black26),
+      headingRowColor: WidgetStateProperty.all(Colors.grey.shade300),
       columns: [
         DataColumn(
           label: Text('التاريخ', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -227,7 +227,7 @@ class _AttendanceTableState extends State<AttendanceTable> {
   Widget build(BuildContext context) {
     List<String> states = ["حاضر", "غائب", "منسحب", "غير مسجل"];
     return DataTable(
-      headingRowColor: WidgetStateProperty.all(Colors.black26),
+      headingRowColor: WidgetStateProperty.all(Colors.grey.shade300),
       columns: [
         if (names.isNotEmpty)
           DataColumn(

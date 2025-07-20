@@ -25,6 +25,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "تصنيف الدورات", // "Courses Categorization"
     "description":
         "تنظيم وتصنيف الدورات لتسهيل التصفح واكتشاف المحتوى.", // Translated
+    "route": "/classifications",
   },
   {
     "icon": Icon(Icons.group, color: Colors.blue),
