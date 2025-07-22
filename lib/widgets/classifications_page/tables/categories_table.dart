@@ -98,6 +98,7 @@ class _CategoriesTableState extends State<CategoriesTable> {
                       ),
                     ),
                   ),
+                  DataColumn(label: Text("")),
                 ],
                 rows: _filteredCategories.map((category) {
                   _selectedStatus = category.status;
@@ -139,6 +140,28 @@ class _CategoriesTableState extends State<CategoriesTable> {
                             Icon(
                               Icons.star_rounded,
                               color: Colors.yellow.shade700,
+                            ),
+                          ],
+                        ),
+                      ),
+                      DataCell(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.pie_chart),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.edit, color: Colors.green),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
                             ),
                           ],
                         ),

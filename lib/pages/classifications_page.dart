@@ -2,6 +2,7 @@ import 'package:control_panel_2/constants/all_courses.dart';
 import 'package:control_panel_2/constants/all_students.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/classifications_page/tables/categories_table.dart';
+import 'package:control_panel_2/widgets/classifications_page/dialogs/add_category_dialog.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -67,11 +68,10 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ElevatedButton(
-                // onPressed: () => showDialog(
-                //   context: context,
-                //   builder: (context) => NewCourseDialog(),
-                // ),
-                onPressed: () {},
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => AddCategoryDialog(),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(
