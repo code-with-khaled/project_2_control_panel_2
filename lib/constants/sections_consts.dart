@@ -65,5 +65,6 @@ final List<Map<String, dynamic>> sections = [
     "title": "تصدير الشهادات", // "Certificate Exporting"
     "description":
         "إنشاء وتصدير شهادات إتمام الدورات والإنجازات.", // Translated
+    "route": "/certificates",
   },
 ];

@@ -49,7 +49,8 @@ class _CourseEnrollmentsDialogState extends State<CourseEnrollmentsDialog> {
                 _buildSearchSection2(),
                 SizedBox(height: 25),
 
-                Expanded(
+                SizedBox(
+                  width: 400,
                   child: StudentsEnrollmentsTable(
                     searchQuery: _searchEnrollmentsController.text,
                   ),

@@ -1,5 +1,6 @@
 import 'package:control_panel_2/constants/all_caregories.dart';
 import 'package:control_panel_2/models/category_model.dart';
+import 'package:control_panel_2/widgets/classifications_page/dialogs/edit_category_dialog.dart';
 import 'package:flutter/material.dart';
 
 class CategoriesTable extends StatefulWidget {
@@ -98,7 +99,15 @@ class _CategoriesTableState extends State<CategoriesTable> {
                       ),
                     ),
                   ),
-                  DataColumn(label: Text("")),
+                  DataColumn(
+                    label: Text(
+                      "الإجرائات",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
                 ],
                 rows: _filteredCategories.map((category) {
                   _selectedStatus = category.status;
@@ -153,7 +162,11 @@ class _CategoriesTableState extends State<CategoriesTable> {
                               icon: Icon(Icons.pie_chart),
                             ),
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    EditCategoryDialog(category: category.name),
+                              ),
                               icon: Icon(Icons.edit, color: Colors.green),
                             ),
                             IconButton(

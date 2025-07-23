@@ -1,19 +1,27 @@
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
-class AddCategoryDialog extends StatefulWidget {
-  const AddCategoryDialog({super.key});
+class EditCategoryDialog extends StatefulWidget {
+  final String category;
+
+  const EditCategoryDialog({super.key, required this.category});
 
   @override
-  State<AddCategoryDialog> createState() => _AddCategoryDialogState();
+  State<EditCategoryDialog> createState() => _EditCategoryDialogState();
 }
 
-class _AddCategoryDialogState extends State<AddCategoryDialog> {
+class _EditCategoryDialogState extends State<EditCategoryDialog> {
   // Form key for validation and form state management
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for managing text input fields
   final TextEditingController _titleController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.category;
+  }
 
   @override
   void dispose() {
@@ -68,7 +76,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       children: [
         // Dialog title
         Text(
-          "إنشاء تصنيف", // "Send Notification"
+          "تعديل تصنيف", // "Send Notification"
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         Spacer(),
@@ -108,7 +116,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء التصنيف"),
+          child: Text("حفظ التعديلات"),
         ),
       ),
     ],
