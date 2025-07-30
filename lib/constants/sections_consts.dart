@@ -59,6 +59,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "إدارة المناهج", // "Curriculum Management"
     "description":
         "تصميم وإدارة أقسام المنهج مع مسارات تعليمية منظمة.", // Translated
+    "route": "/curriculums",
   },
   {
     "icon": Icon(Icons.military_tech, color: Colors.yellow),

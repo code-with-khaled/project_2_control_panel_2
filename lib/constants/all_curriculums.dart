@@ -1,0 +1,57 @@
+import 'package:control_panel_2/models/curriculum_model.dart';
+
+final List<Curriculum> allCurriculums = [
+  Curriculum(
+    id: 'CUR-001',
+    name: 'برنامج اللغات المتكامل',
+    startDate: '2025-09-01',
+    endDate: '2026-06-15',
+    students: 25,
+    subjects: ['لغة عربية', 'لغة إنجليزية', 'لغة فرنسية'],
+    status: 'قادم',
+  ),
+  Curriculum(
+    id: 'CUR-002',
+    name: 'المسار العلمي المكثف',
+    startDate: '2025-08-15',
+    endDate: '2026-05-30',
+    students: 30,
+    subjects: ['رياضيات', 'فيزياء', 'كيمياء', 'علم أحياء'],
+    status: 'مكتمل',
+  ),
+  Curriculum(
+    id: 'CUR-003',
+    name: 'المنهاج العام الموسع',
+    startDate: '2025-10-01',
+    endDate: '2026-07-01',
+    students: 27,
+    subjects: [
+      'رياضيات',
+      'فيزياء',
+      'كيمياء',
+      'علم أحياء',
+      'لغة عربية',
+      'وطنية',
+    ],
+    status: 'نشط',
+  ),
+  Curriculum(
+    id: 'CUR-004',
+    name: 'المنهاج الشامل',
+    startDate: '2025-09-10',
+    endDate: '2026-06-10',
+    students: 32,
+    subjects: [
+      'رياضيات',
+      'فيزياء',
+      'كيمياء',
+      'علم أحياء',
+      'لغة عربية',
+      'لغة إنجليزية',
+      'لغة فرنسية',
+      'وطنية',
+      'ديانة',
+    ],
+    status: 'نشط',
+  ),
+];
