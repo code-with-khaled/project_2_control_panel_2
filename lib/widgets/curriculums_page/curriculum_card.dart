@@ -1,4 +1,7 @@
 import 'package:control_panel_2/models/curriculum_model.dart';
+import 'package:control_panel_2/widgets/curriculums_page/sections/marks_section.dart';
+import 'package:control_panel_2/widgets/curriculums_page/sections/students_attendance_section.dart';
+import 'package:control_panel_2/widgets/curriculums_page/sections/teachers_attendance_section.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:flutter/material.dart';
 
@@ -55,111 +58,119 @@ class _CurriculumCardState extends State<CurriculumCard> {
                   ]
                 : [],
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            Text(
+                              curriculum.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Spacer(),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getStatusBgColor(curriculum.status),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                curriculum.status,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: _getStatusColor(curriculum.status),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
                         Text(
-                          curriculum.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                          "${curriculum.startDate} - ${curriculum.endDate}",
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
                         ),
-                        Spacer(),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getStatusBgColor(curriculum.status),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            curriculum.status,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              color: _getStatusColor(curriculum.status),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "${curriculum.startDate} - ${curriculum.endDate}",
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                    SizedBox(height: 10),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 5,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
+                        SizedBox(height: 10),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 5,
                           children: [
-                            Icon(
-                              Icons.import_contacts,
-                              size: 20,
-                              color: Colors.black54,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.import_contacts,
+                                  size: 20,
+                                  color: Colors.black54,
+                                ),
+                                SizedBox(width: 5),
+                                Text(subjects.length.toString()),
+                                SizedBox(width: 5),
+                                Text("مواد"),
+                              ],
                             ),
-                            SizedBox(width: 5),
-                            Text(subjects.length.toString()),
-                            SizedBox(width: 5),
-                            Text("مواد"),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.group_outlined,
+                                  size: 20,
+                                  color: Colors.black54,
+                                ),
+                                SizedBox(width: 5),
+                                Text(curriculum.students.toString()),
+                                SizedBox(width: 5),
+                                Text("طلاب"),
+                              ],
+                            ),
                           ],
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
+                        SizedBox(height: 5),
+                        Wrap(
+                          spacing: 5,
+                          runSpacing: 2,
                           children: [
-                            Icon(
-                              Icons.group_outlined,
-                              size: 20,
-                              color: Colors.black54,
-                            ),
-                            SizedBox(width: 5),
-                            Text(curriculum.students.toString()),
-                            SizedBox(width: 5),
-                            Text("طلاب"),
+                            for (int i = 0; i < subjects.length; i++)
+                              Chip(
+                                label: Text(
+                                  subjects.elementAt(i),
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                backgroundColor: Colors.grey.shade200,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                side: BorderSide.none,
+                              ),
                           ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 5),
-                    Wrap(
-                      spacing: 5,
-                      runSpacing: 2,
-                      children: [
-                        for (int i = 0; i < subjects.length; i++)
-                          Chip(
-                            label: Text(
-                              subjects.elementAt(i),
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            backgroundColor: Colors.grey.shade200,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            side: BorderSide.none,
-                          ),
-                      ],
-                    ),
-                    if (isPressed) _buildRest(),
-                  ],
-                ),
+                  ),
+                  Icon(
+                    isPressed
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                ],
               ),
-              Icon(
-                isPressed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              ),
+              if (isPressed) _buildRest(),
             ],
           ),
         ),
@@ -195,6 +206,7 @@ class _CurriculumCardState extends State<CurriculumCard> {
       children: [
         SizedBox(height: 25),
         _buildNavigationTabs(),
+        SizedBox(height: 20),
         _buildCurrentSection(),
       ],
     );
@@ -245,11 +257,11 @@ class _CurriculumCardState extends State<CurriculumCard> {
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
       case "حضور الأساتذة":
-        return Text("");
+        return TeachersAttendanceSection();
       case "العلامات":
-        return Text("");
+        return MarksSection();
       default:
-        return Text("");
+        return StudentsAttendanceSection();
     }
   }
 }
