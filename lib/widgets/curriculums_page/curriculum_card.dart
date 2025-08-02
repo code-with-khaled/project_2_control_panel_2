@@ -1,5 +1,5 @@
 import 'package:control_panel_2/models/curriculum_model.dart';
-import 'package:control_panel_2/widgets/curriculums_page/sections/marks_section.dart';
+import 'package:control_panel_2/widgets/curriculums_page/sections/marks_section/marks_section.dart';
 import 'package:control_panel_2/widgets/curriculums_page/sections/students_attendance_section.dart';
 import 'package:control_panel_2/widgets/curriculums_page/sections/teachers_attendance_section.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
@@ -259,7 +259,7 @@ class _CurriculumCardState extends State<CurriculumCard> {
       case "حضور الأساتذة":
         return TeachersAttendanceSection();
       case "العلامات":
-        return MarksSection();
+        return MarksSection(curriculum: widget.curriculum);
       default:
         return StudentsAttendanceSection();
     }

@@ -1,11 +1,14 @@
 import 'package:control_panel_2/constants/all_curriculums.dart';
 import 'package:control_panel_2/constants/all_students.dart';
+import 'package:control_panel_2/models/curriculum_model.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/curriculums_page/tables/student_marks_table.dart';
 import 'package:flutter/material.dart';
 
 class MarksSection extends StatefulWidget {
-  const MarksSection({super.key});
+  final Curriculum curriculum;
+
+  const MarksSection({super.key, required this.curriculum});
 
   @override
   State<MarksSection> createState() => _MarksSectionState();
@@ -98,7 +101,7 @@ class _MarksSectionState extends State<MarksSection> {
         ),
         SizedBox(height: 20),
 
-        if (MediaQuery.of(context).size.width > 600)
+        if (MediaQuery.of(context).size.width > 750)
           Row(
             children: [
               Expanded(
@@ -112,6 +115,7 @@ class _MarksSectionState extends State<MarksSection> {
                     joinDate: "joinDate",
                     subjects: allCurriculums.first.subjects,
                   ),
+                  curriculum: widget.curriculum,
                 ),
               ),
             ],
@@ -133,6 +137,7 @@ class _MarksSectionState extends State<MarksSection> {
                   joinDate: "joinDate",
                   subjects: allCurriculums.first.subjects,
                 ),
+                curriculum: widget.curriculum,
               ),
             ),
           ),
