@@ -1,3 +1,4 @@
+import 'package:control_panel_2/pages/accounts_page.dart';
 import 'package:control_panel_2/pages/classifications_page.dart';
 import 'package:control_panel_2/pages/courses_page.dart';
 import 'package:control_panel_2/pages/certificates_page.dart';
@@ -62,6 +63,7 @@ class MyApp extends StatelessWidget {
           '/promotions': (context) => PromotionsPage(),
           '/certificates': (context) => CertificatesPage(),
           "/curriculums": (context) => CurriculumsPage(),
+          '/accounts': (context) => AccountsPage(),
         },
       ),
     );
