@@ -1,4 +1,5 @@
 import 'package:control_panel_2/models/account_model.dart';
+import 'package:control_panel_2/widgets/accounts_page/dialogs/account_profile_details.dart';
 import 'package:flutter/material.dart';
 
 class AccountProfile extends StatefulWidget {
@@ -136,7 +137,11 @@ class _AccountProfileState extends State<AccountProfile> {
     children: [
       Expanded(
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) =>
+                AccountProfileDetails(account: widget.account),
+          ),
           style: ElevatedButton.styleFrom(
             elevation: 0,
             padding: EdgeInsets.symmetric(vertical: 17.5),

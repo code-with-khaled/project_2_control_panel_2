@@ -1,8 +1,8 @@
 import 'package:control_panel_2/constants/all_accounts.dart';
-import 'package:control_panel_2/constants/all_courses.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/models/account_model.dart';
 import 'package:control_panel_2/widgets/accounts_page/account_profile.dart';
+import 'package:control_panel_2/widgets/accounts_page/dialogs/new_account_dialog.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -124,7 +124,10 @@ class _AccountsPageState extends State<AccountsPage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => NewAccountDialog(),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(
@@ -196,19 +199,19 @@ class _AccountsPageState extends State<AccountsPage> {
             children: [
               _buildOverviewCard(
                 "مجمل الحسابات",
-                "4",
+                allAccounts.length.toString(),
                 Icon(Icons.group_outlined, color: Colors.black, size: 32),
               ),
               SizedBox(height: 15),
               _buildOverviewCard(
                 "الإداريين",
-                courses.length.toString(),
+                (allAccounts.length - accountants).toString(),
                 Icon(Icons.person_outline, color: Colors.blue, size: 32),
               ),
               SizedBox(height: 15),
               _buildOverviewCard(
                 "المحاسبين",
-                allAccounts.length.toString(),
+                accountants.toString(),
                 Icon(Icons.person_outline, color: Colors.green, size: 32),
               ),
             ],

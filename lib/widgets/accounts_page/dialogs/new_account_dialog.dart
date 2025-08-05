@@ -4,14 +4,14 @@ import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-class AddTeacherDialog extends StatefulWidget {
-  const AddTeacherDialog({super.key});
+class NewAccountDialog extends StatefulWidget {
+  const NewAccountDialog({super.key});
 
   @override
-  State<AddTeacherDialog> createState() => _AddTeacherDialogState();
+  State<NewAccountDialog> createState() => _NewAccountDialogState();
 }
 
-class _AddTeacherDialogState extends State<AddTeacherDialog> {
+class _NewAccountDialogState extends State<NewAccountDialog> {
   // Form key for validation control
   final _formKey = GlobalKey<FormState>();
 
@@ -23,14 +23,10 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final TextEditingController _specializationController =
-      TextEditingController();
-  final TextEditingController _certificatesController = TextEditingController();
-  final TextEditingController _experienceController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
   Uint8List? _imageBytes;
+  String? _selectAccountType;
   String? _selectedEducationLevel;
 
   // Image picker function
@@ -81,34 +77,6 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     return null;
   }
 
-  String? _validateSpecialization(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'التخصص مطلوب';
-    }
-    return null;
-  }
-
-  String? _validateCertifications(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الشهدات مطلوبة';
-    }
-    return null;
-  }
-
-  String? _validateExperience(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الخبرة مطلوبة';
-    }
-    return null;
-  }
-
-  String? _validateDescription(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الوصف مطلوب';
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -117,43 +85,29 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
+          maxWidth: 600,
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
         ),
         child: Padding(
           padding: EdgeInsets.only(left: 2),
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header section with close button
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "إنشاء حساب مدرس جديد",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.close, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                      ),
-                    ],
-                  ),
+                  _buildHeader(),
                   SizedBox(height: 25),
 
                   // Profile Picture
                   _buildProfilePicture(),
+                  SizedBox(height: 25),
+
+                  // Account Type
+                  _buildAccountType(),
                   SizedBox(height: 25),
 
                   // First Name and last name fields
@@ -174,37 +128,15 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
                   _buildMobileNumberField(),
                   SizedBox(height: 25),
 
+                  // Education Level
+                  _buildEducationLevelField(),
+                  SizedBox(height: 25),
+
                   // Password fields
-                  Row(
-                    children: [
-                      Expanded(child: _buildPasswordField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildConfirmPasswordField()),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-
-                  // Education Level and Specialization fields
-                  Row(
-                    children: [
-                      Expanded(child: _buildEducationLevelField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildSpecializationField()),
-                    ],
-                  ),
+                  _buildPasswordField(),
                   SizedBox(height: 25),
-
-                  // Certificates field
-                  _buildCertificatesField(),
-                  SizedBox(height: 25),
-
-                  // Work Experience field
-                  _buildWorkExperienceField(),
-                  SizedBox(height: 25),
-
-                  // Short Description field
-                  _buildDescriptionField(),
-                  SizedBox(height: 25),
+                  _buildConfirmPasswordField(),
+                  SizedBox(height: 40),
 
                   // Submit button
                   _buildSubmitButton(),
@@ -216,6 +148,23 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       ),
     );
   }
+
+  Widget _buildHeader() => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "إنشاء حساب جديد",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      Spacer(),
+      IconButton(
+        icon: Icon(Icons.close, size: 20),
+        onPressed: () => Navigator.pop(context),
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(),
+      ),
+    ],
+  );
 
   Widget _buildProfilePicture() {
     return Center(
@@ -283,6 +232,37 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     );
   }
 
+  Widget _buildAccountType() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("نوع الحساب *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      DropdownButtonFormField<String>(
+        value: _selectAccountType,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: 'اختر نوع الحساب',
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black87),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        items: ['إداري', 'محاسب'].map((String value) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() => _selectAccountType = newValue);
+        },
+        validator: (value) => _validateNotEmpty(value, "نوع الحساب"),
+      ),
+    ],
+  );
+
   Widget _buildFirstNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -335,39 +315,6 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     ],
   );
 
-  Widget _buildPasswordField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("كلمة المرور *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      CustomTextField(
-        hintText: "أدخل كلمة المرور",
-        controller: _passwordController,
-        maxLines: 1,
-        obsecure: true,
-        validator: _validatePassword,
-      ),
-    ],
-  );
-
-  Widget _buildConfirmPasswordField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "تأكيد كلمة المرور *",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 5),
-      CustomTextField(
-        hintText: "أعد إدخال كلمة المرور",
-        controller: _confirmPasswordController,
-        maxLines: 1,
-        obsecure: true,
-        validator: _validateConfirmPassword,
-      ),
-    ],
-  );
-
   Widget _buildEducationLevelField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -401,72 +348,71 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     ],
   );
 
-  Widget _buildSpecializationField() => Column(
+  Widget _buildPasswordField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("التخصص الجامعي *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("كلمة المرور *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       CustomTextField(
-        hintText: "مثال: رياضيات، كيمياء",
-        controller: _specializationController,
-        validator: _validateSpecialization,
+        hintText: "أدخل كلمة المرور",
+        controller: _passwordController,
+        maxLines: 1,
+        obsecure: true,
+        validator: _validatePassword,
       ),
     ],
   );
 
-  Widget _buildCertificatesField() => Column(
+  Widget _buildConfirmPasswordField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الشهادات *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      CustomTextField(
-        hintText: "أدخل الشهادات ذات الصلة والمؤهلات",
-        controller: _certificatesController,
-        maxLines: 3,
-        validator: _validateCertifications,
+      Text(
+        "تأكيد كلمة المرور *",
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
-    ],
-  );
-
-  Widget _buildWorkExperienceField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("سنوات الخبرة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       CustomTextField(
-        hintText: "مثال:  5 سنوات",
-        controller: _experienceController,
-        validator: _validateExperience,
-      ),
-    ],
-  );
-
-  Widget _buildDescriptionField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("وصف قصير *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      CustomTextField(
-        hintText: "شرح مختصر حول خلفية المدرس و خبرته",
-        maxLines: 4,
-        controller: _descriptionController,
-        validator: _validateDescription,
+        hintText: "أعد إدخال كلمة المرور",
+        controller: _confirmPasswordController,
+        maxLines: 1,
+        obsecure: true,
+        validator: _validateConfirmPassword,
       ),
     ],
   );
 
   Widget _buildSubmitButton() => Row(
-    mainAxisAlignment: MainAxisAlignment.end,
     children: [
-      ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            // Form is valid - process data
-          }
-        },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء حساب المدرس"),
+      Expanded(
+        child: ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(color: Colors.black26),
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Text("إلغاء"),
+          ),
+        ),
+      ),
+      SizedBox(width: 15),
+      Expanded(
+        child: ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              // Form is valid - process data
+            }
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Text("إنشاء الحساب"),
+          ),
         ),
       ),
     ],

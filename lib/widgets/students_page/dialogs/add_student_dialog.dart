@@ -251,7 +251,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("الاسم الأول *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل الاسم الأول",
         controller: _firstNameController,
@@ -264,7 +264,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("الاسم الأخير *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل الاسم الأخير",
         controller: _lastNameController,
@@ -277,7 +277,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("اسم الأب *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل اسم الأب",
         controller: _fatherNameController,
@@ -290,7 +290,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("اسم المستخدم *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل اسم المستخدم",
         controller: _usernameController,
@@ -303,7 +303,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("رقم الجوال *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل رقم الجوال",
         controller: _mobileNumberController,
@@ -316,7 +316,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("الجنس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       DropdownButtonFormField<String>(
         value: _selectedGender,
         decoration: InputDecoration(
@@ -347,7 +347,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("تاريخ الميلاد *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       TextFormField(
         controller: _dateController,
         decoration: InputDecoration(
@@ -440,7 +440,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("كلمة المرور *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل كلمة المرور",
         controller: _passwordController,
@@ -458,7 +458,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
         "تأكيد كلمة المرور *",
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أعد إدخال كلمة المرور",
         controller: _confirmPasswordController,
@@ -473,7 +473,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("المستوى التعليمي *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       DropdownButtonFormField<String>(
         value: _selectedEducationLevel,
         decoration: InputDecoration(
@@ -517,7 +517,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("التخصص *", style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 2),
+          SizedBox(height: 5),
           CustomTextField(
             hintText: "مثال: رياضيات، فنون، إعلام",
             controller: _specializationController,
