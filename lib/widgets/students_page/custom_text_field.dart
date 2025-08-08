@@ -6,16 +6,20 @@ class CustomTextField extends StatelessWidget {
   final dynamic initialValue;
   final int? maxLines;
   final bool? obsecure;
+  final Icon? prefixIcon;
+  final Widget? suffix;
   final String? Function(String?)? validator;
 
   const CustomTextField({
     super.key,
     required this.hintText,
     required this.controller,
-    this.obsecure,
-    this.validator,
-    this.maxLines,
     this.initialValue,
+    this.maxLines,
+    this.obsecure,
+    this.prefixIcon,
+    this.suffix,
+    this.validator,
   });
 
   @override
@@ -28,6 +32,8 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.grey),
+        prefixIcon: prefixIcon,
+        suffixIcon: suffix,
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black26),
           borderRadius: BorderRadius.circular(6),
