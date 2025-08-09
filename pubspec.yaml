@@ -42,6 +42,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   fl_chart: ^1.0.0
+  http: ^1.5.0
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
