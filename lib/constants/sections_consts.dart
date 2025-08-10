@@ -11,6 +11,7 @@ final List<Map<String, dynamic>> sections = [
     "icon": Icon(Icons.description_outlined, color: Colors.lightGreen),
     "title": "التقارير الإدارية والمالية", // "Admin & Financial Reports"
     "description": "إنشاء تقارير إدارية ومالية شاملة لاتخاذ قرارات أفضل.",
+    "route": "/financial_reports",
   },
   {
     "icon": Icon(Icons.import_contacts, color: Colors.purpleAccent),
