@@ -1,4 +1,6 @@
+import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
+import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -67,7 +69,17 @@ class _FinancialReportsPageState extends State<FinancialReportsPage> {
   void initState() {
     super.initState();
 
-    _endDateController.text = DateFormat('MM/dd/yyyy').format(DateTime.now());
+    // Initialize end date (today)
+    _selectedEndDate = DateTime.now();
+    _endDateController.text = DateFormat(
+      'MM/dd/yyyy',
+    ).format(_selectedEndDate!);
+
+    // Initialize start date (Jan 1 of current year)
+    _selectedStartDate = DateTime(DateTime.now().year, 1, 1);
+    _startDateController.text = DateFormat(
+      'MM/dd/yyyy',
+    ).format(_selectedStartDate!);
   }
 
   @override
@@ -280,15 +292,15 @@ class _FinancialReportsPageState extends State<FinancialReportsPage> {
             onChanged: (value) => setState(() {}),
           ),
           SizedBox(height: 20),
-          // Row(
-          //   children: [
-          //     Expanded(
-          //       child: TeacherCommissionTable(
-          //         searchQuery: _searchController.text,
-          //       ),
-          //     ),
-          //   ],
-          // ),
+          Row(
+            children: [
+              Expanded(
+                child: TeacherCommissionTable(
+                  searchQuery: _searchController.text,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -307,6 +319,14 @@ class TeacherCommissionTable extends StatefulWidget {
 class _TeacherCommissionTableState extends State<TeacherCommissionTable> {
   final ScrollController _horizontalScrollController = ScrollController();
 
+  List<Teacher> get _filteredTeachers {
+    if (widget.searchQuery.isEmpty) return allTeachers;
+    final query = widget.searchQuery.toLowerCase();
+    return allTeachers.where((teacher) {
+      return teacher.fullName.toString().toLowerCase().contains(query);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -324,11 +344,257 @@ class _TeacherCommissionTableState extends State<TeacherCommissionTable> {
                 border: Border.all(color: Colors.black26),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: DataTable(columns: [], rows: []),
+              child: DataTable(
+                // ignore: deprecated_member_use
+                dataRowHeight: 60,
+                columnSpacing: 20,
+                horizontalMargin: 20,
+                columns: [
+                  DataColumn(
+                    label: Text(
+                      "اسم المدرس",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      "عدد الكورسات",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      "طريقة الدفع",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      "نسبة العمولة",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      "الراتب على الحصة",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      "الذمة المالية",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      "الإجراء",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                ],
+                rows: _filteredTeachers
+                    .map(
+                      (teacher) => DataRow(
+                        cells: [
+                          DataCell(
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  teacher.fullName,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  teacher.username,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          DataCell(Text("5")),
+                          DataCell(
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getTypeColor("عمولة"),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                "عمولة",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: "عمولة" == "عمولة"
+                                      ? Colors.white
+                                      : Colors.black54,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(Text("60%")),
+                          DataCell(Text("N/A")),
+                          DataCell(Text("1200\$")),
+                          DataCell(
+                            ElevatedButton(
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    _buildEditMethodDialog(teacher),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.all(20),
+                                backgroundColor: Colors.white,
+                                elevation: 0.0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(color: Colors.black26),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                              child: Text(
+                                "تعديل الطريقة",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
           ),
         );
       },
     );
   }
+
+  Color _getTypeColor(String status) {
+    return status == 'عمولة' ? Colors.black : Colors.grey.shade200;
+  }
+
+  Widget _buildEditMethodDialog(Teacher teacher) => Dialog(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    backgroundColor: Colors.white,
+    insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: 600,
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(left: 2),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header section with close button
+              _buildHeader(),
+              SizedBox(height: 25),
+
+              _buildTeacherInfo(teacher),
+
+              SizedBox(height: 20),
+              Divider(),
+              SizedBox(height: 20),
+
+              _buildPaymentMethod(),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _buildHeader() => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "تحديد طريقة الدفع",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      Spacer(),
+      IconButton(
+        icon: Icon(Icons.close, size: 20),
+        onPressed: () => Navigator.pop(context),
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(),
+      ),
+    ],
+  );
+
+  Widget _buildTeacherInfo(Teacher teacher) => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "معلومات المدرس",
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10),
+      Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              teacher.fullName,
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Text(
+              teacher.username,
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Row(children: [Text("2 كورسات"), Text("  •  "), Text("43 طالب")]),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  Widget _buildPaymentMethod() => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [],
+  );
 }
