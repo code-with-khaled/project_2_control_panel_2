@@ -244,13 +244,19 @@ class _AccountProfileDetailsState extends State<AccountProfileDetails> {
               ),
               widget.account.type == "إداري"
                   ? Text(
-                      "نص عشوائي للاختبار نص عشوائي للاختبار نص عشوائي للاختبار نص عشوائي للاختبار نص عشوائي للاختبار رنص عشوائي للاختبار",
+                      "للإداري صلاحية الوصول لجميع الأمور الإدارية التي تخص الطلاب، الكورسات، والدورات ودورات المناهج وكذلك للعروض الترويجية والإشعارات.",
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
                       ),
                     )
-                  : Text(""),
+                  : Text(
+                      "المحاسب له صلاحية كاملة على الشؤون المالية وعرض التقارير المالية وتحديد رواتب المدرسين.",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
             ],
           ),
         ),
