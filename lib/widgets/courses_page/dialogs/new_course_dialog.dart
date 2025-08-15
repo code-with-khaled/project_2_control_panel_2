@@ -192,6 +192,7 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
       CustomTextField(
         hintText: "أدخل سعر التسجيل",
         controller: _coursePriceController,
+        prefixIcon: Icon(Icons.attach_money, color: Colors.grey.shade600),
         // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
       ),
     ],

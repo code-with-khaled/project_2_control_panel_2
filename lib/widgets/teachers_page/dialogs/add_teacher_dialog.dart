@@ -30,8 +30,15 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
+  bool _obsecure = true;
   Uint8List? _imageBytes;
   String? _selectedEducationLevel;
+
+  void _showPassword() {
+    setState(() {
+      _obsecure = !_obsecure;
+    });
+  }
 
   // Image picker function
   Future<void> _pickImage() async {
@@ -343,8 +350,23 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "أدخل كلمة المرور",
         controller: _passwordController,
+        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade600),
+        suffix: Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: IconButton(
+            onPressed: () {
+              _showPassword();
+            },
+            icon: _obsecure
+                ? Icon(Icons.visibility_outlined, color: Colors.grey.shade600)
+                : Icon(
+                    Icons.visibility_off_outlined,
+                    color: Colors.grey.shade600,
+                  ),
+          ),
+        ),
         maxLines: 1,
-        obsecure: true,
+        obsecure: _obsecure,
         validator: _validatePassword,
       ),
     ],
@@ -361,6 +383,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       CustomTextField(
         hintText: "أعد إدخال كلمة المرور",
         controller: _confirmPasswordController,
+        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade600),
         maxLines: 1,
         obsecure: true,
         validator: _validateConfirmPassword,
