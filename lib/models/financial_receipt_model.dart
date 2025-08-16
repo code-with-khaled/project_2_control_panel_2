@@ -1,4 +1,4 @@
-class FinancialReciept {
+class FinancialReceipt {
   final String number;
   final String type;
   final String date;
@@ -8,7 +8,7 @@ class FinancialReciept {
   final String ammount;
   String? reason;
 
-  FinancialReciept({
+  FinancialReceipt({
     required this.reason,
     required this.number,
     required this.type,

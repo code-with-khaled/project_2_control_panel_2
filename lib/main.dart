@@ -3,7 +3,7 @@ import 'package:control_panel_2/pages/classifications_page.dart';
 import 'package:control_panel_2/pages/courses_page.dart';
 import 'package:control_panel_2/pages/certificates_page.dart';
 import 'package:control_panel_2/pages/curriculums_page.dart';
-import 'package:control_panel_2/pages/financial_reciepts_page.dart';
+import 'package:control_panel_2/pages/financial_receipts_page.dart';
 import 'package:control_panel_2/pages/financial_reports_page.dart';
 import 'package:control_panel_2/pages/home_page.dart';
 // import 'package:control_panel_2/pages/login_screen.dart';
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
           '/students': (context) => StudentsPage(),
           '/teachers': (context) => TeachersPage(),
           '/promotions': (context) => PromotionsPage(),
-          "/financial_receipts": (context) => FinancialRecieptsPage(),
+          "/financial_receipts": (context) => FinancialReceiptsPage(),
           '/certificates': (context) => CertificatesPage(),
           "/curriculums": (context) => CurriculumsPage(),
           '/accounts': (context) => AccountsPage(),

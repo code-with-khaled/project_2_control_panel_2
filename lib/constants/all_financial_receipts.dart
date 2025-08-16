@@ -1,7 +1,7 @@
-import 'package:control_panel_2/models/financial_reciept_model.dart';
+import 'package:control_panel_2/models/financial_receipt_model.dart';
 
-final List<FinancialReciept> allReceipts = [
-  FinancialReciept(
+final List<FinancialReceipt> allReceipts = [
+  FinancialReceipt(
     number: 'FR001',
     type: 'دفع',
     date: '2025-08-15',
@@ -11,7 +11,7 @@ final List<FinancialReciept> allReceipts = [
     ammount: '250000',
     reason: null,
   ),
-  FinancialReciept(
+  FinancialReceipt(
     number: 'FR002',
     type: 'ارتجاع',
     date: '2025-08-14',
@@ -21,7 +21,7 @@ final List<FinancialReciept> allReceipts = [
     ammount: '150000',
     reason: 'تم إلغاء الرحلة بسبب الظروف الجوية',
   ),
-  FinancialReciept(
+  FinancialReceipt(
     number: 'FR003',
     type: 'صرف',
     date: '2025-08-13',
@@ -31,7 +31,7 @@ final List<FinancialReciept> allReceipts = [
     ammount: '300000',
     reason: null,
   ),
-  FinancialReciept(
+  FinancialReceipt(
     number: 'FR004',
     type: 'دفع',
     date: '2025-08-12',
@@ -41,7 +41,7 @@ final List<FinancialReciept> allReceipts = [
     ammount: '50000',
     reason: null,
   ),
-  FinancialReciept(
+  FinancialReceipt(
     number: 'FR005',
     type: 'صرف',
     date: '2025-08-11',
