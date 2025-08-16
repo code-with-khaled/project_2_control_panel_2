@@ -3,9 +3,10 @@ import 'package:control_panel_2/pages/classifications_page.dart';
 import 'package:control_panel_2/pages/courses_page.dart';
 import 'package:control_panel_2/pages/certificates_page.dart';
 import 'package:control_panel_2/pages/curriculums_page.dart';
+import 'package:control_panel_2/pages/financial_reciepts_page.dart';
 import 'package:control_panel_2/pages/financial_reports_page.dart';
-// import 'package:control_panel_2/pages/home_page.dart';
-import 'package:control_panel_2/pages/login_screen.dart';
+import 'package:control_panel_2/pages/home_page.dart';
+// import 'package:control_panel_2/pages/login_screen.dart';
 import 'package:control_panel_2/pages/promotions_page.dart';
 import 'package:control_panel_2/pages/students_page.dart';
 import 'package:control_panel_2/pages/teachers_page.dart';
@@ -56,8 +57,8 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        // home: const MyHomePage(),
-        home: const LoginScreen(),
+        home: const MyHomePage(),
+        // home: const LoginScreen(),
         routes: {
           '/courses': (context) => CoursesPage(),
           '/classifications': (context) => ClassificationsPage(),
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
           '/students': (context) => StudentsPage(),
           '/teachers': (context) => TeachersPage(),
           '/promotions': (context) => PromotionsPage(),
+          "/financial_receipts": (context) => FinancialRecieptsPage(),
           '/certificates': (context) => CertificatesPage(),
           "/curriculums": (context) => CurriculumsPage(),
           '/accounts': (context) => AccountsPage(),

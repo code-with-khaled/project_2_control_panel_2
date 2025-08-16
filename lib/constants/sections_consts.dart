@@ -50,6 +50,7 @@ final List<Map<String, dynamic>> sections = [
     "icon": Icon(Icons.receipt_long_outlined, color: Colors.green),
     "title": "الإيصالات المالية", // "Financial Receipts"
     "description": "معالجة إيصالات الدفع وأوامر الصرف لمتابعة مالية شاملة.",
+    "route": "/financial_receipts",
   },
   {
     "icon": Icon(Icons.menu_book, color: Colors.teal),

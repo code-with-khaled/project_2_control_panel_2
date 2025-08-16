@@ -1,3 +1,4 @@
+import 'package:control_panel_2/constants/all_courses.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a table of available courses with enrollment capability
@@ -10,36 +11,6 @@ class CoursesTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Generate mock course data (in real app, this would come from API/database)
-    final List<Map<String, dynamic>> courses = List.generate(5, (index) {
-      // Course data template
-      String courseName = "رياكت - المستوى المتقدم"; // "React - Advanced"
-      Widget category = Container(
-        padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          "برمجة", // "Programming"
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-        ),
-      );
-      String teacher = "أحمد محمد"; // "John Smith"
-      String date = "٦/٥/٢٠٢٤"; // Arabic numerals for date
-
-      return {
-        'name': courseName,
-        'category': category,
-        'teacher': teacher,
-        'date': date,
-        'action': ElevatedButton(
-          onPressed: () => onEnroll(), // Trigger enrollment callback
-          child: Text("تسجيل"), // "Enroll"
-        ),
-      };
-    });
-
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
@@ -79,10 +50,16 @@ class CoursesTable extends StatelessWidget {
               (course) => TableRow(
                 decoration: BoxDecoration(color: Colors.white),
                 children: [
-                  _buildCourseNameCell(course['name']),
-                  _buildCategoryCell(course['category']),
-                  _buildTeacherCell(course['teacher']),
-                  _buildActionCell(course['action']),
+                  _buildCourseNameCell(course.name),
+                  _buildCategoryCell(Text(course.categorization)),
+                  _buildTeacherCell(course.teacher),
+                  _buildActionCell(
+                    ElevatedButton(
+                      onPressed: () =>
+                          onEnroll(), // Trigger enrollment callback
+                      child: Text("تسجيل"), // "Enroll"
+                    ),
+                  ),
                 ],
               ),
             ),
