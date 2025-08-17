@@ -41,12 +41,4 @@ const List<Certificate> certificates = [
     type: 'إنجليزية',
     status: "تمت طباعته",
   ),
-  Certificate(
-    student: 'ياسمين محمود',
-    course: 'مبادئ تطوير واجهات باستخدام Flutter',
-    teacher: 'أحمد محمد',
-    date: '2025-06-17',
-    type: 'عربية',
-    status: "قيد الانتظار",
-  ),
 ];

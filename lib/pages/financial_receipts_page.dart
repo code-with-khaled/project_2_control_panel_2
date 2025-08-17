@@ -1,6 +1,7 @@
 import 'package:control_panel_2/constants/all_financial_receipts.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
-import 'package:control_panel_2/models/financial_receipt_model.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/dialogs/add_payment_dialog.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/tables/financial_receipts_table.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -99,24 +100,119 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
 
   // Builds page header
   Widget _buildPageHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "التقارير المالية",
-          style: GoogleFonts.montserrat(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "التقارير المالية",
+              style: GoogleFonts.montserrat(
+                color: Colors.black,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "إدارة نسب المدرسين وروابهم، حساب الذمم المالية، وعرض تقارير مالية",
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
+            ),
+          ],
+        ),
+        // Wrapped buttons for responsive layout
+        Flexible(
+          child: Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            runAlignment: WrapAlignment.end,
+            children: [
+              // Payment button
+              _buildAddPaymentButton(),
+
+              // Return button
+              _buildAddReturnButton(),
+
+              // Disbursement button
+              _buildAddDisbursementButton(),
+            ],
           ),
         ),
-        Text(
-          "إدارة نسب المدرسين وروابهم، حساب الذمم المالية، وعرض تقارير مالية",
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-        ),
       ],
+    );
+  }
+
+  // Builds payment action button
+  Widget _buildAddPaymentButton() {
+    return ElevatedButton(
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => AddPaymentDialog(),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add),
+            SizedBox(width: 10),
+            Flexible(child: Text("إيصال دفع", overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Builds reurn action button
+  Widget _buildAddReturnButton() {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+          side: BorderSide(color: Colors.black12),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add),
+            SizedBox(width: 10),
+            Flexible(
+              child: Text("إيصال ارتجاع", overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Builds disbursement action button
+  Widget _buildAddDisbursementButton() {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueGrey.shade100,
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add),
+            SizedBox(width: 10),
+            Flexible(child: Text("أمر صرف", overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -457,244 +553,5 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
         ],
       ),
     );
-  }
-}
-
-class FinancialReceiptsTable extends StatefulWidget {
-  final String filter;
-
-  const FinancialReceiptsTable({super.key, required this.filter});
-
-  @override
-  State<FinancialReceiptsTable> createState() => _FinancialReceiptsTableState();
-}
-
-class _FinancialReceiptsTableState extends State<FinancialReceiptsTable> {
-  final ScrollController _horizontalScrollController = ScrollController();
-
-  List<FinancialReceipt> get _filteredReceipts {
-    switch (widget.filter) {
-      case 'دفع':
-        return allReceipts.where((receipt) => receipt.type == "دفع").toList();
-      case 'ارتجاع':
-        return allReceipts
-            .where((receipt) => receipt.type == "ارتجاع")
-            .toList();
-      case 'صرف':
-        return allReceipts.where((receipt) => receipt.type == "صرف").toList();
-      default: // 'جميع الأنواع'
-        return allReceipts;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scrollbar(
-          controller: _horizontalScrollController,
-          thumbVisibility: true,
-          trackVisibility: true,
-          child: SingleChildScrollView(
-            controller: _horizontalScrollController,
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              constraints: BoxConstraints(minWidth: constraints.maxWidth),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black26),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: DataTable(
-                // ignore: deprecated_member_use
-                dataRowHeight: 60,
-                columnSpacing: 20,
-                horizontalMargin: 20,
-                columns: [
-                  DataColumn(
-                    label: Text(
-                      "رقم الإيصال",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Flexible(
-                      child: Text(
-                        "نوع الإيصال",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade600,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      "التاريخ",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      "الشخص/الكيان",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Flexible(
-                      child: Text(
-                        "العنصر/الخدمة",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade600,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      "القيمة",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      "السبب",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                ],
-                rows: _filteredReceipts
-                    .map(
-                      (receipt) => DataRow(
-                        cells: [
-                          DataCell(
-                            Text(
-                              receipt.number,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          DataCell(
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _getTypeBgColor(receipt.type),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                receipt.type,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: _getTypeColor(receipt.type),
-                                ),
-                              ),
-                            ),
-                          ),
-                          DataCell(Text(receipt.date)),
-                          DataCell(Text(receipt.person)),
-                          DataCell(
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  receipt.item,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                receipt.service != null
-                                    ? Text(
-                                        receipt.service!,
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
-                                      )
-                                    : Text(
-                                        "-",
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                              ],
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              receipt.ammount,
-                              style: receipt.type == "دفع"
-                                  ? TextStyle(color: Colors.green)
-                                  : TextStyle(color: Colors.red),
-                            ),
-                          ),
-                          DataCell(
-                            receipt.reason != null
-                                ? Text(
-                                    receipt.reason!,
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 13,
-                                    ),
-                                  )
-                                : Text(
-                                    "-",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                          ),
-                        ],
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Color _getTypeColor(String status) {
-    switch (status) {
-      case "دفع":
-        return Colors.green.shade900;
-      case "ارتجاع":
-        return Colors.yellow.shade900;
-      default:
-        return Colors.red.shade900;
-    }
-  }
-
-  Color _getTypeBgColor(String status) {
-    switch (status) {
-      case "دفع":
-        return Colors.green.shade100;
-      case "ارتجاع":
-        return Colors.yellow.shade100;
-      default:
-        return Colors.red.shade100;
-    }
   }
 }
