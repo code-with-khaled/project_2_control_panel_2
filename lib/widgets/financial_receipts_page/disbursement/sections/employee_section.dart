@@ -1,16 +1,16 @@
-import 'package:control_panel_2/widgets/financial_receipts_page/other/step3.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/other/setp3.dart';
 import 'package:flutter/material.dart';
 
-class TripSection extends StatefulWidget {
-  const TripSection({super.key});
+class EmployeeSection extends StatefulWidget {
+  const EmployeeSection({super.key});
 
   @override
-  State<TripSection> createState() => _TripSectionState();
+  State<EmployeeSection> createState() => _EmployeeSectionState();
 }
 
-class _TripSectionState extends State<TripSection> {
+class _EmployeeSectionState extends State<EmployeeSection> {
   // State variables
-  String? _selectedTrip;
+  String? _selectedEmployee;
 
   @override
   Widget build(BuildContext context) {
@@ -27,32 +27,32 @@ class _TripSectionState extends State<TripSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "خطوة 2: تحديد الرحلة",
+                "خطوة 2: التفاصيل",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 25),
 
-              _buildTripField(),
+              _buildEmployeeField(),
             ],
           ),
         ),
         SizedBox(height: 20),
 
-        if (_selectedTrip != null) Step3(),
+        if (_selectedEmployee != null) DisbursementSetp3(),
       ],
     );
   }
 
-  Widget _buildTripField() => Column(
+  Widget _buildEmployeeField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الرحلة", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الموظف", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       DropdownButtonFormField<String>(
-        value: _selectedTrip,
+        value: _selectedEmployee,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر الرحلة',
+          hintText: 'اختر الموطف',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -67,7 +67,7 @@ class _TripSectionState extends State<TripSection> {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedTrip = newValue);
+          setState(() => _selectedEmployee = newValue);
         },
         // validator: _validateGender,
       ),

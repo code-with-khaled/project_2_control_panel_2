@@ -1,17 +1,19 @@
-import 'package:control_panel_2/constants/all_certificates.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/other/step3.dart';
+import 'package:control_panel_2/constants/all_courses.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
 import 'package:flutter/material.dart';
 
-class CertificateSection extends StatefulWidget {
-  const CertificateSection({super.key});
+class CourseSection extends StatefulWidget {
+  final bool isReturn;
+
+  const CourseSection({super.key, required this.isReturn});
 
   @override
-  State<CertificateSection> createState() => _CertificateSectionState();
+  State<CourseSection> createState() => _CourseSectionState();
 }
 
-class _CertificateSectionState extends State<CertificateSection> {
+class _CourseSectionState extends State<CourseSection> {
   // State variables
-  String? _selectedCertificate;
+  String? _selectedCourse;
 
   @override
   Widget build(BuildContext context) {
@@ -28,32 +30,32 @@ class _CertificateSectionState extends State<CertificateSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "خطوة 2: تحديد الشهادة",
+                "خطوة 2: تحديد الكورس",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 25),
 
-              _buildCertificateField(),
+              _buildCourseField(),
             ],
           ),
         ),
         SizedBox(height: 20),
 
-        if (_selectedCertificate != null) Step3(),
+        if (_selectedCourse != null) Step3(isReturn: widget.isReturn),
       ],
     );
   }
 
-  Widget _buildCertificateField() => Column(
+  Widget _buildCourseField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الشهادة", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الكورس", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       DropdownButtonFormField<String>(
-        value: _selectedCertificate,
+        value: _selectedCourse,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر الشهادة',
+          hintText: 'اختر الكورس',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -64,14 +66,14 @@ class _CertificateSectionState extends State<CertificateSection> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: certificates.map((value) {
+        items: courses.map((value) {
           return DropdownMenuItem<String>(
-            value: value.course,
-            child: Text(value.course),
+            value: value.name,
+            child: Text(value.name),
           );
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedCertificate = newValue);
+          setState(() => _selectedCourse = newValue);
         },
         // validator: _validateGender,
       ),

@@ -1,16 +1,19 @@
-import 'package:control_panel_2/widgets/financial_receipts_page/other/step3.dart';
+import 'package:control_panel_2/constants/all_certificates.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
 import 'package:flutter/material.dart';
 
-class BookSection extends StatefulWidget {
-  const BookSection({super.key});
+class CertificateSection extends StatefulWidget {
+  final bool isReturn;
+
+  const CertificateSection({super.key, required this.isReturn});
 
   @override
-  State<BookSection> createState() => _BookSectionState();
+  State<CertificateSection> createState() => _CertificateSectionState();
 }
 
-class _BookSectionState extends State<BookSection> {
+class _CertificateSectionState extends State<CertificateSection> {
   // State variables
-  String? _selectedBook;
+  String? _selectedCertificate;
 
   @override
   Widget build(BuildContext context) {
@@ -27,32 +30,32 @@ class _BookSectionState extends State<BookSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "خطوة 2: تحديد الكتاب",
+                "خطوة 2: تحديد الشهادة",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 25),
 
-              _buildBookField(),
+              _buildCertificateField(),
             ],
           ),
         ),
         SizedBox(height: 20),
 
-        if (_selectedBook != null) Step3(),
+        if (_selectedCertificate != null) Step3(isReturn: widget.isReturn),
       ],
     );
   }
 
-  Widget _buildBookField() => Column(
+  Widget _buildCertificateField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الكتاب", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الشهادة", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       DropdownButtonFormField<String>(
-        value: _selectedBook,
+        value: _selectedCertificate,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر الكتاب',
+          hintText: 'اختر الشهادة',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -63,11 +66,14 @@ class _BookSectionState extends State<BookSection> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: [''].map((value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
+        items: certificates.map((value) {
+          return DropdownMenuItem<String>(
+            value: value.course,
+            child: Text(value.course),
+          );
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedBook = newValue);
+          setState(() => _selectedCertificate = newValue);
         },
         // validator: _validateGender,
       ),

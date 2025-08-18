@@ -1,17 +1,18 @@
-import 'package:control_panel_2/constants/all_curriculums.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/other/step3.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
 import 'package:flutter/material.dart';
 
-class CurriculumSection extends StatefulWidget {
-  const CurriculumSection({super.key});
+class BookSection extends StatefulWidget {
+  final bool isReturn;
+
+  const BookSection({super.key, required this.isReturn});
 
   @override
-  State<CurriculumSection> createState() => _CurriculumSectionState();
+  State<BookSection> createState() => _BookSectionState();
 }
 
-class _CurriculumSectionState extends State<CurriculumSection> {
+class _BookSectionState extends State<BookSection> {
   // State variables
-  String? _selectedCurriculum;
+  String? _selectedBook;
 
   @override
   Widget build(BuildContext context) {
@@ -28,32 +29,32 @@ class _CurriculumSectionState extends State<CurriculumSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "خطوة 2: تحديد المنهاج",
+                "خطوة 2: تحديد الكتاب",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 25),
 
-              _buildCurriculumField(),
+              _buildBookField(),
             ],
           ),
         ),
         SizedBox(height: 20),
 
-        if (_selectedCurriculum != null) Step3(),
+        if (_selectedBook != null) Step3(isReturn: widget.isReturn),
       ],
     );
   }
 
-  Widget _buildCurriculumField() => Column(
+  Widget _buildBookField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("المنهاج", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الكتاب", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       DropdownButtonFormField<String>(
-        value: _selectedCurriculum,
+        value: _selectedBook,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر المنهاج',
+          hintText: 'اختر الكتاب',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -64,14 +65,11 @@ class _CurriculumSectionState extends State<CurriculumSection> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: allCurriculums.map((value) {
-          return DropdownMenuItem<String>(
-            value: value.name,
-            child: Text(value.name),
-          );
+        items: [''].map((value) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedCurriculum = newValue);
+          setState(() => _selectedBook = newValue);
         },
         // validator: _validateGender,
       ),

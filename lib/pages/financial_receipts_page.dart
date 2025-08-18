@@ -1,6 +1,8 @@
 import 'package:control_panel_2/constants/all_financial_receipts.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/dialogs/add_disbursement_dialog.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/dialogs/add_payment_dialog.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/dialogs/add_return_dialog.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/tables/financial_receipts_table.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -168,7 +170,8 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
   // Builds reurn action button
   Widget _buildAddReturnButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () =>
+          showDialog(context: context, builder: (context) => AddReturnDialog()),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -196,7 +199,10 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
   // Builds disbursement action button
   Widget _buildAddDisbursementButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => AddDisbursementDialog(),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueGrey.shade100,
         foregroundColor: Colors.black,

@@ -1,21 +1,16 @@
-import 'package:control_panel_2/constants/all_students.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/book_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/certificate_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/course_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/curriculum_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/trip_section.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/employee_section.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/teacher_section.dart';
 import 'package:flutter/material.dart';
 
-class AddPaymentDialog extends StatefulWidget {
-  const AddPaymentDialog({super.key});
+class AddDisbursementDialog extends StatefulWidget {
+  const AddDisbursementDialog({super.key});
 
   @override
-  State<AddPaymentDialog> createState() => _AddPaymentDialogState();
+  State<AddDisbursementDialog> createState() => _AddDisbursementDialogState();
 }
 
-class _AddPaymentDialogState extends State<AddPaymentDialog> {
+class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
   // State variables
-  String? _selectedStudent;
   String? _selectedType;
 
   @override
@@ -60,7 +55,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        "إنشاء إيصال دفع",
+        "إنشاء أمر صرف",
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       Spacer(),
@@ -84,51 +79,14 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "خطوة 1: المعلومات الأساسية",
+          "خطوة 1: نوع أمر الصرف",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 25),
 
-        _buildStudentField(),
-        SizedBox(height: 20),
-
         _buildTypeField(),
       ],
     ),
-  );
-
-  Widget _buildStudentField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("اسم الطالب", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      DropdownButtonFormField<String>(
-        value: _selectedStudent,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر الطالب',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        items: allStudents.map((value) {
-          return DropdownMenuItem<String>(
-            value: value['name'],
-            child: Text(value['name']),
-          );
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedStudent = newValue);
-        },
-        // validator: _validateGender,
-      ),
-    ],
   );
 
   Widget _buildTypeField() => Column(
@@ -151,7 +109,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['شهادة', 'كورس', 'رحلة', 'كتاب', 'مناهج'].map((String value) {
+        items: ['راتب موظف', 'راتب مدرس', 'عملية تحويل', 'عملية شراء'].map((
+          String value,
+        ) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
@@ -198,16 +158,14 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
 
   Widget _buildStep2() {
     switch (_selectedType) {
-      case 'شهادة':
-        return CertificateSection(isReturn: false);
-      case 'كورس':
-        return CourseSection(isReturn: false);
-      case 'رحلة':
-        return TripSection(isReturn: false);
-      case 'كتاب':
-        return BookSection(isReturn: false);
-      case 'مناهج':
-        return CurriculumSection(isReturn: false);
+      case 'راتب موظف':
+        return EmployeeSection();
+      case 'راتب مدرس':
+        return TeacherSection();
+      case 'عملية تحويل':
+      // return TranseferSection();
+      case 'عملية شراء':
+      // return PurchaseSection();
       default:
         return Text("");
     }

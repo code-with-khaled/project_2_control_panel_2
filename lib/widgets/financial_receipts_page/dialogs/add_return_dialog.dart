@@ -6,14 +6,14 @@ import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_retu
 import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/trip_section.dart';
 import 'package:flutter/material.dart';
 
-class AddPaymentDialog extends StatefulWidget {
-  const AddPaymentDialog({super.key});
+class AddReturnDialog extends StatefulWidget {
+  const AddReturnDialog({super.key});
 
   @override
-  State<AddPaymentDialog> createState() => _AddPaymentDialogState();
+  State<AddReturnDialog> createState() => _AddReturnDialogState();
 }
 
-class _AddPaymentDialogState extends State<AddPaymentDialog> {
+class _AddReturnDialogState extends State<AddReturnDialog> {
   // State variables
   String? _selectedStudent;
   String? _selectedType;
@@ -60,7 +60,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        "إنشاء إيصال دفع",
+        "إنشاء إيصال ارتجاع",
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       Spacer(),
@@ -199,15 +199,15 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
   Widget _buildStep2() {
     switch (_selectedType) {
       case 'شهادة':
-        return CertificateSection(isReturn: false);
+        return CertificateSection(isReturn: true);
       case 'كورس':
-        return CourseSection(isReturn: false);
+        return CourseSection(isReturn: true);
       case 'رحلة':
-        return TripSection(isReturn: false);
+        return TripSection(isReturn: true);
       case 'كتاب':
-        return BookSection(isReturn: false);
+        return BookSection(isReturn: true);
       case 'مناهج':
-        return CurriculumSection(isReturn: false);
+        return CurriculumSection(isReturn: true);
       default:
         return Text("");
     }

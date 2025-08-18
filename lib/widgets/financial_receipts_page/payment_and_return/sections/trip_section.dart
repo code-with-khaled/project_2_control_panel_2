@@ -1,17 +1,18 @@
-import 'package:control_panel_2/constants/all_courses.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/other/step3.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
 import 'package:flutter/material.dart';
 
-class CourseSection extends StatefulWidget {
-  const CourseSection({super.key});
+class TripSection extends StatefulWidget {
+  final bool isReturn;
+
+  const TripSection({super.key, required this.isReturn});
 
   @override
-  State<CourseSection> createState() => _CourseSectionState();
+  State<TripSection> createState() => _TripSectionState();
 }
 
-class _CourseSectionState extends State<CourseSection> {
+class _TripSectionState extends State<TripSection> {
   // State variables
-  String? _selectedCourse;
+  String? _selectedTrip;
 
   @override
   Widget build(BuildContext context) {
@@ -28,32 +29,32 @@ class _CourseSectionState extends State<CourseSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "خطوة 2: تحديد الكورس",
+                "خطوة 2: تحديد الرحلة",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 25),
 
-              _buildCourseField(),
+              _buildTripField(),
             ],
           ),
         ),
         SizedBox(height: 20),
 
-        if (_selectedCourse != null) Step3(),
+        if (_selectedTrip != null) Step3(isReturn: widget.isReturn),
       ],
     );
   }
 
-  Widget _buildCourseField() => Column(
+  Widget _buildTripField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الكورس", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الرحلة", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       DropdownButtonFormField<String>(
-        value: _selectedCourse,
+        value: _selectedTrip,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر الكورس',
+          hintText: 'اختر الرحلة',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -64,14 +65,11 @@ class _CourseSectionState extends State<CourseSection> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: courses.map((value) {
-          return DropdownMenuItem<String>(
-            value: value.name,
-            child: Text(value.name),
-          );
+        items: [''].map((value) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedCourse = newValue);
+          setState(() => _selectedTrip = newValue);
         },
         // validator: _validateGender,
       ),
