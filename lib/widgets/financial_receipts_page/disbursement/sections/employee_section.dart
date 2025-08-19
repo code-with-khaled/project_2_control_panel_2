@@ -1,3 +1,4 @@
+import 'package:control_panel_2/constants/all_accounts.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/other/setp3.dart';
 import 'package:flutter/material.dart';
 
@@ -63,8 +64,11 @@ class _EmployeeSectionState extends State<EmployeeSection> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: [''].map((value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
+        items: allAccounts.map((value) {
+          return DropdownMenuItem<String>(
+            value: value.fullName,
+            child: Text(value.fullName),
+          );
         }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedEmployee = newValue);

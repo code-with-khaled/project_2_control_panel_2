@@ -223,9 +223,18 @@ class _StudentProfileState extends State<StudentProfile> {
           "انضم في: $formattedDate",
           style: TextStyle(color: Colors.black87, fontSize: 12),
         ),
-        IconButton(
-          onPressed: () {}, // TODO: Implement delete functionality
-          icon: Icon(Icons.delete_outline, color: Colors.red),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () {}, // TODO: Implement edit functionality
+              icon: Icon(Icons.edit, color: Colors.green),
+            ),
+            IconButton(
+              onPressed: () {}, // TODO: Implement delete functionality
+              icon: Icon(Icons.delete_outline, color: Colors.red),
+            ),
+          ],
         ),
       ],
     );

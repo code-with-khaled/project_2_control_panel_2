@@ -1,9 +1,16 @@
+import 'package:control_panel_2/constants/all_financial_receipts.dart';
+import 'package:control_panel_2/models/financial_receipt_model.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/employee_section.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/purchase_section.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/teacher_section.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/transfer_section.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AddDisbursementDialog extends StatefulWidget {
-  const AddDisbursementDialog({super.key});
+  final VoidCallback onAddDisbursement;
+
+  const AddDisbursementDialog({super.key, required this.onAddDisbursement});
 
   @override
   State<AddDisbursementDialog> createState() => _AddDisbursementDialogState();
@@ -147,6 +154,26 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
           // if (_formKey.currentState!.validate()) {
           //   // Form is valid - process data
           // }
+
+          setState(() {
+            allReceipts.add(
+              FinancialReceipt(
+                reason: null,
+                number: "FR00${allReceipts.length + 1}",
+                type: "أمر صرف",
+                date: DateFormat('').format(DateTime.now()),
+                person: "",
+                item: "",
+                service: null,
+                ammount: "new ammount",
+              ),
+            );
+          });
+          for (var receipt in allReceipts) {
+            print(receipt.ammount);
+          }
+          widget.onAddDisbursement();
+          Navigator.pop(context);
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
@@ -163,9 +190,9 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
       case 'راتب مدرس':
         return TeacherSection();
       case 'عملية تحويل':
-      // return TranseferSection();
+        return TransferSection();
       case 'عملية شراء':
-      // return PurchaseSection();
+        return PurchaseSection();
       default:
         return Text("");
     }

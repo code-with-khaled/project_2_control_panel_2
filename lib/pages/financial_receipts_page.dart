@@ -201,7 +201,11 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
     return ElevatedButton(
       onPressed: () => showDialog(
         context: context,
-        builder: (context) => AddDisbursementDialog(),
+        builder: (context) => AddDisbursementDialog(
+          onAddDisbursement: () {
+            setState(() {});
+          },
+        ),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueGrey.shade100,
