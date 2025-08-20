@@ -1,3 +1,4 @@
+import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/pages/accounts_page.dart';
 import 'package:control_panel_2/pages/classifications_page.dart';
 import 'package:control_panel_2/pages/courses_page.dart';
@@ -6,7 +7,7 @@ import 'package:control_panel_2/pages/curriculums_page.dart';
 import 'package:control_panel_2/pages/financial_receipts_page.dart';
 import 'package:control_panel_2/pages/financial_reports_page.dart';
 import 'package:control_panel_2/pages/home_page.dart';
-// import 'package:control_panel_2/pages/login_screen.dart';
+import 'package:control_panel_2/pages/login_screen.dart';
 import 'package:control_panel_2/pages/promotions_page.dart';
 import 'package:control_panel_2/pages/students_page.dart';
 import 'package:control_panel_2/pages/teachers_page.dart';
@@ -14,11 +15,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  final token = TokenHelper.getToken();
+  final Widget initialScreen = token != null ? MyHomePage() : LoginScreen();
+
+  runApp(MyApp(initialScreen: initialScreen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialScreen;
+
+  const MyApp({super.key, required this.initialScreen});
 
   // This widget is the root of your application.
   @override
@@ -57,8 +63,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const MyHomePage(),
-        // home: const LoginScreen(),
+        home: initialScreen,
         routes: {
           '/courses': (context) => CoursesPage(),
           '/classifications': (context) => ClassificationsPage(),

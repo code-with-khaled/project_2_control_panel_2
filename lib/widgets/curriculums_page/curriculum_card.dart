@@ -258,8 +258,8 @@ class _CurriculumCardState extends State<CurriculumCard> {
     switch (_activeFilter) {
       case "حضور الأساتذة":
         return TeachersAttendanceSection();
-      case "العلامات":
-        return MarksSection(curriculum: widget.curriculum);
+      // case "العلامات":
+      //   return MarksSection(curriculum: widget.curriculum);
       default:
         return StudentsAttendanceSection();
     }

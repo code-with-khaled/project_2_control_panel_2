@@ -169,9 +169,7 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
               ),
             );
           });
-          for (var receipt in allReceipts) {
-            print(receipt.ammount);
-          }
+
           widget.onAddDisbursement();
           Navigator.pop(context);
         },

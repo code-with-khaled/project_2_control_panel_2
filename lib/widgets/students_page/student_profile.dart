@@ -1,3 +1,5 @@
+import 'package:control_panel_2/models/student_model.dart';
+import 'package:control_panel_2/widgets/students_page/dialogs/edit_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/student_profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -227,7 +229,23 @@ class _StudentProfileState extends State<StudentProfile> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              onPressed: () {}, // TODO: Implement edit functionality
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => EditStudentDialog(
+                  student: Student(
+                    id: 1,
+                    firstName: "firstName",
+                    lastName: "lastName",
+                    middleName: "fatherName",
+                    username: "username",
+                    phone: "mobileNumber",
+                    parentPhone: '',
+                    educationLevel: '',
+                    gender: '',
+                    birthDate: DateTime.now(),
+                  ),
+                ),
+              ),
               icon: Icon(Icons.edit, color: Colors.green),
             ),
             IconButton(

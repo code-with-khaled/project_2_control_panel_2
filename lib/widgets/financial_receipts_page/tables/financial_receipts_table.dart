@@ -53,11 +53,13 @@ class _FinancialReceiptsTableState extends State<FinancialReceiptsTable> {
                 horizontalMargin: 20,
                 columns: [
                   DataColumn(
-                    label: Text(
-                      "رقم الإيصال",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
+                    label: Flexible(
+                      child: Text(
+                        "رقم الإيصال",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                   ),
@@ -74,20 +76,24 @@ class _FinancialReceiptsTableState extends State<FinancialReceiptsTable> {
                     ),
                   ),
                   DataColumn(
-                    label: Text(
-                      "التاريخ",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
+                    label: Flexible(
+                      child: Text(
+                        "التاريخ",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                   ),
                   DataColumn(
-                    label: Text(
-                      "الشخص/الكيان",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
+                    label: Flexible(
+                      child: Text(
+                        "الشخص/الكيان",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                   ),
@@ -104,20 +110,24 @@ class _FinancialReceiptsTableState extends State<FinancialReceiptsTable> {
                     ),
                   ),
                   DataColumn(
-                    label: Text(
-                      "القيمة",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
+                    label: Flexible(
+                      child: Text(
+                        "القيمة",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                   ),
                   DataColumn(
-                    label: Text(
-                      "السبب",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
+                    label: Flexible(
+                      child: Text(
+                        "السبب",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                   ),

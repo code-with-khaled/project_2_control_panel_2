@@ -1,9 +1,14 @@
 import 'dart:ui';
 
-// import 'package:control_panel_2/pages/home_page.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/pages/home_page.dart';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/services/auth_service.dart';
 import 'package:control_panel_2/pages/reset_password_page.dart';
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,7 +17,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   // Form key for validation control
   final _formKey = GlobalKey<FormState>();
 
@@ -23,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // State variables
   bool _obsecure = true;
   String _selectedRole = 'manager'; // Default selection
+  bool _isLoading = false;
 
   void _showPassword() {
     setState(() {
@@ -46,6 +53,69 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل';
     }
     return null;
+  }
+
+  // ----Animation----
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  late Animation<double> _usernameAnimation;
+  late Animation<double> _passwordAnimation;
+  late Animation<double> _roleAnimation;
+  late Animation<double> _buttonAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    _slideAnimation = Tween<Offset>(begin: Offset(0.0, 0.3), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
+
+    // Start animation after build completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _animationController.forward();
+    });
+
+    // Staggered animations
+    _usernameAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.0, 0.3, curve: Curves.easeOut),
+      ),
+    );
+
+    _passwordAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.2, 0.5, curve: Curves.easeOut),
+      ),
+    );
+
+    _roleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.4, 0.7, curve: Curves.easeOut),
+      ),
+    );
+
+    _buttonAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.6, 1.0, curve: Curves.easeOut),
+      ),
+    );
   }
 
   @override
@@ -81,49 +151,141 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: 540),
                 child: SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black26),
-                      borderRadius: BorderRadius.circular(6),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                          offset: Offset(0, 4),
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        padding: EdgeInsets.all(30),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black26),
+                          borderRadius: BorderRadius.circular(6),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
 
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "مرحباً بك",
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "مرحباً بك",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              "أدخل معلومات حسابك لتصل للوحة تحكم مسار",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            SizedBox(height: 30),
+
+                            // --- Animated Fields ---
+                            FadeTransition(
+                              opacity: _usernameAnimation,
+                              child: SlideTransition(
+                                position:
+                                    Tween<Offset>(
+                                      begin: Offset(0.0, 0.5),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: _animationController,
+                                        curve: Interval(
+                                          0.0,
+                                          0.3,
+                                          curve: Curves.easeOut,
+                                        ),
+                                      ),
+                                    ),
+                                child: _buildUsernameField(),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+
+                            FadeTransition(
+                              opacity: _passwordAnimation,
+                              child: SlideTransition(
+                                position:
+                                    Tween<Offset>(
+                                      begin: Offset(0.0, 0.5),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: _animationController,
+                                        curve: Interval(
+                                          0.2,
+                                          0.5,
+                                          curve: Curves.easeOut,
+                                        ),
+                                      ),
+                                    ),
+                                child: _buildPasswordField(),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+
+                            FadeTransition(
+                              opacity: _roleAnimation,
+                              child: SlideTransition(
+                                position:
+                                    Tween<Offset>(
+                                      begin: Offset(0.0, 0.5),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: _animationController,
+                                        curve: Interval(
+                                          0.4,
+                                          0.7,
+                                          curve: Curves.easeOut,
+                                        ),
+                                      ),
+                                    ),
+                                child: _buildRoleSelection(),
+                              ),
+                            ),
+                            SizedBox(height: 25),
+
+                            // --- Animated Button ---
+                            FadeTransition(
+                              opacity: _buttonAnimation,
+                              child: SlideTransition(
+                                position:
+                                    Tween<Offset>(
+                                      begin: Offset(0.0, 0.5),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: _animationController,
+                                        curve: Interval(
+                                          0.6,
+                                          1.0,
+                                          curve: Curves.easeOut,
+                                        ),
+                                      ),
+                                    ),
+                                child: _buildLoginButton(),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+
+                            _buildPasswordEdits(),
+                          ],
                         ),
-                        SizedBox(height: 5),
-                        Text(
-                          "أدخل معلومات حسابك لتصل للوحة تحكم مسار",
-                          style: TextStyle(fontSize: 15, color: Colors.grey),
-                        ),
-                        SizedBox(height: 30),
-                        _buildUsernameField(),
-                        SizedBox(height: 20),
-                        _buildPasswordField(),
-                        SizedBox(height: 20),
-                        _buildRoleSelection(),
-                        SizedBox(height: 25),
-                        _buildLoginButton(),
-                        SizedBox(height: 10),
-                        _buildPasswordEdits(),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -235,18 +397,66 @@ class _LoginScreenState extends State<LoginScreen> {
     children: [
       Expanded(
         child: ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              // Add form submission logic here
-            }
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => MyHomePage()),
-            // );
-          },
+          onPressed: _isLoading
+              ? null
+              : () async {
+                  if (_formKey.currentState!.validate()) {
+                    // Form submission logic
+                    setState(() {
+                      _isLoading = true;
+                    });
+
+                    try {
+                      final apiClient = ApiClient(
+                        baseUrl: "http://127.0.0.1:8000/api",
+                        httpClient: http.Client(),
+                      );
+
+                      final authService = AuthService(apiClient: apiClient);
+
+                      final token = await authService.login(
+                        username: _usernameController.text.trim(),
+                        password: _passwordController.text.trim(),
+                        roleId: 1,
+                      );
+
+                      TokenHelper.storeToken(token);
+
+                      // ignore: avoid_print
+                      print(token);
+
+                      _navigateToHome();
+                    } catch (e) {
+                      if (mounted) {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Text('خطأ'),
+                            content: Text(e.toString()),
+                          ),
+                        );
+                      }
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
+                    }
+                  }
+                },
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 13),
-            child: Text("تسجيل دخول"),
+            child: _isLoading
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                : Text("تسجيل دخول"),
           ),
         ),
       ),
@@ -271,15 +481,58 @@ class _LoginScreenState extends State<LoginScreen> {
         HoverUnderlineText(
           text: "تغيير كلمة المرور",
           onTap: () {
-            Navigator.push(
-              context,
-              (MaterialPageRoute(
-                builder: (context) => ResetPasswordPage(forget: false),
-              )),
-            );
+            // Navigator.push(
+            //   context,
+            //   (MaterialPageRoute(
+            //     builder: (context) => ResetPasswordPage(forget: false),
+            //   )),
+            // );
+            try {
+              final apiClient = ApiClient(
+                baseUrl: "http://127.0.0.1:8000/api",
+                httpClient: http.Client(),
+              );
+
+              final authService = AuthService(apiClient: apiClient);
+
+              authService.logout(TokenHelper.getToken()!);
+            } catch (e) {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('خطأ'),
+                  content: Text(e.toString()),
+                ),
+              );
+            }
           },
         ),
       ],
+    );
+  }
+
+  // Navigation with animations
+  void _navigateToHome() {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: Duration(milliseconds: 500),
+      ),
     );
   }
 }

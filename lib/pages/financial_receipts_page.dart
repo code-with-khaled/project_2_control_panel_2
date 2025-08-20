@@ -105,24 +105,13 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "التقارير المالية",
-              style: GoogleFonts.montserrat(
-                color: Colors.black,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              "إدارة نسب المدرسين وروابهم، حساب الذمم المالية، وعرض تقارير مالية",
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-            ),
-          ],
+        Text(
+          "التقارير المالية",
+          style: GoogleFonts.montserrat(
+            color: Colors.black,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         // Wrapped buttons for responsive layout
         Flexible(
@@ -411,32 +400,74 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
           ),
           SizedBox(height: 20),
 
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(child: _buildFilters()),
-              SizedBox(width: 15),
-              Expanded(child: _buildStartDate()),
-              SizedBox(width: 15),
-              Expanded(child: _buildEndDate()),
-              SizedBox(width: 15),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(21.5),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.filter_alt_outlined),
-                      SizedBox(width: 10),
-                      Text("تطبيق الفلاتر"),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 600) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(child: _buildFilters()),
+                    SizedBox(width: 15),
+                    Expanded(child: _buildStartDate()),
+                    SizedBox(width: 15),
+                    Expanded(child: _buildEndDate()),
+                    SizedBox(width: 15),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.all(21.5),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.filter_alt_outlined),
+                            SizedBox(width: 10),
+                            Text("تطبيق الفلاتر"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(children: [Expanded(child: _buildFilters())]),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(child: _buildStartDate()),
+                        SizedBox(width: 10),
+                        Expanded(child: _buildEndDate()),
+                      ],
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.all(21.5),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.filter_alt_outlined),
+                                SizedBox(width: 10),
+                                Text("تطبيق الفلاتر"),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ],
       ),
