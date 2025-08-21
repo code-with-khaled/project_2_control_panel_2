@@ -16,7 +16,18 @@ class StudentsService {
       final List<dynamic> items = json['data']['items'];
       return items.map((json) => Student.fromJson(json)).toList();
     } else {
-      throw Exception('Fetch students failed');
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
     }
   }
 
@@ -29,7 +40,42 @@ class StudentsService {
 
     if (response.statusCode == 200) {
     } else {
-      throw Exception('Create student failed');
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
+    }
+  }
+
+  Future<void> editStudent(String? token, int id, Student student) async {
+    final response = await apiClient.put(
+      "dashboard/students/$id",
+      body: student.toJson(),
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+    } else {
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
     }
   }
 
@@ -41,7 +87,18 @@ class StudentsService {
 
     if (response.statusCode == 200) {
     } else {
-      throw Exception('Create student failed');
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
     }
   }
 }

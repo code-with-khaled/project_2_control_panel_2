@@ -296,8 +296,10 @@ class _StudentProfileState extends State<StudentProfile> {
             IconButton(
               onPressed: () => showDialog(
                 context: context,
-                builder: (context) =>
-                    EditStudentDialog(student: widget.student),
+                builder: (context) => EditStudentDialog(
+                  student: widget.student,
+                  callback: widget.callback,
+                ),
               ),
               icon: Icon(Icons.edit, color: Colors.green),
             ),

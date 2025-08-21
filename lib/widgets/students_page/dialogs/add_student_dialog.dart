@@ -43,6 +43,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Uint8List? _imageBytes;
   String _fileName = "لم يتم اختيار ملف";
   String? _selectedEducationLevel;
+  bool _isSubmitting = false;
 
   void _showPassword() {
     setState(() {
@@ -155,6 +156,12 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   late StudentsService _studentService;
 
   Future<void> _createStudent() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final middleName = _middleNameController.text.trim();
@@ -196,9 +203,23 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       if (mounted) {
         showDialog(
           context: context,
-          builder: (_) =>
-              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء حساب الطالب الطالب'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
       }
     }
   }
@@ -654,10 +675,19 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             _createStudent();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء حساب الطالب"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء حساب الطالب"),
+              ),
       ),
     ],
   );
