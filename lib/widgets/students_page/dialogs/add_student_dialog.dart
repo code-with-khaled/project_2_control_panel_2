@@ -1,11 +1,18 @@
 import 'dart:typed_data';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/students_service.dart';
+import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 
 class AddStudentDialog extends StatefulWidget {
-  const AddStudentDialog({super.key});
+  final VoidCallback callback;
+
+  const AddStudentDialog({super.key, required this.callback});
 
   @override
   State<AddStudentDialog> createState() => _AddStudentDialogState();
@@ -18,7 +25,8 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   // Controllers for all form fields
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _fatherNameController = TextEditingController();
+  final TextEditingController _middleNameController = TextEditingController();
+  final TextEditingController _parentNumberController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _mobileNumberController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
@@ -143,6 +151,70 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     return null;
   }
 
+  // Variables for API integration
+  late StudentsService _studentService;
+
+  Future<void> _createStudent() async {
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final middleName = _middleNameController.text.trim();
+    final parentPhone = _parentNumberController.text.trim();
+    final username = _usernameController.text.trim();
+    final phone = _mobileNumberController.text.trim();
+    final educationLevel = _selectedEducationLevel == "بكالوريوس"
+        ? 'university'
+        : '';
+    final gender = _selectedGender == "ذكر" ? 'M' : 'F';
+    final birthDate = _selectedDate;
+    final password = _passwordController.text.trim();
+
+    final student = Student(
+      username: username,
+      firstName: firstName,
+      middleName: middleName,
+      lastName: lastName,
+      phone: phone,
+      parentPhone: parentPhone,
+      educationLevel: educationLevel,
+      gender: gender,
+      birthDate: birthDate!,
+      password: password,
+    );
+
+    try {
+      final token = TokenHelper.getToken();
+      await _studentService.createStudent(token, student);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء حساب الطالب بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _studentService = StudentsService(apiClient: apiClient);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -197,7 +269,13 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   SizedBox(height: 25),
 
                   // Father's Name field
-                  _buildFatherNameField(),
+                  Row(
+                    children: [
+                      Expanded(child: _buildFatherNameField()),
+                      SizedBox(width: 15),
+                      Expanded(child: _buildFatherNumberField()),
+                    ],
+                  ),
                   SizedBox(height: 25),
 
                   // Username and Mobile Number fields
@@ -287,8 +365,21 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل اسم الأب",
-        controller: _fatherNameController,
+        controller: _middleNameController,
         validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+      ),
+    ],
+  );
+
+  Widget _buildFatherNumberField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("رقم جوال الأب *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      CustomTextField(
+        hintText: "أدخل رقم الجوال",
+        controller: _parentNumberController,
+        validator: _validateMobileNumber,
       ),
     ],
   );
@@ -537,7 +628,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   Widget _buildSpecializationField() {
     if (_selectedEducationLevel == 'الثانوية العامة' ||
         _selectedEducationLevel == null) {
-      return Spacer();
+      return SizedBox.shrink();
     } else {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,7 +651,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Form is valid - process data
+            _createStudent();
           }
         },
         child: Padding(

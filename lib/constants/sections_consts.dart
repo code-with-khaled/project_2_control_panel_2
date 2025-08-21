@@ -6,6 +6,7 @@ final List<Map<String, dynamic>> sections = [
     "title": "إحصائيات لوحة التحكم", // "Dashboard Statistics"
     "description":
         "رؤى وتحليلات فورية لمتابعة أداء المؤسسة وتمثيل البيانات المرئي.",
+    "route": '/login',
   },
   {
     "icon": Icon(Icons.description_outlined, color: Colors.lightGreen),

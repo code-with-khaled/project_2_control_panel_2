@@ -1,7 +1,11 @@
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/students_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/edit_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/student_profile_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 /// Compact student profile card that expands to full dialog on tap
@@ -11,17 +15,13 @@ import 'package:intl/intl.dart';
 /// - [email] contact
 /// - [joinDate] of enrollment
 class StudentProfile extends StatefulWidget {
-  final String name;
-  final String username;
-  final String email;
-  final DateTime joinDate;
+  final Student student;
+  final VoidCallback callback;
 
   const StudentProfile({
     super.key,
-    required this.name,
-    required this.username,
-    required this.email,
-    required this.joinDate,
+    required this.student,
+    required this.callback,
   });
 
   @override
@@ -30,13 +30,80 @@ class StudentProfile extends StatefulWidget {
 
 class _StudentProfileState extends State<StudentProfile> {
   bool isHovered = false; // Tracks hover state for visual feedback
+  bool _isDeleting = false;
+
+  // Variables for API integration
+  late StudentsService _studentService;
+
+  Future<void> _deleteStudent() async {
+    if (_isDeleting) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('تأكيد الحذف'),
+        content: Text(
+          'هل أنت متأكد من رغبتك في حذف حساب ${widget.student.fullName}؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      _studentService.deleteStudent(token, widget.student.id!);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم حذف حساب الطالب بنجاح')));
+
+        widget.callback();
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _studentService = StudentsService(apiClient: apiClient);
+  }
 
   @override
   Widget build(BuildContext context) {
     final formattedDate = DateFormat(
       'MMM dd, yyyy',
       'ar',
-    ).format(widget.joinDate);
+    ).format(widget.student.birthDate);
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
@@ -60,17 +127,16 @@ class _StudentProfileState extends State<StudentProfile> {
               SizedBox(height: 10),
 
               // Course progress section
-              _buildCourseProgress(),
-              SizedBox(height: 7),
+              // _buildCourseProgress(),
+              // SizedBox(height: 7),
 
               // Progress bar visualization
-              EvaluationBar(),
-              SizedBox(height: 15),
+              // EvaluationBar(),
+              // SizedBox(height: 15),
 
               // Rating display
-              _buildRatingSection(),
-              SizedBox(height: 10),
-
+              // _buildRatingSection(),
+              // SizedBox(height: 10),
               Divider(color: Colors.black12),
               SizedBox(height: 10),
 
@@ -87,8 +153,7 @@ class _StudentProfileState extends State<StudentProfile> {
   void _showProfileDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) =>
-          StudentProfileDialog(name: widget.name, username: widget.username),
+      builder: (context) => StudentProfileDialog(student: widget.student),
     );
   }
 
@@ -123,13 +188,13 @@ class _StudentProfileState extends State<StudentProfile> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              widget.name,
+              widget.student.fullName,
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
-              widget.username,
+              widget.student.username,
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -159,7 +224,7 @@ class _StudentProfileState extends State<StudentProfile> {
           ],
         ),
         Text(
-          "جامعة/مدرسة",
+          widget.student.educationLevel,
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -222,7 +287,7 @@ class _StudentProfileState extends State<StudentProfile> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "انضم في: $formattedDate",
+          "ولد في: $formattedDate",
           style: TextStyle(color: Colors.black87, fontSize: 12),
         ),
         Row(
@@ -231,26 +296,16 @@ class _StudentProfileState extends State<StudentProfile> {
             IconButton(
               onPressed: () => showDialog(
                 context: context,
-                builder: (context) => EditStudentDialog(
-                  student: Student(
-                    id: 1,
-                    firstName: "firstName",
-                    lastName: "lastName",
-                    middleName: "fatherName",
-                    username: "username",
-                    phone: "mobileNumber",
-                    parentPhone: '',
-                    educationLevel: '',
-                    gender: '',
-                    birthDate: DateTime.now(),
-                  ),
-                ),
+                builder: (context) =>
+                    EditStudentDialog(student: widget.student),
               ),
               icon: Icon(Icons.edit, color: Colors.green),
             ),
             IconButton(
-              onPressed: () {}, // TODO: Implement delete functionality
-              icon: Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: () => _deleteStudent(),
+              icon: _isDeleting
+                  ? CircularProgressIndicator(strokeWidth: 2)
+                  : Icon(Icons.delete_outline, color: Colors.red),
             ),
           ],
         ),

@@ -75,6 +75,7 @@ class MyApp extends StatelessWidget {
           '/certificates': (context) => CertificatesPage(),
           "/curriculums": (context) => CurriculumsPage(),
           '/accounts': (context) => AccountsPage(),
+          '/login': (context) => LoginScreen(),
         },
       ),
     );

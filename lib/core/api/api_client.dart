@@ -77,7 +77,11 @@ class ApiClient {
     final uri = Uri.parse('$baseUrl/$endpoint');
     return await httpClient.delete(
       uri,
-      headers: {},
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
       body: body != null ? jsonEncode(body) : null,
     );
   }

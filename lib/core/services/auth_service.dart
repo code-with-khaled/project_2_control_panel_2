@@ -36,7 +36,7 @@ class AuthService {
 
     if (response.statusCode == 200) {
     } else {
-      throw Exception('Login failed');
+      throw Exception('Logout failed');
     }
   }
 }

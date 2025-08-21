@@ -1,3 +1,4 @@
+import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/send_notification_dialog.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
@@ -12,14 +13,9 @@ import 'package:google_fonts/google_fonts.dart';
 ///
 /// Shows [name] and [username] with tabbed sections for different profile aspects
 class StudentProfileDialog extends StatefulWidget {
-  final String name;
-  final String username;
+  final Student student;
 
-  const StudentProfileDialog({
-    super.key,
-    required this.name,
-    required this.username,
-  });
+  const StudentProfileDialog({super.key, required this.student});
 
   @override
   State<StudentProfileDialog> createState() => _StudentProfileDialogState();
@@ -160,8 +156,10 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (context) =>
-              EnrollStudentDialog(name: widget.name, username: widget.username),
+          builder: (context) => EnrollStudentDialog(
+            name: widget.student.fullName,
+            username: widget.student.username,
+          ),
         );
       },
       style: ElevatedButton.styleFrom(
@@ -202,7 +200,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.name,
+              widget.student.fullName,
               style: GoogleFonts.roboto(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -210,7 +208,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
             ),
             SizedBox(height: 4),
             Text(
-              widget.username,
+              widget.student.username,
               style: GoogleFonts.roboto(fontSize: 15, color: Colors.grey[600]),
             ),
           ],
@@ -279,7 +277,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       case "التقييمات":
         return ReviewsSection();
       default:
-        return OverviewSection(name: widget.name, username: widget.username);
+        return OverviewSection(student: widget.student);
     }
   }
 }

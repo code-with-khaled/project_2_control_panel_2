@@ -1,11 +1,16 @@
-import 'package:control_panel_2/constants/all_students.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/students_service.dart';
+import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/add_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/student_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:http/http.dart' as http;
 
 /// Main page for student management system
 ///
@@ -26,11 +31,36 @@ class _StudentsPageState extends State<StudentsPage> {
   String _activeFilter = 'كل الطلاب'; // Current active filter type
 
   /// Filters and sorts students based on search query and active filter
-  List<Map<String, dynamic>> get _filteredStudents {
-    // Initial filtering by search query
-    List<Map<String, dynamic>> results = allStudents.where((student) {
-      final name = student['name'].toString().toLowerCase();
-      final username = student['username'].toString().toLowerCase();
+  // List<Map<String, dynamic>> get _filteredStudents {
+  //   // Initial filtering by search query
+  //   List<Map<String, dynamic>> results = allStudents.where((student) {
+  //     final name = student['name'].toString().toLowerCase();
+  //     final username = student['username'].toString().toLowerCase();
+  //     final query = _searchQuery.toLowerCase();
+  //     return name.contains(query) || username.contains(query);
+  //   }).toList();
+
+  //   // Apply additional sorting based on active filter
+  //   switch (_activeFilter) {
+  //     case 'الأحدث':
+  //       results.sort((a, b) => b['joinDate'].compareTo(a['joinDate']));
+  //       break;
+  //     case 'أبجدي':
+  //       results.sort((a, b) => a['name'].compareTo(b['name']));
+  //       break;
+  //     default: // 'كل الطلاب' - no additional sorting
+  //       break;
+  //   }
+
+  //   return results;
+  // }
+
+  List<Student> get _filteredStudents {
+    if (_students.isEmpty) return [];
+
+    List<Student> results = _students.where((student) {
+      final name = student.fullName.toString().toLowerCase();
+      final username = student.username.toString().toLowerCase();
       final query = _searchQuery.toLowerCase();
       return name.contains(query) || username.contains(query);
     }).toList();
@@ -38,10 +68,10 @@ class _StudentsPageState extends State<StudentsPage> {
     // Apply additional sorting based on active filter
     switch (_activeFilter) {
       case 'الأحدث':
-        results.sort((a, b) => b['joinDate'].compareTo(a['joinDate']));
+        results.sort((a, b) => b.birthDate.compareTo(a.birthDate));
         break;
       case 'أبجدي':
-        results.sort((a, b) => a['name'].compareTo(b['name']));
+        results.sort((a, b) => a.firstName.compareTo(b.firstName));
         break;
       default: // 'كل الطلاب' - no additional sorting
         break;
@@ -57,15 +87,64 @@ class _StudentsPageState extends State<StudentsPage> {
     });
   }
 
+  // Variables for API integration
+  late StudentsService _studentService;
+  List<Student> _students = [];
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _studentService = StudentsService(apiClient: apiClient);
+
+    _loadStudents();
+
     // Listen for search query changes
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text;
       });
     });
+  }
+
+  Future<void> _loadStudents() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final students = await _studentService.fetchStudents(token);
+      setState(() {
+        _students = students;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+
+    // ignore: avoid_print
+    print(_students);
+  }
+
+  // Refresh students list (call this after adding a new student)
+  void _refreshStudents() {
+    _loadStudents();
   }
 
   @override
@@ -91,12 +170,16 @@ class _StudentsPageState extends State<StudentsPage> {
                   _buildPageHeader(),
                   SizedBox(height: 25),
 
-                  // Search and filter section
-                  _buildSearchSection(),
-                  SizedBox(height: 25),
+                  if (_isLoading) _buildLoadingState(),
 
-                  // Responsive student grid
-                  _buildStudentGrid(),
+                  if (!_isLoading) ...[
+                    // Search and filter section
+                    _buildSearchSection(),
+                    SizedBox(height: 25),
+
+                    // Responsive student grid
+                    _buildStudentGrid(),
+                  ],
                 ],
               ),
             ),
@@ -154,7 +237,20 @@ class _StudentsPageState extends State<StudentsPage> {
 
   // Shows the add student dialog
   void _showAddStudentDialog() {
-    showDialog(context: context, builder: (context) => AddStudentDialog());
+    showDialog(
+      context: context,
+      builder: (context) => AddStudentDialog(callback: _refreshStudents),
+    );
+  }
+
+  // Build loading state
+  Widget _buildLoadingState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 
   // Builds search and filter controls
@@ -251,10 +347,8 @@ class _StudentsPageState extends State<StudentsPage> {
                     (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
                     itemsPerRow,
                 child: StudentProfile(
-                  name: student['name'],
-                  username: student['username'],
-                  email: student['email'],
-                  joinDate: student['joinDate'],
+                  student: student,
+                  callback: _refreshStudents,
                 ),
               ),
           ],

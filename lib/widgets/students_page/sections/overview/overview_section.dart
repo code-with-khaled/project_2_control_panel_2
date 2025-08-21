@@ -1,17 +1,13 @@
+import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/sections/overview/overview_left.dart';
 import 'package:control_panel_2/widgets/students_page/sections/overview/overview_right.dart';
 import 'package:control_panel_2/widgets/students_page/statistic_card.dart';
 import 'package:flutter/material.dart';
 
 class OverviewSection extends StatelessWidget {
-  final String name;
-  final String username;
+  final Student student;
 
-  const OverviewSection({
-    super.key,
-    required this.name,
-    required this.username,
-  });
+  const OverviewSection({super.key, required this.student});
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +21,18 @@ class OverviewSection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OverviewLeft(
-                      name: name,
-                      username: username,
-                      phone: '+963-994-387-970',
-                      gender: 'ذكر', // Male → ذكر
+                      name: student.fullName,
+                      username: student.username,
+                      phone: student.phone,
+                      gender: student.gender,
                     ),
                   ),
                   SizedBox(width: 20),
                   Expanded(
                     child: OverviewRight(
                       university: "MIT",
-                      specialization:
-                          "علم البيانات", // Data Science → علم البيانات
-                      level: "درجة الماجستير", // Master Degree → درجة الماجستير
+                      specialization: "علم البيانات",
+                      level: "درجة الماجستير",
                     ),
                   ),
                 ],
@@ -46,10 +41,10 @@ class OverviewSection extends StatelessWidget {
               return Column(
                 children: [
                   OverviewLeft(
-                    name: name,
-                    username: username,
-                    phone: '+963-994-387-970',
-                    gender: 'ذكر',
+                    name: student.fullName,
+                    username: student.username,
+                    phone: student.phone,
+                    gender: student.gender,
                   ),
                   SizedBox(height: 20),
                   OverviewRight(
