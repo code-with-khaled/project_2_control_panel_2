@@ -30,62 +30,12 @@ class _StudentsPageState extends State<StudentsPage> {
   String _searchQuery = '';
   String _activeFilter = 'كل الطلاب'; // Current active filter type
 
-  /// Filters and sorts students based on search query and active filter
-  // List<Map<String, dynamic>> get _filteredStudents {
-  //   // Initial filtering by search query
-  //   List<Map<String, dynamic>> results = allStudents.where((student) {
-  //     final name = student['name'].toString().toLowerCase();
-  //     final username = student['username'].toString().toLowerCase();
-  //     final query = _searchQuery.toLowerCase();
-  //     return name.contains(query) || username.contains(query);
-  //   }).toList();
-
-  //   // Apply additional sorting based on active filter
-  //   switch (_activeFilter) {
-  //     case 'الأحدث':
-  //       results.sort((a, b) => b['joinDate'].compareTo(a['joinDate']));
-  //       break;
-  //     case 'أبجدي':
-  //       results.sort((a, b) => a['name'].compareTo(b['name']));
-  //       break;
-  //     default: // 'كل الطلاب' - no additional sorting
-  //       break;
-  //   }
-
-  //   return results;
-  // }
-
-  List<Student> get _filteredStudents {
-    if (_students.isEmpty) return [];
-
-    List<Student> results = _students.where((student) {
-      final name = student.fullName.toString().toLowerCase();
-      final username = student.username.toString().toLowerCase();
-      final query = _searchQuery.toLowerCase();
-      return name.contains(query) || username.contains(query);
-    }).toList();
-
-    // Apply additional sorting based on active filter
-    switch (_activeFilter) {
-      case 'الأحدث':
-        results.sort((a, b) => b.birthDate.compareTo(a.birthDate));
-        break;
-      case 'أبجدي':
-        results.sort((a, b) => a.firstName.compareTo(b.firstName));
-        break;
-      default: // 'كل الطلاب' - no additional sorting
-        break;
-    }
-
-    return results;
-  }
-
-  /// Updates the active filter type
-  void _setFilter(String filter) {
-    setState(() {
-      _activeFilter = filter;
-    });
-  }
+  // Pagination variables
+  int _currentPage = 1;
+  int _totalPages = 1;
+  int _perPage = 10;
+  int _totalItems = 0;
+  final TextEditingController _pageController = TextEditingController();
 
   // Variables for API integration
   late StudentsService _studentService;
@@ -113,17 +63,22 @@ class _StudentsPageState extends State<StudentsPage> {
     });
   }
 
-  Future<void> _loadStudents() async {
+  Future<void> _loadStudents({int page = 1}) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       final token = TokenHelper.getToken();
-      final students = await _studentService.fetchStudents(token);
+      final response = await _studentService.fetchStudents(token, page: page);
       setState(() {
-        _students = students;
+        _students = response['students'];
+        _currentPage = response['pagination']['current_page'];
+        _totalPages = response['pagination']['last_page'];
+        _perPage = response['pagination']['per_page'];
+        _totalItems = response['pagination']['total'];
         _isLoading = false;
+        _pageController.text = _currentPage.toString();
       });
     } catch (e) {
       setState(() {
@@ -142,14 +97,21 @@ class _StudentsPageState extends State<StudentsPage> {
     print(_students);
   }
 
-  // Refresh students list (call this after adding a new student)
+  void _goToPage(int page) {
+    if (page >= 1 && page <= _totalPages) {
+      _loadStudents(page: page);
+    }
+  }
+
+  // Refresh students list (call this after adding/editing or deleting a student)
   void _refreshStudents() {
-    _loadStudents();
+    _loadStudents(page: _currentPage);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -177,8 +139,16 @@ class _StudentsPageState extends State<StudentsPage> {
                     _buildSearchSection(),
                     SizedBox(height: 25),
 
+                    // Student count and pagination info
+                    _buildPaginationInfo(),
+                    SizedBox(height: 15),
+
                     // Responsive student grid
                     _buildStudentGrid(),
+                    SizedBox(height: 25),
+
+                    // Pagination controls
+                    _buildPaginationControls(),
                   ],
                 ],
               ),
@@ -322,8 +292,65 @@ class _StudentsPageState extends State<StudentsPage> {
     );
   }
 
+  /// Updates the active filter type
+  void _setFilter(String filter) {
+    setState(() {
+      _activeFilter = filter;
+    });
+  }
+
+  // Build pagination info
+  Widget _buildPaginationInfo() {
+    final startItem = ((_currentPage - 1) * _perPage) + 1;
+    final endItem = _currentPage == _totalPages
+        ? _totalItems
+        : _currentPage * _perPage;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "عرض $startItem - $endItem من أصل $_totalItems طالب",
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+        Text(
+          "الصفحة $_currentPage من $_totalPages",
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+      ],
+    );
+  }
+
   // Builds responsive student grid
   Widget _buildStudentGrid() {
+    List<Student> displayedStudents = _students;
+
+    // Apply search filter
+    if (_searchQuery.isNotEmpty) {
+      displayedStudents = _students.where((student) {
+        final name = student.fullName.toString().toLowerCase();
+        final username = student.username.toString().toLowerCase();
+        final query = _searchQuery.toLowerCase();
+        return name.contains(query) || username.contains(query);
+      }).toList();
+    }
+
+    // Apply sorting
+    switch (_activeFilter) {
+      case 'الأحدث':
+        displayedStudents.sort((a, b) => b.birthDate.compareTo(a.birthDate));
+        break;
+      case 'أبجدي':
+        displayedStudents.sort((a, b) => a.firstName.compareTo(b.firstName));
+        break;
+      default:
+        break;
+    }
+
+    if (displayedStudents.isEmpty) {
+      return _buildEmptyState();
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // Calculate responsive column count
@@ -331,17 +358,11 @@ class _StudentsPageState extends State<StudentsPage> {
         int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
         itemsPerRow = itemsPerRow.clamp(1, 4); // Limit between 1-4 columns
 
-        final students = _filteredStudents;
-
-        if (students.isEmpty) {
-          return _buildEmptyState();
-        }
-
         return Wrap(
           spacing: 20,
           runSpacing: 20,
           children: [
-            for (final student in students)
+            for (final student in displayedStudents)
               SizedBox(
                 width:
                     (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
@@ -365,6 +386,86 @@ class _StudentsPageState extends State<StudentsPage> {
         child: Text(
           'لا توجد نتائج',
           style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  // Build pagination controls
+  Widget _buildPaginationControls() {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // First page button
+            IconButton(
+              icon: Icon(Icons.first_page),
+              onPressed: _currentPage > 1 ? () => _goToPage(1) : null,
+            ),
+            SizedBox(width: 8),
+
+            // Previous page button
+            IconButton(
+              icon: Icon(Icons.chevron_left),
+              onPressed: _currentPage > 1
+                  ? () => _goToPage(_currentPage - 1)
+                  : null,
+            ),
+            SizedBox(width: 16),
+
+            // Page input
+            SizedBox(
+              width: 40,
+              height: 30,
+              child: TextField(
+                cursorColor: Colors.blue,
+                controller: _pageController,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 12,
+                  ),
+                  border: OutlineInputBorder(),
+                ),
+                onSubmitted: (value) {
+                  final page = int.tryParse(value) ?? 1;
+                  _goToPage(page);
+                },
+              ),
+            ),
+
+            Text(' / $_totalPages', style: TextStyle(fontSize: 16)),
+            SizedBox(width: 16),
+
+            // Next page button
+            IconButton(
+              icon: Icon(Icons.chevron_right),
+              onPressed: _currentPage < _totalPages
+                  ? () => _goToPage(_currentPage + 1)
+                  : null,
+            ),
+            SizedBox(width: 8),
+
+            // Last page button
+            IconButton(
+              icon: Icon(Icons.last_page),
+              onPressed: _currentPage < _totalPages
+                  ? () => _goToPage(_totalPages)
+                  : null,
+            ),
+          ],
         ),
       ),
     );

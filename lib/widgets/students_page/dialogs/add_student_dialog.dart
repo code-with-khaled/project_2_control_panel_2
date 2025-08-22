@@ -171,7 +171,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     final educationLevel = _selectedEducationLevel == "بكالوريوس"
         ? 'university'
         : '';
-    final gender = _selectedGender == "ذكر" ? 'M' : 'F';
+    final gender = _selectedGender;
     final birthDate = _selectedDate;
     final password = _passwordController.text.trim();
 
@@ -183,7 +183,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       phone: phone,
       parentPhone: parentPhone,
       educationLevel: educationLevel,
-      gender: gender,
+      gender: gender!,
       birthDate: birthDate!,
       password: password,
     );
@@ -451,7 +451,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['ذكر', 'أنثى'].map((String value) {
+        items: ['M', 'F'].map((String value) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {

@@ -1,8 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/edit_teacher_profile_dialog.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/teacher_profile_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 /// Compact teacher profile card that:
 /// - Displays key teacher information
@@ -22,11 +23,6 @@ class _TeacherProfileState extends State<TeacherProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat(
-      'MMM dd, yyyy',
-      'ar',
-    ).format(widget.teacher.joinDate);
-
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
@@ -55,7 +51,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
             SizedBox(height: 10),
 
             // Footer with join date and actions
-            _buildFooter(formattedDate),
+            _buildFooter(),
           ],
         ),
       ),
@@ -100,12 +96,10 @@ class _TeacherProfileState extends State<TeacherProfile> {
       children: [
         CircleAvatar(
           radius: 22,
-          backgroundImage: widget.teacher.profileImage != null
-              ? MemoryImage(widget.teacher.profileImage!)
+          backgroundImage: widget.teacher.image != null
+              ? MemoryImage(widget.teacher.image! as Uint8List)
               : null,
-          child: widget.teacher.profileImage == null
-              ? Icon(Icons.person)
-              : null,
+          child: widget.teacher.image == null ? Icon(Icons.person) : null,
         ),
         SizedBox(width: 10),
         Column(
@@ -166,13 +160,13 @@ class _TeacherProfileState extends State<TeacherProfile> {
         SizedBox(width: 8),
         Text("متوسط التقييم"),
         SizedBox(width: 8),
-        Text(widget.teacher.rating.toStringAsFixed(1)),
+        Text(widget.teacher.rate!.toStringAsFixed(1)),
       ],
     );
   }
 
   /// Builds footer with actions and join date
-  Widget _buildFooter(String formattedDate) {
+  Widget _buildFooter() {
     return Row(
       children: [
         // View details button

@@ -25,13 +25,10 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _mobileNumberController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
   final TextEditingController _specializationController =
       TextEditingController();
-  final TextEditingController _certificatesController = TextEditingController();
-  final TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _headlineController = TextEditingController();
+  final TextEditingController _experiencesController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
@@ -59,22 +56,17 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
     _usernameController.text = widget.teacher.username;
-    _mobileNumberController.text = widget.teacher.mobileNumber;
-
-    // Password fields are intentionally left empty for security
-    _passwordController.text = '';
-    _confirmPasswordController.text = '';
-
+    _mobileNumberController.text = widget.teacher.phone;
+    _headlineController.text = widget.teacher.headline;
     _specializationController.text = widget.teacher.specialization;
-    _certificatesController.text = widget.teacher.certificates;
-    _experienceController.text = widget.teacher.experience;
+    _experiencesController.text = widget.teacher.experiences;
     _descriptionController.text = widget.teacher.description;
 
     // Set the education level dropdown value
     _selectedEducationLevel = widget.teacher.educationLevel;
 
     // Set the profile image if it exists
-    _imageBytes = widget.teacher.profileImage;
+    _imageBytes = widget.teacher.image as Uint8List?;
   }
 
   @override
@@ -84,11 +76,9 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     _lastNameController.dispose();
     _usernameController.dispose();
     _mobileNumberController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     _specializationController.dispose();
-    _certificatesController.dispose();
-    _experienceController.dispose();
+    _headlineController.dispose();
+    _experiencesController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -97,23 +87,6 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   String? _validateNotEmpty(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
       return 'مطلوب $fieldName';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'كلمة المرور مطلوبة';
-    }
-    if (value.length < 8) {
-      return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value != _passwordController.text) {
-      return 'كلمات المرور غير متطابقة';
     }
     return null;
   }
@@ -128,23 +101,16 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     return null;
   }
 
-  String? _validateSpecialization(String? value) {
+  String? _validateHeadline(String? value) {
     if (value == null || value.isEmpty) {
-      return 'التخصص مطلوب';
-    }
-    return null;
-  }
-
-  String? _validateCertifications(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الشهدات مطلوبة';
+      return 'المؤهل مطلوبة';
     }
     return null;
   }
 
   String? _validateExperience(String? value) {
     if (value == null || value.isEmpty) {
-      return 'الخبرة مطلوبة';
+      return 'الخبرات مطلوبة';
     }
     return null;
   }
@@ -204,16 +170,6 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
                   _buildMobileNumberField(),
                   SizedBox(height: 25),
 
-                  // Password fields
-                  Row(
-                    children: [
-                      Expanded(child: _buildPasswordField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildConfirmPasswordField()),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-
                   // Education Level and Specialization fields
                   Row(
                     children: [
@@ -225,11 +181,11 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
                   SizedBox(height: 25),
 
                   // Certificates field
-                  _buildCertificatesField(),
+                  _buildHeadlineField(),
                   SizedBox(height: 25),
 
                   // Work Experience field
-                  _buildWorkExperienceField(),
+                  _buildExperiencesField(),
                   SizedBox(height: 25),
 
                   // Short Description field
@@ -386,39 +342,6 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     ],
   );
 
-  Widget _buildPasswordField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("كلمة المرور *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أدخل كلمة المرور",
-        controller: _passwordController,
-        maxLines: 1,
-        obsecure: true,
-        validator: _validatePassword,
-      ),
-    ],
-  );
-
-  Widget _buildConfirmPasswordField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "تأكيد كلمة المرور *",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أعد إدخال كلمة المرور",
-        controller: _confirmPasswordController,
-        maxLines: 1,
-        obsecure: true,
-        validator: _validateConfirmPassword,
-      ),
-    ],
-  );
-
   Widget _buildEducationLevelField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -439,7 +362,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['دبلوم', 'بكالوريوس', 'ماجستير', 'دكتوراه', 'أخرى'].map((
+        items: ['غير ذلك', 'دراسات عليا', 'جامعي', 'ثانوي', 'إعدادي'].map((
           String value,
         ) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
@@ -455,38 +378,37 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   Widget _buildSpecializationField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("التخصص الجامعي *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("التخصص *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       CustomTextField(
         hintText: "مثال: رياضيات، كيمياء",
         controller: _specializationController,
-        validator: _validateSpecialization,
       ),
     ],
   );
 
-  Widget _buildCertificatesField() => Column(
+  Widget _buildHeadlineField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الشهادات *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      Text("المؤهلات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
       CustomTextField(
-        hintText: "أدخل الشهادات ذات الصلة والمؤهلات",
-        controller: _certificatesController,
+        hintText: "أدخل المؤهلات",
+        controller: _headlineController,
+        validator: _validateHeadline,
+      ),
+    ],
+  );
+
+  Widget _buildExperiencesField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("الخبرات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      CustomTextField(
+        hintText: "أدخل الخبرات الخاصة بالمدرس",
         maxLines: 3,
-        validator: _validateCertifications,
-      ),
-    ],
-  );
-
-  Widget _buildWorkExperienceField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("سنوات الخبرة *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "مثال:  5 سنوات",
-        controller: _experienceController,
+        controller: _experiencesController,
         validator: _validateExperience,
       ),
     ],

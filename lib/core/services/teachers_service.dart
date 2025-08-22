@@ -1,19 +1,19 @@
 import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
-import 'package:control_panel_2/models/student_model.dart';
+import 'package:control_panel_2/models/teacher_model.dart';
 
-class StudentsService {
+class TeachersService {
   final ApiClient apiClient;
 
-  StudentsService({required this.apiClient});
+  TeachersService({required this.apiClient});
 
-  Future<Map<String, dynamic>> fetchStudents(
+  Future<Map<String, dynamic>> fetchTeachers(
     String? token, {
     int page = 1,
   }) async {
     final response = await apiClient.get(
-      "dashboard/students?page=$page",
+      "dashboard/teachers?page=$page",
       token: token,
     );
 
@@ -23,7 +23,7 @@ class StudentsService {
       final meta = json['data']['meta'];
 
       return {
-        'students': items.map((json) => Student.fromJson(json)).toList(),
+        'teachers': items.map((json) => Teacher.fromJson(json)).toList(),
         'pagination': {
           'current_page': meta['current_page'],
           'last_page': meta['last_page'],
@@ -47,10 +47,10 @@ class StudentsService {
     }
   }
 
-  Future<void> createStudent(String? token, Student student) async {
+  Future<void> createTeacher(String? token, Teacher teacher) async {
     final response = await apiClient.post(
-      "dashboard/students",
-      body: student.toJson(),
+      "dashboard/teachers",
+      body: teacher.toJson(),
       token: token,
     );
 
@@ -71,9 +71,9 @@ class StudentsService {
     }
   }
 
-  Future<void> editStudent(String? token, int id, Student student) async {
+  Future<void> editTeacher(String? token, int id, Teacher student) async {
     final response = await apiClient.put(
-      "dashboard/students/$id",
+      "dashboard/teachers/$id",
       body: student.toJson(),
       token: token,
     );
@@ -95,9 +95,9 @@ class StudentsService {
     }
   }
 
-  Future<void> deleteStudent(String? token, int id) async {
+  Future<void> deleteTeacher(String? token, int id) async {
     final response = await apiClient.delete(
-      "dashboard/students/$id",
+      "dashboard/teachers/$id",
       token: token,
     );
 

@@ -143,7 +143,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
     final educationLevel = _selectedEducationLevel == "بكالوريوس"
         ? 'university'
         : '';
-    final gender = _selectedGender == "ذكر" ? 'M' : 'F';
+    final gender = _selectedGender;
     final birthDate = _selectedDate;
 
     final student = Student(
@@ -154,7 +154,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
       phone: phone,
       parentPhone: parentPhone,
       educationLevel: educationLevel,
-      gender: gender,
+      gender: gender!,
       birthDate: birthDate!,
     );
 
@@ -207,7 +207,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
       text: DateFormat('MM/dd/yyyy').format(widget.student.birthDate),
     );
 
-    _selectedGender = widget.student.gender == 'M' ? 'ذكر' : 'أنثى';
+    _selectedGender = widget.student.gender;
     _selectedEducationLevel = widget.student.educationLevel == "جامعي"
         ? 'بكالوريوس'
         : '';
@@ -427,7 +427,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['ذكر', 'أنثى'].map((String value) {
+        items: ['M', 'F'].map((String value) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {

@@ -1,11 +1,18 @@
 import 'dart:typed_data';
 
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/teachers_service.dart';
+import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class AddTeacherDialog extends StatefulWidget {
-  const AddTeacherDialog({super.key});
+  final VoidCallback callback;
+
+  const AddTeacherDialog({super.key, required this.callback});
 
   @override
   State<AddTeacherDialog> createState() => _AddTeacherDialogState();
@@ -25,14 +32,15 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       TextEditingController();
   final TextEditingController _specializationController =
       TextEditingController();
-  final TextEditingController _certificatesController = TextEditingController();
-  final TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _headlineController = TextEditingController();
+  final TextEditingController _experiencesController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   // State variables
   bool _obsecure = true;
   Uint8List? _imageBytes;
   String? _selectedEducationLevel;
+  bool _isSubmitting = false;
 
   void _showPassword() {
     setState(() {
@@ -88,23 +96,16 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     return null;
   }
 
-  String? _validateSpecialization(String? value) {
+  String? _validateHeadline(String? value) {
     if (value == null || value.isEmpty) {
-      return 'التخصص مطلوب';
+      return 'المؤهل مطلوب';
     }
     return null;
   }
 
-  String? _validateCertifications(String? value) {
+  String? _validateExperiences(String? value) {
     if (value == null || value.isEmpty) {
-      return 'الشهدات مطلوبة';
-    }
-    return null;
-  }
-
-  String? _validateExperience(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الخبرة مطلوبة';
+      return 'الخبرات مطلوبة';
     }
     return null;
   }
@@ -114,6 +115,106 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       return 'الوصف مطلوب';
     }
     return null;
+  }
+
+  // Variables for API integration
+  late TeachersService _teachersService;
+
+  Future<void> _createTeacher() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final username = _usernameController.text.trim();
+    final phone = _mobileNumberController.text.trim();
+    // final educationLevel = _selectedEducationLevel;
+    final educationLevel = 'university';
+
+    final password = _passwordController.text.trim();
+    final specialization = _specializationController.text.trim();
+    final headline = _headlineController.text.trim();
+    final experiences = _experiencesController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    final teacher = Teacher(
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      phone: phone,
+      password: password,
+      educationLevel: educationLevel,
+      specialization: specialization,
+      headline: headline,
+      experiences: experiences,
+      description: description,
+    );
+
+    try {
+      final token = TokenHelper.getToken();
+      await _teachersService.createTeacher(token, teacher);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء حساب الطالب بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء حساب الطالب الطالب'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _teachersService = TeachersService(apiClient: apiClient);
+  }
+
+  @override
+  void dispose() {
+    // Clean up controllers
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _usernameController.dispose();
+    _mobileNumberController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _specializationController.dispose();
+    _headlineController.dispose();
+    _experiencesController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -201,12 +302,12 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
                   ),
                   SizedBox(height: 25),
 
-                  // Certificates field
-                  _buildCertificatesField(),
+                  // Headline field
+                  _buildHeadlineField(),
                   SizedBox(height: 25),
 
-                  // Work Experience field
-                  _buildWorkExperienceField(),
+                  // Experiences field
+                  _buildExperiencesField(),
                   SizedBox(height: 25),
 
                   // Short Description field
@@ -411,7 +512,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['دبلوم', 'بكالوريوس', 'ماجستير', 'دكتوراه', 'أخرى'].map((
+        items: ['غير ذلك', 'دراسات عليا', 'جامعي', 'ثانوي', 'إعدادي'].map((
           String value,
         ) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
@@ -427,39 +528,38 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   Widget _buildSpecializationField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("التخصص الجامعي *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("التخصص *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       CustomTextField(
         hintText: "مثال: رياضيات، كيمياء",
         controller: _specializationController,
-        validator: _validateSpecialization,
       ),
     ],
   );
 
-  Widget _buildCertificatesField() => Column(
+  Widget _buildHeadlineField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الشهادات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("المؤهلات *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       CustomTextField(
-        hintText: "أدخل الشهادات ذات الصلة والمؤهلات",
-        controller: _certificatesController,
+        hintText: "أدخل المؤهلات",
+        controller: _headlineController,
+        validator: _validateHeadline,
+      ),
+    ],
+  );
+
+  Widget _buildExperiencesField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("الخبرات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      CustomTextField(
+        hintText: "أدخل الخبرات الخاصة بالمدرس",
         maxLines: 3,
-        validator: _validateCertifications,
-      ),
-    ],
-  );
-
-  Widget _buildWorkExperienceField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("سنوات الخبرة *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      CustomTextField(
-        hintText: "مثال:  5 سنوات",
-        controller: _experienceController,
-        validator: _validateExperience,
+        controller: _experiencesController,
+        validator: _validateExperiences,
       ),
     ],
   );
@@ -470,7 +570,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       Text("وصف قصير *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       CustomTextField(
-        hintText: "شرح مختصر حول خلفية المدرس و خبرته",
+        hintText: "شرح مختصر حول خلفية المدرس",
         maxLines: 4,
         controller: _descriptionController,
         validator: _validateDescription,
@@ -484,13 +584,22 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Form is valid - process data
+            _createTeacher();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء حساب المدرس"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء حساب المدرس"),
+              ),
       ),
     ],
   );

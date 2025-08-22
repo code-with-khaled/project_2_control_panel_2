@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/students_service.dart';

@@ -30,9 +30,8 @@ class OverviewSection extends StatelessWidget {
                   SizedBox(width: 20),
                   Expanded(
                     child: OverviewRight(
-                      university: "MIT",
                       specialization: "علم البيانات",
-                      level: "درجة الماجستير",
+                      level: student.educationLevel,
                     ),
                   ),
                 ],
@@ -48,9 +47,8 @@ class OverviewSection extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   OverviewRight(
-                    university: "MIT",
                     specialization: "علم البيانات",
-                    level: "درجة الماجستير",
+                    level: student.educationLevel,
                   ),
                 ],
               );

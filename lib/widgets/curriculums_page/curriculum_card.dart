@@ -1,5 +1,4 @@
 import 'package:control_panel_2/models/curriculum_model.dart';
-import 'package:control_panel_2/widgets/curriculums_page/sections/marks_section/marks_section.dart';
 import 'package:control_panel_2/widgets/curriculums_page/sections/students_attendance_section.dart';
 import 'package:control_panel_2/widgets/curriculums_page/sections/teachers_attendance_section.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';

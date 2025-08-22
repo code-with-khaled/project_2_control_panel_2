@@ -148,142 +148,145 @@ class _LoginScreenState extends State<LoginScreen>
           Form(
             key: _formKey,
             child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 540),
-                child: SingleChildScrollView(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Container(
-                        padding: EdgeInsets.all(30),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black26),
-                          borderRadius: BorderRadius.circular(6),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "مرحباً بك",
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 540),
+                  child: SingleChildScrollView(
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          padding: EdgeInsets.all(30),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black26),
+                            borderRadius: BorderRadius.circular(6),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                                offset: Offset(0, 4),
                               ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              "أدخل معلومات حسابك لتصل للوحة تحكم مسار",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            SizedBox(height: 30),
+                            ],
+                          ),
 
-                            // --- Animated Fields ---
-                            FadeTransition(
-                              opacity: _usernameAnimation,
-                              child: SlideTransition(
-                                position:
-                                    Tween<Offset>(
-                                      begin: Offset(0.0, 0.5),
-                                      end: Offset.zero,
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: _animationController,
-                                        curve: Interval(
-                                          0.0,
-                                          0.3,
-                                          curve: Curves.easeOut,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "مرحباً بك",
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                "أدخل معلومات حسابك لتصل للوحة تحكم مسار",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(height: 30),
+
+                              // --- Animated Fields ---
+                              FadeTransition(
+                                opacity: _usernameAnimation,
+                                child: SlideTransition(
+                                  position:
+                                      Tween<Offset>(
+                                        begin: Offset(0.0, 0.5),
+                                        end: Offset.zero,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: _animationController,
+                                          curve: Interval(
+                                            0.0,
+                                            0.3,
+                                            curve: Curves.easeOut,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                child: _buildUsernameField(),
+                                  child: _buildUsernameField(),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 20),
+                              SizedBox(height: 20),
 
-                            FadeTransition(
-                              opacity: _passwordAnimation,
-                              child: SlideTransition(
-                                position:
-                                    Tween<Offset>(
-                                      begin: Offset(0.0, 0.5),
-                                      end: Offset.zero,
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: _animationController,
-                                        curve: Interval(
-                                          0.2,
-                                          0.5,
-                                          curve: Curves.easeOut,
+                              FadeTransition(
+                                opacity: _passwordAnimation,
+                                child: SlideTransition(
+                                  position:
+                                      Tween<Offset>(
+                                        begin: Offset(0.0, 0.5),
+                                        end: Offset.zero,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: _animationController,
+                                          curve: Interval(
+                                            0.2,
+                                            0.5,
+                                            curve: Curves.easeOut,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                child: _buildPasswordField(),
+                                  child: _buildPasswordField(),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 20),
+                              SizedBox(height: 20),
 
-                            FadeTransition(
-                              opacity: _roleAnimation,
-                              child: SlideTransition(
-                                position:
-                                    Tween<Offset>(
-                                      begin: Offset(0.0, 0.5),
-                                      end: Offset.zero,
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: _animationController,
-                                        curve: Interval(
-                                          0.4,
-                                          0.7,
-                                          curve: Curves.easeOut,
+                              FadeTransition(
+                                opacity: _roleAnimation,
+                                child: SlideTransition(
+                                  position:
+                                      Tween<Offset>(
+                                        begin: Offset(0.0, 0.5),
+                                        end: Offset.zero,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: _animationController,
+                                          curve: Interval(
+                                            0.4,
+                                            0.7,
+                                            curve: Curves.easeOut,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                child: _buildRoleSelection(),
+                                  child: _buildRoleSelection(),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 25),
+                              SizedBox(height: 25),
 
-                            // --- Animated Button ---
-                            FadeTransition(
-                              opacity: _buttonAnimation,
-                              child: SlideTransition(
-                                position:
-                                    Tween<Offset>(
-                                      begin: Offset(0.0, 0.5),
-                                      end: Offset.zero,
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: _animationController,
-                                        curve: Interval(
-                                          0.6,
-                                          1.0,
-                                          curve: Curves.easeOut,
+                              // --- Animated Button ---
+                              FadeTransition(
+                                opacity: _buttonAnimation,
+                                child: SlideTransition(
+                                  position:
+                                      Tween<Offset>(
+                                        begin: Offset(0.0, 0.5),
+                                        end: Offset.zero,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: _animationController,
+                                          curve: Interval(
+                                            0.6,
+                                            1.0,
+                                            curve: Curves.easeOut,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                child: _buildLoginButton(),
+                                  child: _buildLoginButton(),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 10),
+                              SizedBox(height: 10),
 
-                            _buildPasswordEdits(),
-                          ],
+                              _buildPasswordEdits(),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -421,9 +424,6 @@ class _LoginScreenState extends State<LoginScreen>
                       );
 
                       TokenHelper.storeToken(token);
-
-                      // ignore: avoid_print
-                      print(token);
 
                       _navigateToHome();
                     } catch (e) {

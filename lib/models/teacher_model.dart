@@ -2,176 +2,74 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 class Teacher {
-  final String id;
+  final int? id;
   final String firstName;
   final String lastName;
   final String username;
-  final String mobileNumber;
+  final String phone;
+  final String? password;
+  final String? image;
   final String educationLevel;
   final String specialization;
-  final String certificates;
-  final String experience;
+  final String headline;
+  final String experiences;
   final String description;
-  final Uint8List? profileImage;
-  final DateTime joinDate;
-  final double rating;
-  final bool isActive;
+  final double? rate;
+  final int roleId;
 
   const Teacher({
-    required this.id,
+    this.id,
     required this.firstName,
     required this.lastName,
     required this.username,
-    required this.mobileNumber,
+    required this.phone,
+    this.password,
+    this.image,
     required this.educationLevel,
     required this.specialization,
-    required this.certificates,
-    required this.experience,
+    required this.headline,
+    required this.experiences,
     required this.description,
-    this.profileImage,
-    required this.joinDate,
-    this.rating = 0.0,
-    this.isActive = true,
+    this.rate,
+    this.roleId = 4,
   });
 
-  // Named constructor for empty teacher
-  Teacher.empty()
-    : this(
-        id: '',
-        firstName: '',
-        lastName: '',
-        username: '',
-        mobileNumber: '',
-        educationLevel: '',
-        specialization: '',
-        certificates: '',
-        experience: '',
-        description: '',
-        profileImage: null,
-        joinDate: DateTime.now(),
-        rating: 0.0,
-        isActive: false,
-      );
-
-  // CopyWith method for immutable updates
-  Teacher copyWith({
-    String? id,
-    String? firstName,
-    String? lastName,
-    String? username,
-    String? mobileNumber,
-    String? educationLevel,
-    String? specialization,
-    String? certificates,
-    String? experience,
-    String? description,
-    Uint8List? profileImage,
-    DateTime? joinDate,
-    double? rating,
-    bool? isActive,
-  }) {
-    return Teacher(
-      id: id ?? this.id,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      username: username ?? this.username,
-      mobileNumber: mobileNumber ?? this.mobileNumber,
-      educationLevel: educationLevel ?? this.educationLevel,
-      specialization: specialization ?? this.specialization,
-      certificates: certificates ?? this.certificates,
-      experience: experience ?? this.experience,
-      description: description ?? this.description,
-      profileImage: profileImage ?? this.profileImage,
-      joinDate: joinDate ?? this.joinDate,
-      rating: rating ?? this.rating,
-      isActive: isActive ?? this.isActive,
-    );
-  }
-
-  // JSON Serialization
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
-      id: json['id'] as String,
-      firstName: json['firstName'] as String,
-      lastName: json['lastName'] as String,
+      id: json['id'] as int,
+      firstName: json['first_name'] as String,
+      lastName: json['last_name'] as String,
       username: json['username'] as String,
-      mobileNumber: json['mobileNumber'] as String,
-      educationLevel: json['educationLevel'] as String,
+      phone: json['phone'] as String,
+      image: json['image'] as String?,
+      educationLevel: json['education_level'] as String,
       specialization: json['specialization'] as String,
-      certificates: json['certificates'] as String,
-      experience: json['experience'] as String,
+      headline: json['headline'] as String,
+      experiences: json['experiences'] as String,
       description: json['description'] as String,
-      profileImage: json['profileImage'] != null
-          ? Uint8List.fromList(List<int>.from(json['profileImage']))
-          : null,
-      joinDate: DateTime.parse(json['joinDate'] as String),
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      isActive: json['isActive'] as bool? ?? true,
+      rate: double.parse(json['rate'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
+      'first_name': firstName,
+      'last_name': lastName,
       'username': username,
-      'mobileNumber': mobileNumber,
-      'educationLevel': educationLevel,
+      'phone': phone,
+      'password': password,
+      'image': image,
+      'education_level': educationLevel,
       'specialization': specialization,
-      'certificates': certificates,
-      'experience': experience,
+      'headline': headline,
+      'experiences': experiences,
       'description': description,
-      'profileImage': profileImage?.toList(),
-      'joinDate': joinDate.toIso8601String(),
-      'rating': rating,
-      'isActive': isActive,
+      'rate': rate.toString(),
+      'role_id': roleId,
     };
-  }
-
-  // Equality comparison
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Teacher &&
-        other.id == id &&
-        other.firstName == firstName &&
-        other.lastName == lastName &&
-        other.username == username &&
-        other.mobileNumber == mobileNumber &&
-        other.educationLevel == educationLevel &&
-        other.specialization == specialization &&
-        other.certificates == certificates &&
-        other.experience == experience &&
-        other.description == description &&
-        listEquals(other.profileImage, profileImage) &&
-        other.joinDate == joinDate &&
-        other.rating == rating &&
-        other.isActive == isActive;
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      id,
-      firstName,
-      lastName,
-      username,
-      mobileNumber,
-      educationLevel,
-      specialization,
-      certificates,
-      experience,
-      description,
-      profileImage,
-      joinDate,
-      rating,
-      isActive,
-    );
   }
 
   // Helper getters
   String get fullName => '$firstName $lastName';
-  String get formattedJoinDate =>
-      '${joinDate.day}/${joinDate.month}/${joinDate.year}';
 }
