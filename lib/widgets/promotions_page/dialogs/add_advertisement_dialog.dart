@@ -1,8 +1,17 @@
 import 'dart:typed_data';
 
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/advertisements_service.dart';
+import 'package:control_panel_2/models/advertisement_model.dart';
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+
+import 'package:http/http.dart' as http;
 
 /// A dialog widget for creating new advertisements
 ///
@@ -36,6 +45,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
   /// Opens file picker to select an image for the advertisement
   ///
   /// Sets [_imageBytes] and [_fileName] when a file is selected
+  // ignore: unused_element
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -51,12 +61,94 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     }
   }
 
+  String? _imageUrl;
+
+  Future<void> _pickImage2() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        _imageUrl = reader.result as String;
+        _fileName = file.name;
+      });
+    });
+  }
+
   // Validation functions
   String? _validateNotEmpty(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
       return '$fieldName مطلوب';
     }
     return null;
+  }
+
+  late AdvertisementsService advertisementsService;
+  bool _isSubmitting = false;
+
+  Future<void> _createAdvertisement() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final advertisement = Advertisement(
+      media: _imageUrl!,
+      type: "image",
+      startDate: "2025-08-23",
+      endDate: "2025-08-30",
+    );
+
+    try {
+      final token = TokenHelper.getToken();
+      await advertisementsService.createAdvertisement(
+        token,
+        advertisement,
+        _imageUrl,
+        _fileName,
+      );
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء الإعلان'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    advertisementsService = AdvertisementsService(apiClient: apiClient);
   }
 
   @override
@@ -189,7 +281,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       Text("صورة الإعلان *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       InkWell(
-        onTap: _pickImage,
+        onTap: _pickImage2,
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 50),
@@ -273,12 +365,22 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Add form submission logic here
+            _createAdvertisement();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء الإعلان"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء الإعلان"),
+              ),
       ),
     ],
   );
