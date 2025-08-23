@@ -1,18 +1,27 @@
 import 'dart:typed_data';
 
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/teachers_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/edit_teacher_profile_dialog.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/teacher_profile_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 /// Compact teacher profile card that:
 /// - Displays key teacher information
 /// - Expands to full dialog on tap
 /// - Supports edit and delete actions
 class TeacherProfile extends StatefulWidget {
+  final VoidCallback callback;
   final Teacher teacher;
 
-  const TeacherProfile({super.key, required this.teacher});
+  const TeacherProfile({
+    super.key,
+    required this.teacher,
+    required this.callback,
+  });
 
   @override
   State<TeacherProfile> createState() => _TeacherProfileState();
@@ -20,6 +29,73 @@ class TeacherProfile extends StatefulWidget {
 
 class _TeacherProfileState extends State<TeacherProfile> {
   bool isHovered = false; // Tracks hover state for visual feedback
+  bool _isDeleting = false;
+
+  // Variables for API integration
+  late TeachersService _teachersService;
+
+  Future<void> _deleteStudent() async {
+    if (_isDeleting) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('تأكيد الحذف'),
+        content: Text(
+          'هل أنت متأكد من رغبتك في حذف حساب ${widget.teacher.fullName}؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      _teachersService.deleteTeacher(token, widget.teacher.id!);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم حذف حساب المدرس بنجاح')));
+
+        widget.callback();
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _teachersService = TeachersService(apiClient: apiClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +138,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
   void _showProfileDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => TeacherProfileDialog(
-        name: widget.teacher.fullName,
-        username: widget.teacher.username,
-      ),
+      builder: (context) => TeacherProfileDialog(teacher: widget.teacher),
     );
   }
 
@@ -193,8 +266,10 @@ class _TeacherProfileState extends State<TeacherProfile> {
           onTap: () {
             showDialog(
               context: context,
-              builder: (context) =>
-                  EditTeacherProfileDialog(teacher: widget.teacher),
+              builder: (context) => EditTeacherProfileDialog(
+                teacher: widget.teacher,
+                callback: widget.callback,
+              ),
             );
           },
           child: Container(
@@ -210,14 +285,16 @@ class _TeacherProfileState extends State<TeacherProfile> {
 
         // Delete button
         InkWell(
-          onTap: () {}, // TODO: Implement delete functionality
+          onTap: () => _deleteStudent(),
           child: Container(
             padding: EdgeInsets.all(7.5),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.black26),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(Icons.delete_outline, size: 21),
+            child: _isDeleting
+                ? CircularProgressIndicator(strokeWidth: 2)
+                : Icon(Icons.delete_outline, size: 21),
           ),
         ),
       ],

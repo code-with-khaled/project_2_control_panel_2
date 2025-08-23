@@ -1,3 +1,4 @@
+import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/courses/teacher_courses_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/info/teacher_info_section.dart';
@@ -10,14 +11,9 @@ import 'package:google_fonts/google_fonts.dart';
 ///
 /// Shows [name] and [username] with tabbed sections for different profile aspects
 class TeacherProfileDialog extends StatefulWidget {
-  final String name;
-  final String username;
+  final Teacher teacher;
 
-  const TeacherProfileDialog({
-    super.key,
-    required this.name,
-    required this.username,
-  });
+  const TeacherProfileDialog({super.key, required this.teacher});
 
   @override
   State<TeacherProfileDialog> createState() => _TeacherProfileDialogState();
@@ -113,7 +109,7 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.name,
+              widget.teacher.fullName,
               style: GoogleFonts.roboto(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -121,7 +117,7 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
             ),
             SizedBox(height: 4),
             Text(
-              widget.username,
+              widget.teacher.username,
               style: GoogleFonts.roboto(fontSize: 15, color: Colors.grey[600]),
             ),
           ],
@@ -190,7 +186,7 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
       case "اللوحة الإحصائية":
         return TeacherStatPanelSection();
       default:
-        return TeacherInfoSection();
+        return TeacherInfoSection(teacher: widget.teacher);
     }
   }
 }

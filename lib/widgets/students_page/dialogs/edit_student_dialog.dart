@@ -45,6 +45,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
   Uint8List? _imageBytes;
   String _fileName = "لم يتم اختيار ملف";
   String? _selectedEducationLevel;
+  bool _isEditing = false;
 
   // Date picker function
   Future<void> _selectDate(BuildContext context) async {
@@ -134,6 +135,12 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
   late StudentsService _studentService;
 
   Future<void> _editStudent() async {
+    if (_isEditing) return;
+
+    setState(() {
+      _isEditing = true;
+    });
+
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final middleName = _middleNameController.text.trim();
@@ -184,6 +191,12 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
             ],
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isEditing = false;
+        });
       }
     }
   }
@@ -603,10 +616,19 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
             _editStudent();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("تعديل حساب الطالب"),
-        ),
+        child: _isEditing
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("تعديل حساب الطالب"),
+              ),
       ),
     ],
   );

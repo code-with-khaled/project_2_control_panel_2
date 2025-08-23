@@ -1,10 +1,13 @@
+import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:flutter/material.dart';
 
 /// Displays teacher information in two organized sections:
 /// 1. Personal information (email, phone, education, experience)
 /// 2. Additional information (join date, detailed experience, description)
 class TeacherInfoSection extends StatelessWidget {
-  const TeacherInfoSection({super.key});
+  final Teacher teacher;
+
+  const TeacherInfoSection({super.key, required this.teacher});
 
   @override
   Widget build(BuildContext context) {
@@ -47,38 +50,20 @@ class TeacherInfoSection extends StatelessWidget {
           ),
           SizedBox(height: 15),
 
-          // Email and phone row
+          // Education and phone row
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Expanded(
-                // Email field
-                child: Row(
-                  children: [
-                    Icon(Icons.mail_outline, size: 18, color: Colors.black54),
-                    SizedBox(width: 8),
-                    Flexible(child: Text("ahmad_mohamed@gmail.com")),
-                  ],
-                ),
-              ),
               Expanded(
                 // Phone field
                 child: Row(
                   children: [
                     Icon(Icons.phone_outlined, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
-                    Text("0994-387-970"),
+                    Text(teacher.phone),
                   ],
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: 10),
-
-          // Education and experience row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
               Expanded(
                 // Education field
                 child: Row(
@@ -89,24 +74,23 @@ class TeacherInfoSection extends StatelessWidget {
                       color: Colors.black54,
                     ),
                     SizedBox(width: 8),
-                    Text("ماجستير في الفيزياء"),
-                  ],
-                ),
-              ),
-              Expanded(
-                // Experience field
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      size: 18,
-                      color: Colors.black54,
+                    Text(
+                      "${teacher.educationLevel} | ${teacher.specialization}",
                     ),
-                    SizedBox(width: 8),
-                    Text("3 سنوات من الخبرة"),
                   ],
                 ),
               ),
+            ],
+          ),
+          SizedBox(height: 10),
+
+          // Headline
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.person_3_outlined, size: 18, color: Colors.black54),
+              SizedBox(width: 8),
+              Flexible(child: Text(teacher.headline)),
             ],
           ),
         ],
@@ -139,38 +123,31 @@ class TeacherInfoSection extends StatelessWidget {
           // Join date
           Row(
             children: [
-              Text(
-                "تاريخ الانضمام: ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              Text("التقييم: ", style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(width: 5),
-              Text("11/6/2025"),
+              Text(teacher.rate!.toStringAsFixed(1)),
             ],
           ),
           SizedBox(height: 10),
 
           // Detailed experience
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("الخبرات: ", style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(width: 5),
-              Flexible(
-                child: Text("+8 سنوات في تدريس الفيزياء النظرية والتطبيقية"),
-              ),
+              Flexible(child: Text(teacher.experiences)),
             ],
           ),
           SizedBox(height: 10),
 
           // Professional description
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("الوصف: ", style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  "مدرس صاحب شغف كبير وخبرة في الفيزياء، كرس حياته لمساعدة الطلاب على الوصول لأهدافهم التعليمية.",
-                ),
-              ),
+              Flexible(child: Text(teacher.description)),
             ],
           ),
         ],

@@ -1,15 +1,24 @@
 import 'dart:typed_data';
 
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/teachers_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 /// Dialog for editing teacher profile information
 class EditTeacherProfileDialog extends StatefulWidget {
+  final VoidCallback callback;
   final Teacher teacher;
 
-  const EditTeacherProfileDialog({super.key, required this.teacher});
+  const EditTeacherProfileDialog({
+    super.key,
+    required this.teacher,
+    required this.callback,
+  });
 
   @override
   State<EditTeacherProfileDialog> createState() =>
@@ -34,6 +43,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   // State variables
   Uint8List? _imageBytes; // Stores profile image data
   String? _selectedEducationLevel; // Selected dropdown value
+  bool _isEditing = false;
 
   /// Handles image selection from device
   Future<void> _pickImage() async {
@@ -46,41 +56,6 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
         _imageBytes = result.files.single.bytes;
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialize form with teacher data
-    _firstNameController.text = widget.teacher.firstName;
-    _lastNameController.text = widget.teacher.lastName;
-    _usernameController.text = widget.teacher.username;
-    _mobileNumberController.text = widget.teacher.phone;
-    _headlineController.text = widget.teacher.headline;
-    _specializationController.text = widget.teacher.specialization;
-    _experiencesController.text = widget.teacher.experiences;
-    _descriptionController.text = widget.teacher.description;
-
-    // Set the education level dropdown value
-    _selectedEducationLevel = widget.teacher.educationLevel;
-
-    // Set the profile image if it exists
-    _imageBytes = widget.teacher.image as Uint8List?;
-  }
-
-  @override
-  void dispose() {
-    // Clean up controllers
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _usernameController.dispose();
-    _mobileNumberController.dispose();
-    _specializationController.dispose();
-    _headlineController.dispose();
-    _experiencesController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
   }
 
   // --- Validation Methods ---
@@ -120,6 +95,116 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
       return 'الوصف مطلوب';
     }
     return null;
+  }
+
+  // Variables for API integration
+  late TeachersService _teachersService;
+
+  Future<void> _editTeacher() async {
+    if (_isEditing) return;
+
+    setState(() {
+      _isEditing = true;
+    });
+
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final username = _usernameController.text.trim();
+    final phone = _mobileNumberController.text.trim();
+    final educationLevel = _selectedEducationLevel!;
+    final specialization = _specializationController.text.trim();
+    final headline = _headlineController.text.trim();
+    final experiences = _experiencesController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    final teacher = Teacher(
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      phone: phone,
+      educationLevel: educationLevel,
+      specialization: specialization,
+      headline: headline,
+      experiences: experiences,
+      description: description,
+    );
+
+    try {
+      final token = TokenHelper.getToken();
+      await _teachersService.editTeacher(token, widget.teacher.id!, teacher);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم تعديل حساب المدرس بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في تعديل المدرس'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isEditing = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize form with teacher data
+    _firstNameController.text = widget.teacher.firstName;
+    _lastNameController.text = widget.teacher.lastName;
+    _usernameController.text = widget.teacher.username;
+    _mobileNumberController.text = widget.teacher.phone;
+    _headlineController.text = widget.teacher.headline;
+    _specializationController.text = widget.teacher.specialization;
+    _experiencesController.text = widget.teacher.experiences;
+    _descriptionController.text = widget.teacher.description;
+
+    // Set the education level dropdown value
+    _selectedEducationLevel = widget.teacher.educationLevel;
+
+    // Set the profile image if it exists
+    _imageBytes = widget.teacher.image as Uint8List?;
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _teachersService = TeachersService(apiClient: apiClient);
+  }
+
+  @override
+  void dispose() {
+    // Clean up controllers
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _usernameController.dispose();
+    _mobileNumberController.dispose();
+    _specializationController.dispose();
+    _headlineController.dispose();
+    _experiencesController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   // --- UI Building Methods ---
@@ -435,13 +520,22 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
       ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Form is valid - process data
+            _editTeacher();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("حفظ التعديلات"),
-        ),
+        child: _isEditing
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("حفظ التعديلات"),
+              ),
       ),
     ],
   );

@@ -341,7 +341,10 @@ class _TeachersPageState extends State<TeachersPage> {
                 width:
                     (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
                     itemsPerRow,
-                child: TeacherProfile(teacher: teacher),
+                child: TeacherProfile(
+                  teacher: teacher,
+                  callback: _refreshTeachers,
+                ),
               ),
           ],
         );
