@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/teachers_service.dart';
+import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/edit_teacher_profile_dialog.dart';
 import 'package:control_panel_2/widgets/teachers_page/dialogs/teacher_profile_dialog.dart';
@@ -32,7 +32,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
   bool _isDeleting = false;
 
   // Variables for API integration
-  late TeachersService _teachersService;
+  late TeacherService _teachersService;
 
   Future<void> _deleteStudent() async {
     if (_isDeleting) return;
@@ -94,7 +94,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
       httpClient: http.Client(),
     );
 
-    _teachersService = TeachersService(apiClient: apiClient);
+    _teachersService = TeacherService(apiClient: apiClient);
   }
 
   @override
@@ -170,7 +170,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
         CircleAvatar(
           radius: 22,
           backgroundImage: widget.teacher.image != null
-              ? MemoryImage(widget.teacher.image! as Uint8List)
+              ? NetworkImage(widget.teacher.fullImageUrl)
               : null,
           child: widget.teacher.image == null ? Icon(Icons.person) : null,
         ),

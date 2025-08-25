@@ -11,6 +11,11 @@ class Student {
   final String educationLevel;
   final String gender;
   final DateTime birthDate;
+  final DateTime? joinDate;
+  final int? completedCoursesCount;
+  final int? feedbacksCount;
+  final int? answersCount;
+  final int? feedbacksAvg;
   final int roleId;
 
   Student({
@@ -26,6 +31,11 @@ class Student {
     required this.educationLevel,
     required this.gender,
     required this.birthDate,
+    this.joinDate,
+    this.completedCoursesCount,
+    this.feedbacksCount,
+    this.answersCount,
+    this.feedbacksAvg,
     this.roleId = 5,
   });
 
@@ -40,7 +50,12 @@ class Student {
     image: json['image'],
     educationLevel: json['education_level'],
     gender: json['gender'],
-    birthDate: DateTime.parse(json['birth_date']),
+    birthDate: DateTime.parse(json['join_date']),
+    joinDate: DateTime.parse(json['birth_date']),
+    completedCoursesCount: json['completed_courses_count'],
+    feedbacksCount: json['feedbacks_count'],
+    answersCount: json['answers_count'],
+    feedbacksAvg: json['feedbacks_avg'],
   );
 
   Map<String, dynamic> toJson() => {

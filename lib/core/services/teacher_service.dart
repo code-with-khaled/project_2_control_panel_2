@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 
-class TeachersService {
+class TeacherService {
   final ApiClient apiClient;
 
-  TeachersService({required this.apiClient});
+  TeacherService({required this.apiClient});
 
   Future<Map<String, dynamic>> fetchTeachers(
     String? token, {
@@ -115,6 +115,22 @@ class TeachersService {
         }
       });
       throw Exception('$message$detailedErrors');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchCourse(String? token, int id) async {
+    final response = await apiClient.get(
+      "dashboard/teachers/$id/courses",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => json as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Fetch courses failed');
     }
   }
 }

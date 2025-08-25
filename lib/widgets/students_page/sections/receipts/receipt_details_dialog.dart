@@ -1,9 +1,10 @@
-import 'package:control_panel_2/models/financial_receipt_model.dart';
+import 'package:control_panel_2/models/student_receipt_model.dart';
 import 'package:control_panel_2/widgets/students_page/sections/receipts/receipt_item.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReceiptDetailsDialog extends StatefulWidget {
-  final FinancialReceipt receipt;
+  final StudentReceipt receipt;
 
   const ReceiptDetailsDialog({super.key, required this.receipt});
 
@@ -106,7 +107,12 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(widget.receipt.date),
+                    Text(
+                      DateFormat(
+                        'MMM dd, yyyy',
+                        'ar',
+                      ).format(widget.receipt.date),
+                    ),
                   ],
                 ),
               ],
@@ -133,7 +139,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(widget.receipt.item),
+                    Text(widget.receipt.type),
                   ],
                 ),
               ],
@@ -143,41 +149,41 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
       ),
       SizedBox(height: 10),
 
-      _switchItem(widget.receipt.item),
+      _switchItem(widget.receipt.type),
     ],
   );
 
   Widget _switchItem(String item) {
     switch (item) {
-      case "كورس":
+      case "دورة":
         return ReceiptItem(
           icon: Icon(Icons.menu_book_outlined),
-          title: "عنوان الكورس",
-          content: widget.receipt.service!,
+          title: "عنوان الدورة",
+          content: widget.receipt.name,
         );
       case "رحلة":
         return ReceiptItem(
           icon: Icon(Icons.card_travel),
           title: "عنوان الرحلة",
-          content: widget.receipt.service!,
+          content: widget.receipt.name,
         );
       case "كتاب":
         return ReceiptItem(
           icon: Icon(Icons.book_outlined),
           title: "عنوان الكتاب",
-          content: widget.receipt.service!,
+          content: widget.receipt.name,
         );
       case "مناهج":
         return ReceiptItem(
           icon: Icon(Icons.import_contacts),
           title: "عنوان المنهاج",
-          content: widget.receipt.service!,
+          content: widget.receipt.name,
         );
       default:
         return ReceiptItem(
           icon: Icon(Icons.military_tech_outlined),
           title: "عنوان الشهادة",
-          content: widget.receipt.service!,
+          content: widget.receipt.name,
         );
     }
   }
@@ -205,7 +211,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
             style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
           Text(
-            widget.receipt.ammount,
+            widget.receipt.amount.toString(),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
@@ -240,7 +246,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
-              (int.parse(widget.receipt.ammount) - 5000).toString(),
+              (int.parse(widget.receipt.amount.toString()) - 5000).toString(),
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
             ),
           ],

@@ -5,7 +5,7 @@ import 'package:control_panel_2/pages/home_page.dart';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/services/auth_service.dart';
 import 'package:control_panel_2/pages/reset_password_page.dart';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -481,30 +481,12 @@ class _LoginScreenState extends State<LoginScreen>
         HoverUnderlineText(
           text: "تغيير كلمة المرور",
           onTap: () {
-            // Navigator.push(
-            //   context,
-            //   (MaterialPageRoute(
-            //     builder: (context) => ResetPasswordPage(forget: false),
-            //   )),
-            // );
-            try {
-              final apiClient = ApiClient(
-                baseUrl: "http://127.0.0.1:8000/api",
-                httpClient: http.Client(),
-              );
-
-              final authService = AuthService(apiClient: apiClient);
-
-              authService.logout(TokenHelper.getToken()!);
-            } catch (e) {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text('خطأ'),
-                  content: Text(e.toString()),
-                ),
-              );
-            }
+            Navigator.push(
+              context,
+              (MaterialPageRoute(
+                builder: (context) => ResetPasswordPage(forget: false),
+              )),
+            );
           },
         ),
       ],

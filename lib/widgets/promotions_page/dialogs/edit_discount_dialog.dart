@@ -3,7 +3,7 @@ import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/advanced_analysis.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/basic_filters.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/manual_selection.dart';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

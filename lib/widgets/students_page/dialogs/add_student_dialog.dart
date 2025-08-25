@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/students_service.dart';
+import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -153,7 +153,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   }
 
   // Variables for API integration
-  late StudentsService _studentService;
+  late StudentService _studentService;
 
   Future<void> _createStudent() async {
     if (_isSubmitting) return;
@@ -233,7 +233,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       httpClient: http.Client(),
     );
 
-    _studentService = StudentsService(apiClient: apiClient);
+    _studentService = StudentService(apiClient: apiClient);
   }
 
   @override

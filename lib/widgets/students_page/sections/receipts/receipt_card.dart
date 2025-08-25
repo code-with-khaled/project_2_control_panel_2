@@ -1,9 +1,10 @@
-import 'package:control_panel_2/models/financial_receipt_model.dart';
+import 'package:control_panel_2/models/student_receipt_model.dart';
 import 'package:control_panel_2/widgets/students_page/sections/receipts/receipt_details_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReceiptCard extends StatefulWidget {
-  final FinancialReceipt receipt;
+  final StudentReceipt receipt;
 
   const ReceiptCard({super.key, required this.receipt});
 
@@ -53,7 +54,7 @@ class _ReceiptCardState extends State<ReceiptCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    receipt.number,
+                    receipt.id.toString(),
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   Container(
@@ -81,7 +82,7 @@ class _ReceiptCardState extends State<ReceiptCard> {
                     "التاريخ:",
                     style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
-                  Text(receipt.date),
+                  Text(DateFormat('MMM dd, yyyy', 'ar').format(receipt.date)),
                 ],
               ),
               SizedBox(height: 10),
@@ -93,7 +94,7 @@ class _ReceiptCardState extends State<ReceiptCard> {
                     style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                   Text(
-                    receipt.ammount,
+                    receipt.amount.toString(),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ],

@@ -4,7 +4,7 @@ import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/advertisements_service.dart';
 import 'package:control_panel_2/models/advertisement_model.dart';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 

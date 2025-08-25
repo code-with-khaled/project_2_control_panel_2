@@ -1,4 +1,4 @@
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class EditCategoryDialog extends StatefulWidget {

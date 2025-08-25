@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/models/student_model.dart';
+import 'package:control_panel_2/models/student_receipt_model.dart';
 
-class StudentsService {
+class StudentService {
   final ApiClient apiClient;
 
-  StudentsService({required this.apiClient});
+  StudentService({required this.apiClient});
 
   Future<Map<String, dynamic>> fetchStudents(
     String? token, {
@@ -115,6 +116,25 @@ class StudentsService {
         }
       });
       throw Exception('$message$detailedErrors');
+    }
+  }
+
+  Future<List<StudentReceipt>> fetchStudentReciepts(
+    String? token,
+    int id,
+  ) async {
+    final response = await apiClient.get(
+      "dashboard/students/$id/receipts",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => StudentReceipt.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch student reciepts Failed');
     }
   }
 }

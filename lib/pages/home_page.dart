@@ -1,8 +1,12 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/constants/sections_consts.dart';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/auth_service.dart';
 import 'package:control_panel_2/widgets/other/section_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -12,6 +16,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isLoggingout = false;
+
+  Future<void> _logout() async {
+    if (_isLoggingout) return;
+
+    setState(() {
+      _isLoggingout = true;
+    });
+
+    try {
+      final apiClient = ApiClient(
+        baseUrl: "http://127.0.0.1:8000/api",
+        httpClient: http.Client(),
+      );
+
+      final authService = AuthService(apiClient: apiClient);
+
+      authService.logout(TokenHelper.getToken()!);
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) =>
+            AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        _isLoggingout = false;
+      });
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,6 +59,46 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 1120),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(""),
+                      ElevatedButton(
+                        onPressed: () => _logout(),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 25,
+                          ),
+                        ),
+                        child: _isLoggingout
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.logout_outlined),
+                                  SizedBox(width: 10),
+                                  Text("تسجيل الخروج"),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

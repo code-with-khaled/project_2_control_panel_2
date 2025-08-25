@@ -2,7 +2,7 @@
 
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/students_service.dart';
+import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/edit_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/student_profile_dialog.dart';
@@ -14,7 +14,7 @@ import 'package:intl/intl.dart';
 ///
 /// Displays key student information including:
 /// - [name] and [username]
-/// - [email] contact
+/// - [phone] contact
 /// - [joinDate] of enrollment
 class StudentProfile extends StatefulWidget {
   final Student student;
@@ -35,7 +35,7 @@ class _StudentProfileState extends State<StudentProfile> {
   bool _isDeleting = false;
 
   // Variables for API integration
-  late StudentsService _studentService;
+  late StudentService _studentService;
 
   Future<void> _deleteStudent() async {
     if (_isDeleting) return;
@@ -97,15 +97,15 @@ class _StudentProfileState extends State<StudentProfile> {
       httpClient: http.Client(),
     );
 
-    _studentService = StudentsService(apiClient: apiClient);
+    _studentService = StudentService(apiClient: apiClient);
   }
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat(
+    final formattedJoinDate = DateFormat(
       'MMM dd, yyyy',
       'ar',
-    ).format(widget.student.birthDate);
+    ).format(widget.student.joinDate!);
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
@@ -137,13 +137,14 @@ class _StudentProfileState extends State<StudentProfile> {
               // SizedBox(height: 15),
 
               // Rating display
-              // _buildRatingSection(),
-              // SizedBox(height: 10),
+              _buildRatingSection(),
+              SizedBox(height: 10),
+
               Divider(color: Colors.black12),
               SizedBox(height: 10),
 
               // Footer with join date and actions
-              _buildFooter(formattedDate),
+              _buildFooter(formattedJoinDate),
             ],
           ),
         ),
@@ -278,7 +279,10 @@ class _StudentProfileState extends State<StudentProfile> {
             Text("متوسط التقييم"),
           ],
         ),
-        Text("4.6", style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          widget.student.feedbacksAvg.toString(),
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -288,9 +292,11 @@ class _StudentProfileState extends State<StudentProfile> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "ولد في: $formattedDate",
-          style: TextStyle(color: Colors.black87, fontSize: 12),
+        Flexible(
+          child: Text(
+            "انضم في: $formattedDate",
+            style: TextStyle(color: Colors.black87, fontSize: 12),
+          ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,

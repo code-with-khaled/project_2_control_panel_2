@@ -3,6 +3,7 @@ import 'package:control_panel_2/widgets/students_page/sections/overview/overview
 import 'package:control_panel_2/widgets/students_page/sections/overview/overview_right.dart';
 import 'package:control_panel_2/widgets/students_page/statistic_card.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class OverviewSection extends StatelessWidget {
   final Student student;
@@ -21,8 +22,12 @@ class OverviewSection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OverviewLeft(
-                      name: student.fullName,
-                      username: student.username,
+                      birthDate: DateFormat(
+                        'MMM dd, yyyy',
+                        'ar',
+                      ).format(student.birthDate),
+                      completedCoursesCount: student.completedCoursesCount
+                          .toString(),
                       phone: student.phone,
                       gender: student.gender,
                     ),
@@ -30,7 +35,7 @@ class OverviewSection extends StatelessWidget {
                   SizedBox(width: 20),
                   Expanded(
                     child: OverviewRight(
-                      specialization: "علم البيانات",
+                      specialization: "-",
                       level: student.educationLevel,
                     ),
                   ),
@@ -40,14 +45,18 @@ class OverviewSection extends StatelessWidget {
               return Column(
                 children: [
                   OverviewLeft(
-                    name: student.fullName,
-                    username: student.username,
+                    birthDate: DateFormat(
+                      'MMM dd, yyyy',
+                      'ar',
+                    ).format(student.birthDate),
+                    completedCoursesCount: student.completedCoursesCount
+                        .toString(),
                     phone: student.phone,
                     gender: student.gender,
                   ),
                   SizedBox(height: 20),
                   OverviewRight(
-                    specialization: "علم البيانات",
+                    specialization: "-",
                     level: student.educationLevel,
                   ),
                 ],
@@ -70,28 +79,28 @@ class OverviewSection extends StatelessWidget {
               _buildStatCard(
                 icon: Icons.import_contacts,
                 color: Colors.blue,
-                number: "9",
+                number: student.completedCoursesCount.toString(),
                 text: "الدورات المكتملة", // Completed Courses
               ),
               SizedBox(width: 10),
               _buildStatCard(
                 icon: Icons.star_border,
                 color: Colors.orange,
-                number: "4.9",
+                number: student.feedbacksAvg.toString(),
                 text: "متوسط التقييم", // Average Rating
               ),
               SizedBox(width: 10),
               _buildStatCard(
                 icon: Icons.import_contacts,
                 color: Colors.green,
-                number: "28",
+                number: student.feedbacksCount.toString(),
                 text: "التقييمات المقدمة", // Reviews Given
               ),
               SizedBox(width: 10),
               _buildStatCard(
                 icon: Icons.import_contacts,
                 color: Colors.purple,
-                number: "45",
+                number: student.answersCount.toString(),
                 text: "المساهمات", // Contributions
               ),
             ],
@@ -104,14 +113,14 @@ class OverviewSection extends StatelessWidget {
                   _buildStatCard(
                     icon: Icons.import_contacts,
                     color: Colors.blue,
-                    number: "9",
+                    number: student.completedCoursesCount.toString(),
                     text: "الدورات المكتملة",
                   ),
                   SizedBox(width: 10),
                   _buildStatCard(
                     icon: Icons.star_border,
                     color: Colors.orange,
-                    number: "4.9",
+                    number: student.feedbacksAvg.toString(),
                     text: "متوسط التقييم",
                   ),
                 ],
@@ -122,14 +131,14 @@ class OverviewSection extends StatelessWidget {
                   _buildStatCard(
                     icon: Icons.import_contacts,
                     color: Colors.green,
-                    number: "28",
+                    number: student.feedbacksCount.toString(),
                     text: "التقييمات المقدمة",
                   ),
                   SizedBox(width: 10),
                   _buildStatCard(
                     icon: Icons.import_contacts,
                     color: Colors.purple,
-                    number: "45",
+                    number: student.answersCount.toString(),
                     text: "المساهمات",
                   ),
                 ],

@@ -1,7 +1,7 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/students_service.dart';
+import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
@@ -38,7 +38,7 @@ class _StudentsPageState extends State<StudentsPage> {
   final TextEditingController _pageController = TextEditingController();
 
   // Variables for API integration
-  late StudentsService _studentService;
+  late StudentService _studentService;
   List<Student> _students = [];
   bool _isLoading = true;
 
@@ -51,7 +51,7 @@ class _StudentsPageState extends State<StudentsPage> {
       httpClient: http.Client(),
     );
 
-    _studentService = StudentsService(apiClient: apiClient);
+    _studentService = StudentService(apiClient: apiClient);
 
     _loadStudents();
 

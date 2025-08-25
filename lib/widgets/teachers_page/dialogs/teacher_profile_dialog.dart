@@ -101,7 +101,10 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Profile avatar
-        CircleAvatar(radius: 40, child: Icon(Icons.person, size: 42)),
+        CircleAvatar(
+          radius: 40,
+          backgroundImage: NetworkImage(widget.teacher.fullImageUrl),
+        ),
         SizedBox(width: 16),
 
         // Name and username
@@ -180,7 +183,7 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
       case "الكورسات":
-        return TeacherCoursesSection();
+        return TeacherCoursesSection(id: widget.teacher.id!);
       case "المراجعات":
         return TeacherReviewsSection();
       case "اللوحة الإحصائية":

@@ -2,17 +2,17 @@ import 'package:control_panel_2/widgets/students_page/sections/overview/overview
 import 'package:flutter/material.dart';
 
 class OverviewLeft extends StatelessWidget {
-  final String name;
-  final String username;
+  final String birthDate;
   final String phone;
   final String gender;
+  final String completedCoursesCount;
 
   const OverviewLeft({
     super.key,
-    required this.name,
-    required this.username,
+    required this.birthDate,
     required this.phone,
     required this.gender,
+    required this.completedCoursesCount,
   });
 
   @override
@@ -36,10 +36,13 @@ class OverviewLeft extends StatelessWidget {
             ],
           ),
           SizedBox(height: 5),
-          OverviewRow(left: "الاسم الكامل:", right: name), // "Full Name:"
-          OverviewRow(left: "اسم المستخدم:", right: username), // "Username:"
+          OverviewRow(left: "ولد في:", right: birthDate), // "Full Name:"
           OverviewRow(left: "رقم الهاتف:", right: phone), // "phone:"
           OverviewRow(left: "الجنس:", right: gender), // "Gender:"
+          OverviewRow(
+            left: "عدد الدورات المكتملة:",
+            right: completedCoursesCount,
+          ), // "Username:"
         ],
       ),
     );

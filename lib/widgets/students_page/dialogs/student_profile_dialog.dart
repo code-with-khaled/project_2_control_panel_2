@@ -271,7 +271,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
       case "الفواتير":
-        return ReceiptsSection();
+        return ReceiptsSection(id: widget.student.id!);
       case "الكورسات":
         return CoursesSection();
       case "التقييمات":

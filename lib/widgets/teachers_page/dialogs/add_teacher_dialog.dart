@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/teachers_service.dart';
+import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -118,7 +118,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   }
 
   // Variables for API integration
-  late TeachersService _teachersService;
+  late TeacherService _teachersService;
 
   Future<void> _createTeacher() async {
     if (_isSubmitting) return;
@@ -198,7 +198,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       httpClient: http.Client(),
     );
 
-    _teachersService = TeachersService(apiClient: apiClient);
+    _teachersService = TeacherService(apiClient: apiClient);
   }
 
   @override

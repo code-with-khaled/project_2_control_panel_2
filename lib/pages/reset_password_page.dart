@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:control_panel_2/pages/login_screen.dart';
-import 'package:control_panel_2/widgets/students_page/custom_text_field.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_field.dart';
 

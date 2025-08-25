@@ -1,7 +1,7 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/teachers_service.dart';
+import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_filter_button.dart';
@@ -31,7 +31,7 @@ class _TeachersPageState extends State<TeachersPage> {
   final TextEditingController _pageController = TextEditingController();
 
   // Variables for API integration
-  late TeachersService teachersService;
+  late TeacherService teachersService;
   List<Teacher> _teachers = [];
   bool _isLoading = true;
 
@@ -44,7 +44,7 @@ class _TeachersPageState extends State<TeachersPage> {
       httpClient: http.Client(),
     );
 
-    teachersService = TeachersService(apiClient: apiClient);
+    teachersService = TeacherService(apiClient: apiClient);
 
     _loadTeachers();
 
