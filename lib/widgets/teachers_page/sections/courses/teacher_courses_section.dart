@@ -21,7 +21,6 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
   // Date formatter instance
   final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy', 'ar');
 
-  List<Map<String, dynamic>> _courses = [];
   List<Map<String, dynamic>> _filteredCourses = [];
 
   Future<void> _fetchCourses() async {
@@ -31,7 +30,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
 
     try {
       final token = TokenHelper.getToken();
-      _courses = await _teacherService.fetchCourse(token, widget.id);
+      _filteredCourses = await _teacherService.fetchCourse(token, widget.id);
     } catch (e) {
       if (mounted) {
         showDialog(

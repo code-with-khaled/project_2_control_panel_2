@@ -31,7 +31,7 @@ class TeacherReviewsSection extends StatelessWidget {
                 "عبد الحكيم رمضان",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-              RatingStars(),
+              RatingStars(rating: 4),
             ],
           ),
           SizedBox(height: 1),

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/teacher_service.dart';

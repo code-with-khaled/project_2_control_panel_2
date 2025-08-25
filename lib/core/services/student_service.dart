@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/models/student_course_model.dart';
+import 'package:control_panel_2/models/student_feedback_model.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/models/student_receipt_model.dart';
 
@@ -135,6 +137,48 @@ class StudentService {
       return data.map((json) => StudentReceipt.fromJson(json)).toList();
     } else {
       throw Exception('Fetch student reciepts Failed');
+    }
+  }
+
+  Future<List<StudentCourse>> fetchStudentCourses(String? token, int id) async {
+    final response = await apiClient.get(
+      "dashboard/students/$id/courses",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => StudentCourse.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch student courses Failed');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchStudentFeedbacks(
+    String? token,
+    int id,
+  ) async {
+    final response = await apiClient.get(
+      "dashboard/students/$id/feedbacks",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final data = json['data'];
+      final feedbacks = (data['feedbacks'] as List<dynamic>)
+          .map((json) => StudentFeedback.fromJson(json))
+          .toList();
+
+      return {
+        'count': data['count'],
+        'average': data['average'],
+        'feedbacks': feedbacks,
+      };
+    } else {
+      throw Exception('Fetch student feedbacks Failed');
     }
   }
 }

@@ -2,10 +2,10 @@ import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/send_notification_dialog.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
-import 'package:control_panel_2/widgets/students_page/sections/discounts/courses_section.dart';
+import 'package:control_panel_2/widgets/students_page/sections/courses/courses_section.dart';
 import 'package:control_panel_2/widgets/students_page/sections/overview/overview_section.dart';
 import 'package:control_panel_2/widgets/students_page/sections/receipts/receipts_section.dart';
-import 'package:control_panel_2/widgets/students_page/sections/reviews/reviews_section.dart';
+import 'package:control_panel_2/widgets/students_page/sections/feedbacks/feedbacks_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -273,9 +273,9 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       case "الفواتير":
         return ReceiptsSection(id: widget.student.id!);
       case "الكورسات":
-        return CoursesSection();
+        return CoursesSection(id: widget.student.id!);
       case "التقييمات":
-        return ReviewsSection();
+        return FeedbacksSection(id: widget.student.id!);
       default:
         return OverviewSection(student: widget.student);
     }

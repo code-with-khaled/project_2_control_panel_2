@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class RatingStars extends StatelessWidget {
-  const RatingStars({super.key});
+  final double rating;
 
-  final int rating = 4;
+  const RatingStars({super.key, required this.rating});
 
   @override
   Widget build(BuildContext context) {

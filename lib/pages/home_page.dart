@@ -3,6 +3,7 @@ import 'package:control_panel_2/constants/sections_consts.dart';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/auth_service.dart';
+import 'package:control_panel_2/pages/login_screen.dart';
 import 'package:control_panel_2/widgets/other/section_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,7 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _isLoggingout = false;
       });
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
     }
   }
 

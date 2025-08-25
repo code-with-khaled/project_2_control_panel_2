@@ -1,59 +1,120 @@
-import 'package:control_panel_2/constants/all_courses.dart';
-import 'package:control_panel_2/models/course_model.dart';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/student_service.dart';
+import 'package:control_panel_2/models/student_course_model.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class CoursesSection extends StatelessWidget {
-  const CoursesSection({super.key});
+class CoursesSection extends StatefulWidget {
+  final int id;
+
+  const CoursesSection({super.key, required this.id});
+
+  @override
+  State<CoursesSection> createState() => _CoursesSectionState();
+}
+
+class _CoursesSectionState extends State<CoursesSection> {
+  bool _isLoading = false;
+
+  List<StudentCourse> _courses = [];
+
+  Future<void> _fetchCourses() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      _courses = await _studentService.fetchStudentCourses(token, widget.id);
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  late StudentService _studentService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _studentService = StudentService(apiClient: apiClient);
+
+    _fetchCourses();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.import_contacts),
-            SizedBox(width: 6),
-            Text(
-              "الكورسات المسجل بها",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        SizedBox(height: 16),
-
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Calculate number of columns based on available width
-            const double itemWidth = 270; // Minimum card width
-            int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
-            itemsPerRow = itemsPerRow.clamp(1, 3); // Limit between 1-3 columns
-
-            // Build responsive grid of account cards
-            return Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: [
-                for (final course in courses)
-                  SizedBox(
-                    width:
-                        (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
-                        itemsPerRow,
-                    child: CourseCard(course: course),
+    return _isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.import_contacts),
+                  SizedBox(width: 6),
+                  Text(
+                    "الكورسات المسجل بها",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
+                ],
+              ),
+              SizedBox(height: 16),
+
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // Calculate number of columns based on available width
+                  const double itemWidth = 270; // Minimum card width
+                  int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
+                  itemsPerRow = itemsPerRow.clamp(
+                    1,
+                    3,
+                  ); // Limit between 1-3 columns
+
+                  // Build responsive grid of account cards
+                  return Wrap(
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: [
+                      for (final course in _courses)
+                        SizedBox(
+                          width:
+                              (constraints.maxWidth -
+                                  (20 * (itemsPerRow - 1))) /
+                              itemsPerRow,
+                          child: CourseCard(course: course),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          );
   }
 }
 
 class CourseCard extends StatefulWidget {
-  final Course course;
+  final StudentCourse course;
 
   const CourseCard({super.key, required this.course});
 
@@ -125,7 +186,7 @@ class _CourseCardState extends State<CourseCard> {
                       SizedBox(width: 10),
 
                       Text(
-                        widget.course.teacher,
+                        widget.course.teacher.fullName,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -145,7 +206,7 @@ class _CourseCardState extends State<CourseCard> {
                           ),
                           SizedBox(width: 3),
                           Text(
-                            '${widget.course.enrollments} مسجلين',
+                            '${widget.course.studentCount} مسجلين',
                             style: TextStyle(
                               color: Colors.grey.shade700,
                               fontSize: 12,
@@ -159,7 +220,7 @@ class _CourseCardState extends State<CourseCard> {
                           Icon(Icons.star, color: Colors.yellow),
                           SizedBox(width: 5),
                           Text(
-                            "4.6",
+                            widget.course.rating.toString(),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
