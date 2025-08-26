@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/models/teacher_feedback_model.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 
 class TeacherService {
@@ -131,6 +132,32 @@ class TeacherService {
       return data.map((json) => json as Map<String, dynamic>).toList();
     } else {
       throw Exception('Fetch courses failed');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchTeacherFeedbacks(
+    String? token,
+    int id,
+  ) async {
+    final response = await apiClient.get(
+      "dashboard/teachers/$id/feedbacks",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final data = json['data'];
+      final feedbacks = (data['feedbacks'] as List<dynamic>)
+          .map((json) => TeacherFeedback.fromJson(json))
+          .toList();
+
+      return {
+        'count': data['count'],
+        'average': data['average'],
+        'feedbacks': feedbacks,
+      };
+    } else {
+      throw Exception('Fetch student feedbacks Failed');
     }
   }
 }

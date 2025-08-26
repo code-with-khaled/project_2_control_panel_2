@@ -131,7 +131,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (context) => SendNotificationDialog(),
+          builder: (context) => SendNotificationDialog(id: widget.student.id!),
         );
       },
       child: Padding(
@@ -248,18 +248,18 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
           // Discounts tab
           Expanded(
             child: NavButton(
-              navkey: "الكورسات",
-              isActive: _activeFilter == "الكورسات",
-              onTap: () => _setFilter("الكورسات"),
+              navkey: "الدورات",
+              isActive: _activeFilter == "الدورات",
+              onTap: () => _setFilter("الدورات"),
             ),
           ),
 
           // Reviews tab
           Expanded(
             child: NavButton(
-              navkey: "التقييمات",
-              isActive: _activeFilter == "التقييمات",
-              onTap: () => _setFilter("التقييمات"),
+              navkey: "المراجعات",
+              isActive: _activeFilter == "المراجعات",
+              onTap: () => _setFilter("المراجعات"),
             ),
           ),
         ],
@@ -272,9 +272,9 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
     switch (_activeFilter) {
       case "الفواتير":
         return ReceiptsSection(id: widget.student.id!);
-      case "الكورسات":
+      case "الدورات":
         return CoursesSection(id: widget.student.id!);
-      case "التقييمات":
+      case "المراجعات":
         return FeedbacksSection(id: widget.student.id!);
       default:
         return OverviewSection(student: widget.student);

@@ -90,51 +90,53 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Profile filter section
-        Row(
-          children: [
-            SizedBox(
-              width: 180,
-              child: DropdownButtonFormField<String>(
-                value: dropdownValue2,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.circular(6),
+    return _isLoading
+        ? Center(child: CircularProgressIndicator())
+        : _filteredCourses.isEmpty
+        ? Center(child: Text("لا يوجد دورات"))
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile filter section
+              Row(
+                children: [
+                  SizedBox(
+                    width: 180,
+                    child: DropdownButtonFormField<String>(
+                      value: dropdownValue2,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black26),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black87),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue2 = newValue;
+                          _applyFilters();
+                        });
+                      },
+                      items: <String>['الأحدث', 'الأعلى تقييم', 'عدد الطلاب']
+                          .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          })
+                          .toList(),
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black87),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownValue2 = newValue;
-                    _applyFilters();
-                  });
-                },
-                items: <String>['الأحدث', 'الأعلى تقييم', 'عدد الطلاب']
-                    .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    })
-                    .toList(),
+                ],
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 24),
+              SizedBox(height: 24),
 
-        // Courses list
-        _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
+              // Courses list
+              Column(
                 children: _filteredCourses.map((course) {
                   return Column(
                     children: [
@@ -149,8 +151,8 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                   );
                 }).toList(),
               ),
-      ],
-    );
+            ],
+          );
   }
 
   Widget _buildCourseCard({

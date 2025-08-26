@@ -2,7 +2,7 @@ import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/courses/teacher_courses_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/info/teacher_info_section.dart';
-import 'package:control_panel_2/widgets/teachers_page/sections/reviews/teacher_reviews_section.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/feedbacks/teacher_feedbacks_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/stat_panel/teacher_stat_panel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -151,9 +151,9 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
           // Receipts tab
           Expanded(
             child: NavButton(
-              navkey: "الكورسات",
-              isActive: _activeFilter == "الكورسات",
-              onTap: () => _setFilter("الكورسات"),
+              navkey: "الدورات",
+              isActive: _activeFilter == "الدورات",
+              onTap: () => _setFilter("الدورات"),
             ),
           ),
 
@@ -182,10 +182,10 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
   /// Returns the appropriate content section based on active filter
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
-      case "الكورسات":
+      case "الدورات":
         return TeacherCoursesSection(id: widget.teacher.id!);
       case "المراجعات":
-        return TeacherReviewsSection();
+        return TeacherReviewsSection(id: widget.teacher.id!);
       case "اللوحة الإحصائية":
         return TeacherStatPanelSection();
       default:

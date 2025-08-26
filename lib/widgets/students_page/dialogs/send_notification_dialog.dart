@@ -1,19 +1,96 @@
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/notification_service.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 /// Dialog for composing and sending notifications to users
 ///
 /// Provides title and message input fields with send functionality
 class SendNotificationDialog extends StatefulWidget {
-  const SendNotificationDialog({super.key});
+  final int id;
+
+  const SendNotificationDialog({super.key, required this.id});
 
   @override
   State<SendNotificationDialog> createState() => _SendNotificationDialogState();
 }
 
 class _SendNotificationDialogState extends State<SendNotificationDialog> {
-  // Controllers for notification content input fields
-  final TextEditingController _titleController = TextEditingController();
+  // Form key for validation control
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _messageController = TextEditingController();
+
+  bool _isSending = false;
+
+  Future<void> _sendNotification() async {
+    if (_isSending) return;
+
+    setState(() {
+      _isSending = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      await _notificationService.sendToStudent(
+        token,
+        _messageController.text.trim(),
+        widget.id,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إرسال الإشعار')));
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إرسال الإشعار'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSending = false;
+        });
+      }
+    }
+  }
+
+  late NotificationService _notificationService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _notificationService = NotificationService(apiClient: apiClient);
+  }
+
+  // Validation function
+  String? _validateMessage(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'الرسالة مطلوبة';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,23 +106,26 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
         ),
         child: Padding(
           padding: EdgeInsets.only(left: 2),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Dialog header with icon and close button
-                _buildHeader(),
-                SizedBox(height: 20),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Dialog header with icon and close button
+                  _buildHeader(),
+                  SizedBox(height: 20),
 
-                // Notification content input section
-                _buildContentForm(),
-                SizedBox(height: 20),
+                  // Notification content input section
+                  _buildContentForm(),
+                  SizedBox(height: 20),
 
-                // Send action button
-                _buildSendButton(),
-              ],
+                  // Send action button
+                  _buildSendButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -104,45 +184,10 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
           ),
           SizedBox(height: 25),
 
-          // Title input field
-          _buildTitleField(),
-          SizedBox(height: 20),
-
           // Message input field
           _buildMessageField(),
         ],
       ),
-    );
-  }
-
-  // Builds title input field
-  Widget _buildTitleField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "العنوان", // "Title"
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 2),
-        TextField(
-          controller: _titleController,
-          cursorColor: Colors.blue,
-          textDirection: TextDirection.rtl, // Right-align Arabic text
-          decoration: InputDecoration(
-            hintText: "أدخل عنوان الإشعار", // "Enter notification title"
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black26),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black87),
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -156,23 +201,11 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 2),
-        TextField(
+        CustomTextField(
+          hintText: "أدخل محتوى الإشعار",
           controller: _messageController,
-          cursorColor: Colors.blue,
-          maxLines: 3, // Allow multiline input
-          textDirection: TextDirection.rtl, // Right-align Arabic text
-          decoration: InputDecoration(
-            hintText: "أدخل محتوى الإشعار", // "Enter notification message"
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black26),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black87),
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
+          maxLines: 2,
+          validator: (value) => _validateMessage(value),
         ),
       ],
     );
@@ -185,10 +218,9 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
       children: [
         ElevatedButton(
           onPressed: () {
-            // TODO: Implement notification sending logic
-            // Access content via:
-            // _titleController.text
-            // _messageController.text
+            if (_formKey.currentState!.validate()) {
+              _sendNotification();
+            }
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),

@@ -72,5 +72,5 @@ class Teacher {
 
   // Helper getters
   String get fullName => '$firstName $lastName';
-  String get fullImageUrl => 'http://localhost:8000$image';
+  String get fullImageUrl => 'http://127.0.0.1:8000$image';
 }

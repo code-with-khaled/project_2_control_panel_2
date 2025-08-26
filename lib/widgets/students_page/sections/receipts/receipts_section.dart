@@ -65,6 +65,8 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
   Widget build(BuildContext context) {
     return _isLoading
         ? Center(child: CircularProgressIndicator())
+        : _receipts.isEmpty
+        ? Center(child: Text("لا يوجد فواتير"))
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

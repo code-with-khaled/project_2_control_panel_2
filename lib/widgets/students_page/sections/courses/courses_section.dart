@@ -64,6 +64,8 @@ class _CoursesSectionState extends State<CoursesSection> {
   Widget build(BuildContext context) {
     return _isLoading
         ? Center(child: CircularProgressIndicator())
+        : _courses.isEmpty
+        ? Center(child: Text("لا يوجد دورات"))
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

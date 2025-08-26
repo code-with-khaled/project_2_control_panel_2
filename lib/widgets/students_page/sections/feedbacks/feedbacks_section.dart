@@ -74,6 +74,8 @@ class _FeedbacksSectionState extends State<FeedbacksSection> {
   Widget build(BuildContext context) {
     return _isLoading
         ? Center(child: CircularProgressIndicator())
+        : _feedbacks.isEmpty
+        ? Center(child: Text("لا يوجد مراجعات"))
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
