@@ -1,17 +1,14 @@
-import 'dart:typed_data';
-
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/advertisements_service.dart';
 import 'package:control_panel_2/models/advertisement_model.dart';
-import 'package:control_panel_2/widgets/other/custom_text_field.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 // ignore: deprecated_member_use, avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 /// A dialog widget for creating new advertisements
 ///
@@ -32,38 +29,23 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for managing text input fields
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
+
+  // Variables for selecting dates
+  DateTime? _selectedStartDate;
+  DateTime? _selectedEndDate;
 
   // Variables for storing the advertisement image
-  Uint8List? _imageBytes; // Stores the image bytes when uploaded
+  String? _imageUrl;
   String? _fileName; // Stores the name of the uploaded file
-
-  // Tracks whether the advertisement targets all users
-  bool _isChecked = true; // Default value is true (target all users)
 
   /// Opens file picker to select an image for the advertisement
   ///
-  /// Sets [_imageBytes] and [_fileName] when a file is selected
+  /// Sets [_imageUrl] and [_fileName] when a file is selected
   // ignore: unused_element
+
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: true, // Ensures we get the file bytes
-    );
-
-    // Check if file was selected and contains data
-    if (result != null && result.files.single.bytes != null) {
-      setState(() {
-        _imageBytes = result.files.single.bytes;
-        _fileName = result.files.single.name;
-      });
-    }
-  }
-
-  String? _imageUrl;
-
-  Future<void> _pickImage2() async {
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
     uploadInput.accept = 'image/*';
     uploadInput.click();
@@ -75,16 +57,91 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       reader.readAsDataUrl(file!); // This reads the file as a Base64 string
 
       reader.onLoadEnd.listen((e) {
-        _imageUrl = reader.result as String;
-        _fileName = file.name;
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
       });
     });
   }
 
+  // Date picker functions
+  Future<void> _selectStartDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: DateTime(now.year + 2, now.month, now.day),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey[300]!,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Colors.blue),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedStartDate) {
+      setState(() {
+        _selectedStartDate = picked;
+        _startDateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  Future<void> _selectEndDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime endDate = DateTime(now.year, now.month, now.day + 1);
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: endDate,
+      firstDate: endDate,
+      lastDate: DateTime(endDate.year + 3, endDate.month, endDate.day),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey[300]!,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Colors.blue),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedEndDate) {
+      setState(() {
+        _selectedEndDate = picked;
+        _endDateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
   // Validation functions
-  String? _validateNotEmpty(String? value, String fieldName) {
+  String? _validateStartDate(String? value) {
     if (value == null || value.isEmpty) {
-      return '$fieldName مطلوب';
+      return 'تاريخ البدء مطلوب';
+    }
+    return null;
+  }
+
+  String? _validateEndDate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'تاريخ الانتهاء مطلوب';
     }
     return null;
   }
@@ -102,8 +159,8 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     final advertisement = Advertisement(
       media: _imageUrl!,
       type: "image",
-      startDate: "2025-08-23",
-      endDate: "2025-08-30",
+      startDate: _startDateController.text,
+      endDate: _endDateController.text,
     );
 
     try {
@@ -114,6 +171,13 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
         _imageUrl,
         _fileName,
       );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء الإعلان بنجاح')));
+        // widget.callback();
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (mounted) {
         showDialog(
@@ -180,10 +244,6 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
                   _buildAdvertisementDetails(),
                   SizedBox(height: 25),
 
-                  // Target audience selection section
-                  _buildTargetAudience(),
-                  SizedBox(height: 25),
-
                   // Form submission button
                   _buildCreateButton(),
                 ],
@@ -216,8 +276,6 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
   }
 
   /// Builds the advertisement details section containing:
-  /// - Title field
-  /// - Content field
   /// - Image upload section
   Widget _buildAdvertisementDetails() {
     return Container(
@@ -235,44 +293,20 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
             style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 30),
-          _buildTitleField(),
-          SizedBox(height: 25),
-          _buildContentField(),
-          SizedBox(height: 25),
           _buildImageSection(),
+          SizedBox(height: 20),
+
+          Row(
+            children: [
+              Expanded(child: _buildStartDate()),
+              SizedBox(width: 10),
+              Expanded(child: _buildEndDate()),
+            ],
+          ),
         ],
       ),
     );
   }
-
-  /// Builds the title input field
-  Widget _buildTitleField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("العنوان *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أدخل عنوان الإعلان",
-        controller: _titleController,
-        validator: (value) => _validateNotEmpty(value, "عنوان الإعلان"),
-      ),
-    ],
-  );
-
-  /// Builds the content input field with multiple lines
-  Widget _buildContentField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("المضمون *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أدخل مضمون الإعلان",
-        maxLines: 3, // Allows for multiline input
-        controller: _contentController,
-        validator: (value) => _validateNotEmpty(value, "مضمون الإعلان"),
-      ),
-    ],
-  );
 
   /// Builds the image upload section with preview capability
   Widget _buildImageSection() => Column(
@@ -281,7 +315,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       Text("صورة الإعلان *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       InkWell(
-        onTap: _pickImage2,
+        onTap: _pickImage,
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 50),
@@ -289,7 +323,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
             border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: _imageBytes == null
+          child: _imageUrl == null
               ? Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -319,43 +353,59 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     ],
   );
 
-  /// Builds the target audience selection section
-  Widget _buildTargetAudience() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black26),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "الفئة المستهدفة",
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+  Widget _buildStartDate() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("تاريخ البدء *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      TextFormField(
+        controller: _startDateController,
+        decoration: InputDecoration(
+          hintText: 'mm/dd/yyyy',
+          suffixIcon: Icon(Icons.calendar_today),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
           ),
-          SizedBox(height: 20),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black87),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        readOnly: true,
+        onTap: () => _selectStartDate(context),
+        validator: _validateStartDate,
+      ),
+    ],
+  );
 
-          Row(
-            children: [
-              Checkbox(
-                value: _isChecked,
-                checkColor: Colors.white,
-                activeColor: Colors.black,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isChecked = value ?? false;
-                  });
-                },
-              ),
-              Text("جميع المستخدمين"),
-            ],
+  Widget _buildEndDate() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("تاريخ الإنتهاء *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      TextFormField(
+        controller: _endDateController,
+        decoration: InputDecoration(
+          hintText: 'mm/dd/yyyy',
+          suffixIcon: Icon(Icons.calendar_today),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
           ),
-        ],
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black87),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        readOnly: true,
+        onTap: () => _selectEndDate(context),
+        validator: _validateEndDate,
       ),
-    );
-  }
+    ],
+  );
 
   /// Builds the form submission button
   Widget _buildCreateButton() => Row(
@@ -363,8 +413,21 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     children: [
       ElevatedButton(
         onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            // Add form submission logic here
+          if (_imageUrl == null) {
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: Text('خطأ في إنشاء الإعلان'),
+                content: Text("يجب اختيار صورة للإعلان"),
+                actions: [
+                  TextButton(
+                    child: Text('موافق'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            );
+          } else if (_formKey.currentState!.validate()) {
             _createAdvertisement();
           }
         },

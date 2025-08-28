@@ -1,5 +1,6 @@
 import 'package:control_panel_2/widgets/other/nav_button.dart';
-import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/basic_filters.dart';
+import 'package:control_panel_2/widgets/promotions_page/sections/notifications/sections/specific_student_section.dart';
+import 'package:control_panel_2/widgets/promotions_page/sections/notifications/sections/specific_teacher_section.dart';
 import 'package:flutter/material.dart';
 
 class AddNotificationDialog extends StatefulWidget {
@@ -14,11 +15,10 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for notification content input fields
-  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
 
   // State variables
-  String _activeFilter = 'جميع المستخدمين'; // Currently selected section
+  String _activeFilter = "جميع الطلاب"; // Currently selected section
 
   /// Updates the active section filter
   void _setFilter(String filter) {
@@ -122,45 +122,10 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
           ),
           SizedBox(height: 25),
 
-          // Title input field
-          _buildTitleField(),
-          SizedBox(height: 20),
-
           // Message input field
           _buildMessageField(),
         ],
       ),
-    );
-  }
-
-  // Builds title input field
-  Widget _buildTitleField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "العنوان", // "Title"
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 2),
-        TextField(
-          controller: _titleController,
-          cursorColor: Colors.blue,
-          textDirection: TextDirection.rtl, // Right-align Arabic text
-          decoration: InputDecoration(
-            hintText: "أدخل عنوان الإشعار", // "Enter notification title"
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black26),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black87),
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -235,21 +200,39 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
       ),
       child: Row(
         children: [
-          // Overview tab
+          // All students tab
           Expanded(
             child: NavButton(
-              navkey: "جميع المستخدمين",
-              isActive: _activeFilter == "جميع المستخدمين",
-              onTap: () => _setFilter("جميع المستخدمين"),
+              navkey: "جميع الطلاب",
+              isActive: _activeFilter == "جميع الطلاب",
+              onTap: () => _setFilter("جميع الطلاب"),
             ),
           ),
 
-          // Receipts tab
+          // All teachers tab
           Expanded(
             child: NavButton(
-              navkey: "فلاتر أساسية",
-              isActive: _activeFilter == "فلاتر أساسية",
-              onTap: () => _setFilter("فلاتر أساسية"),
+              navkey: "جميع المعلمين",
+              isActive: _activeFilter == "جميع المعلمين",
+              onTap: () => _setFilter("جميع المعلمين"),
+            ),
+          ),
+
+          // Specific student tab
+          Expanded(
+            child: NavButton(
+              navkey: "طالب محدد",
+              isActive: _activeFilter == "طالب محدد",
+              onTap: () => _setFilter("طالب محدد"),
+            ),
+          ),
+
+          // Specific teacher tab
+          Expanded(
+            child: NavButton(
+              navkey: "معلم محدد",
+              isActive: _activeFilter == "معلم محدد",
+              onTap: () => _setFilter("معلم محدد"),
             ),
           ),
         ],
@@ -260,11 +243,18 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
   /// Returns the appropriate content section based on active filter
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
-      case "فلاتر أساسية":
-        return BasicFilters();
+      case "جميع المعلمين":
+        return Text(
+          "هذا الإشعار سيكون لجميع المعلمين",
+          style: TextStyle(color: Colors.grey),
+        );
+      case "طالب محدد":
+        return SpecificStudentSection();
+      case "معلم محدد":
+        return SpecificTeacherSection();
       default:
         return Text(
-          "هذا الإشعار سيكون لجميع المستخدمين",
+          "هذا الإشعار سيكون لجميع الطلاب",
           style: TextStyle(color: Colors.grey),
         );
     }
@@ -276,12 +266,7 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
-          onPressed: () {
-            // TODO: Implement notification sending logic
-            // Access content via:
-            // _titleController.text
-            // _messageController.text
-          },
+          onPressed: () {},
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(

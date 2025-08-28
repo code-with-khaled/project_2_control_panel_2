@@ -37,12 +37,18 @@ class AdvertisementsService {
     }
 
     final response = await request.send();
-    final responseJson = await http.Response.fromStream(response);
-    // ignore: avoid_print
-    print(responseJson.body);
 
     if (response.statusCode != 200) {
       throw Exception('Advertisement create failed');
+    }
+  }
+
+  Future<void> deleteAdvertisement(String? token, int id) async {
+    final response = await apiClient.delete("dashboard/ads/$id", token: token);
+
+    if (response.statusCode == 200) {
+    } else {
+      throw Exception('Delete Advertisement Failed');
     }
   }
 }

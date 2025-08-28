@@ -222,16 +222,25 @@ class _SendNotificationDialogState extends State<SendNotificationDialog> {
               _sendNotification();
             }
           },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              children: [
-                Icon(Icons.send_outlined),
-                SizedBox(width: 10),
-                Text("إرسال الإشعار"), // "Send Notification"
-              ],
-            ),
-          ),
+          child: _isSending
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      Icon(Icons.send_outlined),
+                      SizedBox(width: 10),
+                      Text("إرسال الإشعار"), // "Send Notification"
+                    ],
+                  ),
+                ),
         ),
       ],
     );
