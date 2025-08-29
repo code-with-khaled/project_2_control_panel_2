@@ -1,21 +1,54 @@
 class Course {
-  final String id;
+  final String? id;
   final String name;
-  final String categorization;
-  final String description;
-  final String state;
-  final String teacher;
+  final String image;
+  final String category;
+  // final String description;
+  final CourseTeacher teacher;
+  final double rating;
   final int enrollments;
-  final int price;
 
   const Course({
-    required this.id,
+    this.id,
     required this.name,
-    required this.categorization,
-    required this.description,
-    required this.state,
+    required this.image,
+    required this.category,
+    // required this.description,
     required this.teacher,
+    required this.rating,
     required this.enrollments,
-    required this.price,
   });
+
+  factory Course.fromJson(Map<String, dynamic> json) => Course(
+    id: json['id'],
+    name: json['name'],
+    image: json['image'],
+    category: json['category_name'],
+    teacher: CourseTeacher.fromJson(json['teacher']),
+    rating: json['rating'],
+    enrollments: json['number_of_students'],
+  );
+}
+
+class CourseTeacher {
+  final int id;
+  final String firstName;
+  final String lastName;
+  final String image;
+
+  CourseTeacher({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.image,
+  });
+
+  factory CourseTeacher.fromJson(Map<String, dynamic> json) => CourseTeacher(
+    id: json['id'],
+    firstName: json['first_name'],
+    lastName: json['last_name'],
+    image: json['image'],
+  );
+
+  get fullName => '$firstName $lastName';
 }

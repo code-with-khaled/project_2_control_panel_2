@@ -1,11 +1,14 @@
-import 'package:control_panel_2/constants/all_courses.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/courses_page/course_card.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/new_course_dialog.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class CoursesPage extends StatefulWidget {
   const CoursesPage({super.key});
@@ -19,19 +22,61 @@ class _CoursesPageState extends State<CoursesPage> {
 
   String _searchQuery = '';
 
-  List<Course> get _filteredCourses {
-    // Initial filtering by search query
-    List<Course> results = courses.where((course) {
-      final name = course.name.toString().toLowerCase();
-      final categorization = course.categorization.toString().toLowerCase();
-      final teacher = course.teacher.toString().toLowerCase();
+  // Pagination variables
+  int _currentPage = 1;
+  int _totalPages = 1;
+  int _perPage = 10;
+  int _totalItems = 0;
+  final TextEditingController _pageController = TextEditingController();
 
-      final query = _searchQuery.toLowerCase();
-      return name.contains(query) ||
-          categorization.contains(query) ||
-          teacher.contains(query);
-    }).toList();
-    return results;
+  // Variables for API integration
+  late CourseService _courseService;
+  List<Course> _courses = [];
+  bool _isLoading = true;
+
+  Future<void> _loadCourses({int page = 1}) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final response = await _courseService.fetchCourses(token, page: page);
+      setState(() {
+        _courses = response['courses'];
+        _currentPage = response['pagination']['current_page'];
+        _totalPages = response['pagination']['last_page'];
+        _perPage = response['pagination']['per_page'];
+        _totalItems = response['pagination']['total'];
+        _isLoading = false;
+        _pageController.text = _currentPage.toString();
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+
+    // ignore: avoid_print
+    print(_courses);
+  }
+
+  void _goToPage(int page) {
+    if (page >= 1 && page <= _totalPages) {
+      _loadCourses(page: page);
+    }
+  }
+
+  // Refresh courses list (call this after adding/editing or deleting a course)
+  void _refreshCourses() {
+    _loadCourses(page: _currentPage);
   }
 
   @override
@@ -43,6 +88,15 @@ class _CoursesPageState extends State<CoursesPage> {
         _searchQuery = _searchController.text;
       });
     });
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _courseService = CourseService(apiClient: apiClient);
+
+    _loadCourses();
   }
 
   @override
@@ -68,12 +122,24 @@ class _CoursesPageState extends State<CoursesPage> {
                   _buildPageHeader(),
                   SizedBox(height: 25),
 
-                  // Search and filter section
-                  _buildSearchSection(),
-                  SizedBox(height: 25),
+                  if (_isLoading) _buildLoadingState(),
 
-                  // Responsive courses list
-                  _buildCoursesGrid(),
+                  if (!_isLoading) ...[
+                    // Search and filter section
+                    _buildSearchSection(),
+                    SizedBox(height: 25),
+
+                    // Course count and pagination info
+                    _buildPaginationInfo(),
+                    SizedBox(height: 15),
+
+                    // Responsive courses list
+                    _buildCoursesGrid(),
+                    SizedBox(height: 25),
+
+                    // Pagination controls
+                    _buildPaginationControls(),
+                  ],
                 ],
               ),
             ),
@@ -132,6 +198,16 @@ class _CoursesPageState extends State<CoursesPage> {
     );
   }
 
+  // Build loading state
+  Widget _buildLoadingState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
   // Builds search and filter controls
   Widget _buildSearchSection() {
     return Container(
@@ -148,26 +224,147 @@ class _CoursesPageState extends State<CoursesPage> {
     );
   }
 
-  Widget _buildCoursesGrid() {
-    if (_filteredCourses.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Text('لا توجد كورسات مطابقة للبحث'),
+  // Build pagination info
+  Widget _buildPaginationInfo() {
+    final startItem = ((_currentPage - 1) * _perPage) + 1;
+    final endItem = _currentPage == _totalPages
+        ? _totalItems
+        : _currentPage * _perPage;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "عرض $startItem - $endItem من أصل $_totalItems طالب",
+          style: TextStyle(color: Colors.grey[600]),
         ),
-      );
+        Text(
+          "الصفحة $_currentPage من $_totalPages",
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCoursesGrid() {
+    List<Course> displayedCourses = _courses;
+
+    // Apply search filter
+    if (_searchQuery.isNotEmpty) {
+      displayedCourses = _courses.where((course) {
+        final name = course.name.toString().toLowerCase();
+        final id = course.id.toString().toLowerCase();
+        final query = _searchQuery.toLowerCase();
+        return name.contains(query) || id.contains(query);
+      }).toList();
+    }
+
+    if (displayedCourses.isEmpty) {
+      return _buildEmptyState();
     }
 
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: _filteredCourses.length,
+      itemCount: displayedCourses.length,
       itemBuilder: (context, index) {
         return Padding(
           padding: EdgeInsets.only(bottom: 10),
-          child: CourseCard(course: _filteredCourses[index]),
+          child: CourseCard(course: displayedCourses[index]),
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: Text(
+          'لا يوجد دورات',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  // Build pagination controls
+  Widget _buildPaginationControls() {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // First page button
+            IconButton(
+              icon: Icon(Icons.first_page),
+              onPressed: _currentPage > 1 ? () => _goToPage(1) : null,
+            ),
+            SizedBox(width: 8),
+
+            // Previous page button
+            IconButton(
+              icon: Icon(Icons.chevron_left),
+              onPressed: _currentPage > 1
+                  ? () => _goToPage(_currentPage - 1)
+                  : null,
+            ),
+            SizedBox(width: 16),
+
+            // Page input
+            SizedBox(
+              width: 40,
+              height: 30,
+              child: TextField(
+                cursorColor: Colors.blue,
+                controller: _pageController,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 12,
+                  ),
+                  border: OutlineInputBorder(),
+                ),
+                onSubmitted: (value) {
+                  final page = int.tryParse(value) ?? 1;
+                  _goToPage(page);
+                },
+              ),
+            ),
+
+            Text(' / $_totalPages', style: TextStyle(fontSize: 16)),
+            SizedBox(width: 16),
+
+            // Next page button
+            IconButton(
+              icon: Icon(Icons.chevron_right),
+              onPressed: _currentPage < _totalPages
+                  ? () => _goToPage(_currentPage + 1)
+                  : null,
+            ),
+            SizedBox(width: 8),
+
+            // Last page button
+            IconButton(
+              icon: Icon(Icons.last_page),
+              onPressed: _currentPage < _totalPages
+                  ? () => _goToPage(_totalPages)
+                  : null,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

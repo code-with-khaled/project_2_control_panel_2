@@ -107,7 +107,7 @@ class _CourseCardState extends State<CourseCard> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
-                  widget.course.categorization,
+                  widget.course.category,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
@@ -131,7 +131,7 @@ class _CourseCardState extends State<CourseCard> {
                           color: Colors.grey[200],
                         ),
                         child: Text(
-                          widget.course.id,
+                          widget.course.id!,
                           style: TextStyle(
                             color: Colors.black54,
                             fontWeight: FontWeight.bold,
@@ -162,23 +162,6 @@ class _CourseCardState extends State<CourseCard> {
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                     ],
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: widget.course.state == "منشورة"
-                          ? Colors.black
-                          : Colors.grey,
-                    ),
-                    child: Text(
-                      widget.course.state,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                 ],
               ),

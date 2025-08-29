@@ -112,10 +112,17 @@ class _AccountProfileState extends State<AccountProfile> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("المستوى الدراسي:", style: TextStyle(color: Colors.grey)),
-          Text(
-            widget.account.education,
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Flexible(
+            child: Text(
+              "المستوى الدراسي:",
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          Flexible(
+            child: Text(
+              widget.account.education,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

@@ -33,7 +33,7 @@ class NotificationService {
 
   Future<void> sendToAllStudents(String? token, String message) async {
     final response = await apiClient.post(
-      "dashboard/notifications/students/send/send-all",
+      "dashboard/notifications/students/send-all",
       body: {'message': message},
       token: token,
     );
@@ -46,7 +46,7 @@ class NotificationService {
 
   Future<void> sendToAllTeachers(String? token, String message) async {
     final response = await apiClient.post(
-      "dashboard/notifications/teachers/send/send-all",
+      "dashboard/notifications/teachers/send-all",
       body: {'message': message},
       token: token,
     );

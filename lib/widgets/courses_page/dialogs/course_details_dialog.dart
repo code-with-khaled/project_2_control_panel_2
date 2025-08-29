@@ -135,7 +135,7 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      widget.course.categorization,
+                      widget.course.category,
                       style: TextStyle(fontSize: 19),
                     ),
                   ],
@@ -144,85 +144,6 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
             ],
           ),
 
-          SizedBox(height: 20),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "المعرف",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: Colors.grey[200],
-                      ),
-                      child: Text(
-                        widget.course.id,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "الحالة",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: widget.course.state == "منشورة"
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                      child: Text(
-                        widget.course.state,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
           SizedBox(height: 20),
 
           Column(
@@ -238,7 +159,10 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                 ),
               ),
               SizedBox(height: 5),
-              Text(widget.course.description, style: TextStyle(fontSize: 17)),
+              Text(
+                "'دورة تمهيدية لتعلم أساسيات تطوير التطبيقات باستخدام Flutter، مناسبة للمبتدئين في البرمجة متعددة المنصات.'",
+                style: TextStyle(fontSize: 17),
+              ),
             ],
           ),
 
@@ -331,7 +255,7 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                     ),
                   ),
                   Text(
-                    "${widget.course.price}",
+                    "1 300 000",
                     style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
                   ),
                 ],

@@ -30,10 +30,10 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     super.initState();
 
     _courseNameController.text = widget.course.name;
-    _selectedCategory = widget.course.categorization;
-    _selectedTeacher = widget.course.teacher;
-    _coursePriceController.text = widget.course.price.toString();
-    _courseDescriptionController.text = widget.course.description;
+    _selectedCategory = widget.course.category;
+    _selectedTeacher = widget.course.teacher.fullName;
+    // _coursePriceController.text = widget.course.price.toString();
+    // _courseDescriptionController.text = widget.course.description;
   }
 
   @override

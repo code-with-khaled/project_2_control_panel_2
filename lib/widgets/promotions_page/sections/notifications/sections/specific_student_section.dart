@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class SpecificStudentSection extends StatefulWidget {
-  const SpecificStudentSection({super.key});
+  final Function(int?) onMessageChanged;
+
+  const SpecificStudentSection({super.key, required this.onMessageChanged});
 
   @override
   State<SpecificStudentSection> createState() => _SpecificStudentSectionState();
@@ -23,7 +25,7 @@ class _SpecificStudentSectionState extends State<SpecificStudentSection> {
   Student? _selectedStudent;
   bool _isLoading = true;
 
-  List<Student> get _filteredTeachers {
+  List<Student> get _filteredStudents {
     List<Student> result = _students;
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
@@ -101,30 +103,32 @@ class _SpecificStudentSectionState extends State<SpecificStudentSection> {
               ),
               SizedBox(height: 20),
 
-              // Teachers list
-              if (_filteredTeachers.isEmpty)
+              // Students list
+              if (_filteredStudents.isEmpty)
                 Center(child: Text('لا يوجد طلاب'))
               else
                 ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 300),
                   child: ListView.builder(
                     shrinkWrap: true,
-                    itemCount: _filteredTeachers.length,
+                    itemCount: _filteredStudents.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final teacher = _filteredTeachers[index];
-                      final isSelected = _selectedStudent?.id == teacher.id;
+                      final student = _filteredStudents[index];
+                      final isSelected = _selectedStudent?.id == student.id;
 
                       return ListTile(
-                        title: Text(teacher.fullName),
-                        subtitle: Text(teacher.username),
+                        title: Text(student.fullName),
+                        subtitle: Text(student.username),
                         leading: isSelected
                             ? Icon(Icons.check_circle, color: Colors.green)
                             : Icon(Icons.person_outline),
                         tileColor: isSelected ? Colors.blue[50] : null,
                         onTap: () {
                           setState(() {
-                            _selectedStudent = teacher;
+                            _selectedStudent = student;
                           });
+
+                          widget.onMessageChanged(student.id);
                         },
                       );
                     },
@@ -132,12 +136,12 @@ class _SpecificStudentSectionState extends State<SpecificStudentSection> {
                 ),
 
               if (_selectedStudent != null) SizedBox(height: 16),
-              if (_selectedStudent != null) _buildSelectedTeacherSection(),
+              if (_selectedStudent != null) _buildSelectedStudentSection(),
             ],
           );
   }
 
-  Widget _buildSelectedTeacherSection() {
+  Widget _buildSelectedStudentSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -176,6 +180,8 @@ class _SpecificStudentSectionState extends State<SpecificStudentSection> {
                   setState(() {
                     _selectedStudent = null;
                   });
+
+                  widget.onMessageChanged(null);
                 },
               ),
             ],

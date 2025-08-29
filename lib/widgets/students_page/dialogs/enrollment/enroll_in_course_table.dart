@@ -51,8 +51,8 @@ class CoursesTable extends StatelessWidget {
                 decoration: BoxDecoration(color: Colors.white),
                 children: [
                   _buildCourseNameCell(course.name),
-                  _buildCategoryCell(Text(course.categorization)),
-                  _buildTeacherCell(course.teacher),
+                  _buildCategoryCell(Text(course.category)),
+                  _buildTeacherCell(course.teacher.fullName),
                   _buildActionCell(
                     ElevatedButton(
                       onPressed: () =>

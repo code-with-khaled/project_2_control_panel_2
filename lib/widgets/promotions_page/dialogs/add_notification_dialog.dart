@@ -1,7 +1,12 @@
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/notification_service.dart';
+import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/notifications/sections/specific_student_section.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/notifications/sections/specific_teacher_section.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class AddNotificationDialog extends StatefulWidget {
   const AddNotificationDialog({super.key});
@@ -25,6 +30,91 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
     setState(() {
       _activeFilter = filter;
     });
+  }
+
+  // Validation function
+  String? _validateMessage(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'محتوى الرسالة مطلوب';
+    }
+    return null;
+  }
+
+  // User id
+  int? id;
+
+  void _getId(int? id) {
+    setState(() {
+      this.id = id;
+    });
+  }
+
+  bool _isSending = false;
+
+  Future<void> _sendNotification() async {
+    if (_isSending) return;
+
+    setState(() {
+      _isSending = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final message = _messageController.text.trim();
+      switch (_activeFilter) {
+        case "جميع المعلمين":
+          await _notificationService.sendToAllTeachers(token, message);
+        case "طالب محدد":
+          await _notificationService.sendToStudent(token, message, id!);
+        case "معلم محدد":
+          await _notificationService.sendToTeacher(token, message, id!);
+        default:
+          await _notificationService.sendToAllStudents(token, message);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إرسال الإشعار')));
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إرسال الإشعار'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSending = false;
+        });
+      }
+    }
+  }
+
+  late NotificationService _notificationService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _notificationService = NotificationService(apiClient: apiClient);
   }
 
   @override
@@ -135,27 +225,15 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "الرسالة", // "Message"
+          "الرسالة",
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 2),
-        TextField(
+        CustomTextField(
           controller: _messageController,
-          cursorColor: Colors.blue,
-          maxLines: 3, // Allow multiline input
-          textDirection: TextDirection.rtl, // Right-align Arabic text
-          decoration: InputDecoration(
-            hintText: "أدخل محتوى الإشعار", // "Enter notification message"
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black26),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black87),
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
+          hintText: "أدخل محتوى الرسالة",
+          maxLines: 3,
+          validator: _validateMessage,
         ),
       ],
     );
@@ -249,9 +327,9 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
           style: TextStyle(color: Colors.grey),
         );
       case "طالب محدد":
-        return SpecificStudentSection();
+        return SpecificStudentSection(onMessageChanged: _getId);
       case "معلم محدد":
-        return SpecificTeacherSection();
+        return SpecificTeacherSection(onMessageChanged: _getId);
       default:
         return Text(
           "هذا الإشعار سيكون لجميع الطلاب",
@@ -266,17 +344,48 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
-          onPressed: () {},
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              children: [
-                Icon(Icons.send_outlined),
-                SizedBox(width: 10),
-                Text("إرسال الإشعار"), // "Send Notification"
-              ],
-            ),
-          ),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              if (id == null &&
+                  (_activeFilter == "طالب محدد" ||
+                      _activeFilter == "معلم محدد")) {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: Text('خطأ في إرسال الإشعار'),
+                    content: Text("يجب اختيار مستخدم محدد لإرسال الإشعار"),
+                    actions: [
+                      TextButton(
+                        child: Text('موافق'),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                _sendNotification();
+              }
+            }
+          },
+          child: _isSending
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      Icon(Icons.send_outlined),
+                      SizedBox(width: 10),
+                      Text("إرسال الإشعار"), // "Send Notification"
+                    ],
+                  ),
+                ),
         ),
       ],
     );

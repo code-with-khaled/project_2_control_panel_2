@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class SpecificTeacherSection extends StatefulWidget {
-  const SpecificTeacherSection({super.key});
+  final Function(int?) onMessageChanged;
+
+  const SpecificTeacherSection({super.key, required this.onMessageChanged});
 
   @override
   State<SpecificTeacherSection> createState() => _SpecificTeacherSectionState();
@@ -125,6 +127,8 @@ class _SpecificTeacherSectionState extends State<SpecificTeacherSection> {
                           setState(() {
                             _selectedTeacher = teacher;
                           });
+
+                          widget.onMessageChanged(teacher.id);
                         },
                       );
                     },
@@ -176,6 +180,8 @@ class _SpecificTeacherSectionState extends State<SpecificTeacherSection> {
                   setState(() {
                     _selectedTeacher = null;
                   });
+
+                  widget.onMessageChanged(null);
                 },
               ),
             ],

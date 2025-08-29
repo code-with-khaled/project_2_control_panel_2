@@ -95,7 +95,7 @@ class _TeachersPageState extends State<TeachersPage> {
     }
   }
 
-  // Refresh students list (call this after adding/editing or deleting a student)
+  // Refresh teachers list (call this after adding/editing or deleting a teacher)
   void _refreshTeachers() {
     _loadTeachers(page: _currentPage);
   }
@@ -129,7 +129,7 @@ class _TeachersPageState extends State<TeachersPage> {
                     _buildSearchSection(),
                     const SizedBox(height: 25),
 
-                    // Student count and pagination info
+                    // Teacher count and pagination info
                     _buildPaginationInfo(),
                     SizedBox(height: 15),
 
