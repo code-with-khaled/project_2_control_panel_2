@@ -270,7 +270,10 @@ class _CoursesPageState extends State<CoursesPage> {
       itemBuilder: (context, index) {
         return Padding(
           padding: EdgeInsets.only(bottom: 10),
-          child: CourseCard(course: displayedCourses[index]),
+          child: CourseCard(
+            course: displayedCourses[index],
+            callback: _refreshCourses,
+          ),
         );
       },
     );

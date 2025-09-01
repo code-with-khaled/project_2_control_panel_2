@@ -1,11 +1,11 @@
 class Course {
-  final String? id;
+  final int? id;
   final String name;
   final String image;
   final String category;
   // final String description;
   final CourseTeacher teacher;
-  final double rating;
+  final String rating;
   final int enrollments;
 
   const Course({

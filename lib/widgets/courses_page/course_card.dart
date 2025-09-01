@@ -1,14 +1,19 @@
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/course_data_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/course_details_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/course_enrollments_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/edit_course_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class CourseCard extends StatefulWidget {
+  final VoidCallback callback;
   final Course course;
 
-  const CourseCard({super.key, required this.course});
+  const CourseCard({super.key, required this.course, required this.callback});
 
   @override
   State<CourseCard> createState() => _CourseCardState();
@@ -16,6 +21,72 @@ class CourseCard extends StatefulWidget {
 
 class _CourseCardState extends State<CourseCard> {
   bool isHovered = false; // Tracks hover state for visual feedback
+  bool _isDeleting = false;
+
+  Future<void> _deleteCourse() async {
+    if (_isDeleting) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('تأكيد الحذف'),
+        content: Text(
+          'هل أنت متأكد من رغبتك في حذف دورة ${widget.course.name}؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      _courseService.deleteCourse(token, widget.course.id!);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم حذف الدورة بنجاح')));
+
+        widget.callback();
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  late CourseService _courseService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _courseService = CourseService(apiClient: apiClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +164,19 @@ class _CourseCardState extends State<CourseCard> {
                         icon: Icon(Icons.insert_chart_outlined_outlined),
                       ),
                       IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.delete_outline),
+                        onPressed: () {
+                          _deleteCourse();
+                        },
+                        icon: _isDeleting
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.red,
+                                ),
+                              )
+                            : Icon(Icons.delete_outline, color: Colors.red),
                       ),
                     ],
                   ),
@@ -131,7 +213,7 @@ class _CourseCardState extends State<CourseCard> {
                           color: Colors.grey[200],
                         ),
                         child: Text(
-                          widget.course.id!,
+                          widget.course.id!.toString(),
                           style: TextStyle(
                             color: Colors.black54,
                             fontWeight: FontWeight.bold,
@@ -147,7 +229,7 @@ class _CourseCardState extends State<CourseCard> {
                       Icon(Icons.person_outline, color: Colors.grey),
                       SizedBox(width: 5),
                       Text(
-                        "أ. ${widget.course.teacher}",
+                        "أ. ${widget.course.teacher.fullName}",
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                     ],

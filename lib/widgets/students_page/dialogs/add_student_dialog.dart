@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/student_service.dart';
@@ -7,7 +6,9 @@ import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:file_picker/file_picker.dart';
+
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 class AddStudentDialog extends StatefulWidget {
   final VoidCallback callback;
@@ -40,7 +41,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   bool _obsecure = true;
   String? _selectedGender;
   DateTime? _selectedDate;
-  Uint8List? _imageBytes;
+  String? _imageUrl;
   String _fileName = "لم يتم اختيار ملف";
   String? _selectedEducationLevel;
   bool _isSubmitting = false;
@@ -84,16 +85,23 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
 
   // Image picker function
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: true,
-    );
-    if (result != null && result.files.single.bytes != null) {
-      setState(() {
-        _imageBytes = result.files.single.bytes;
-        _fileName = result.files.single.name;
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
       });
-    }
+    });
   }
 
   // Validation functions
@@ -174,6 +182,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     final gender = _selectedGender;
     final birthDate = _selectedDate;
     final password = _passwordController.text.trim();
+    final image = _imageUrl;
 
     final student = Student(
       username: username,
@@ -186,6 +195,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       gender: gender!,
       birthDate: birthDate!,
       password: password,
+      image: image,
     );
 
     try {
@@ -539,17 +549,19 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       CircleAvatar(
         radius: 40,
         backgroundColor: Colors.grey[200],
-        backgroundImage: _imageBytes != null ? MemoryImage(_imageBytes!) : null,
-        child: _imageBytes == null
+        backgroundImage: _imageUrl != null
+            ? NetworkImage(_imageUrl!) // <-- Use the data URL here
+            : null,
+        child: _imageUrl == null
             ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
             : null,
       ),
-      if (_imageBytes != null)
+      if (_imageUrl != null)
         Padding(
           padding: const EdgeInsets.only(right: 60, bottom: 60),
           child: IconButton(
             onPressed: () => setState(() {
-              _imageBytes = null;
+              _imageUrl = null;
               _fileName = "لم يتم اختيار ملف";
             }),
             icon: Icon(Icons.cancel_outlined, color: Colors.red),

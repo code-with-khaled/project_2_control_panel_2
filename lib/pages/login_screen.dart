@@ -55,6 +55,54 @@ class _LoginScreenState extends State<LoginScreen>
     return null;
   }
 
+  // Login
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final apiClient = ApiClient(
+        baseUrl: "http://127.0.0.1:8000/api",
+        httpClient: http.Client(),
+      );
+
+      final authService = AuthService(apiClient: apiClient);
+
+      final token = await authService.login(
+        username: _usernameController.text.trim(),
+        password: _passwordController.text.trim(),
+        roleId: 1,
+      );
+
+      TokenHelper.storeToken(token);
+
+      _navigateToHome();
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في تسجيل الدخول'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   // ----Animation----
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -405,44 +453,7 @@ class _LoginScreenState extends State<LoginScreen>
               : () async {
                   if (_formKey.currentState!.validate()) {
                     // Form submission logic
-                    setState(() {
-                      _isLoading = true;
-                    });
-
-                    try {
-                      final apiClient = ApiClient(
-                        baseUrl: "http://127.0.0.1:8000/api",
-                        httpClient: http.Client(),
-                      );
-
-                      final authService = AuthService(apiClient: apiClient);
-
-                      final token = await authService.login(
-                        username: _usernameController.text.trim(),
-                        password: _passwordController.text.trim(),
-                        roleId: 1,
-                      );
-
-                      TokenHelper.storeToken(token);
-
-                      _navigateToHome();
-                    } catch (e) {
-                      if (mounted) {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text('خطأ'),
-                            content: Text(e.toString()),
-                          ),
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      }
-                    }
+                    _login();
                   }
                 },
           child: Padding(
@@ -465,27 +476,14 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildPasswordEdits() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         HoverUnderlineText(
           text: "نسيت كلمة المرور؟",
           onTap: () {
             Navigator.push(
               context,
-              (MaterialPageRoute(
-                builder: (context) => ResetPasswordPage(forget: true),
-              )),
-            );
-          },
-        ),
-        HoverUnderlineText(
-          text: "تغيير كلمة المرور",
-          onTap: () {
-            Navigator.push(
-              context,
-              (MaterialPageRoute(
-                builder: (context) => ResetPasswordPage(forget: false),
-              )),
+              (MaterialPageRoute(builder: (context) => ResetPasswordPage())),
             );
           },
         ),

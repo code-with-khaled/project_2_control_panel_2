@@ -184,7 +184,16 @@ class _StudentProfileState extends State<StudentProfile> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(radius: 22, child: Icon(Icons.person)),
+        CircleAvatar(
+          radius: 22,
+          backgroundImage: widget.student.image != null
+              ? NetworkImage(
+                  "http://127.0.0.1:8000${widget.student.image!}",
+                  scale: 1.0,
+                )
+              : null,
+          child: widget.student.image == null ? Icon(Icons.person) : null,
+        ),
         SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

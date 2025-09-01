@@ -87,8 +87,16 @@ class _StudentsPageState extends State<StudentsPage> {
       if (mounted) {
         showDialog(
           context: context,
-          builder: (_) =>
-              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في تحميل حسابات الطلاب'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         );
       }
     }

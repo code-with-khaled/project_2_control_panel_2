@@ -1,13 +1,13 @@
-import 'dart:typed_data';
-
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 class AddTeacherDialog extends StatefulWidget {
   final VoidCallback callback;
@@ -38,7 +38,9 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
 
   // State variables
   bool _obsecure = true;
-  Uint8List? _imageBytes;
+  String? _imageUrl;
+  // ignore: unused_field
+  String? _fileName;
   String? _selectedEducationLevel;
   bool _isSubmitting = false;
 
@@ -50,15 +52,23 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
 
   // Image picker function
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: true,
-    );
-    if (result != null && result.files.single.bytes != null) {
-      setState(() {
-        _imageBytes = result.files.single.bytes;
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
       });
-    }
+    });
   }
 
   // Validation functions
@@ -127,6 +137,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       _isSubmitting = true;
     });
 
+    final image = _imageUrl;
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final username = _usernameController.text.trim();
@@ -146,6 +157,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       username: username,
       phone: phone,
       password: password,
+      image: image,
       educationLevel: educationLevel,
       specialization: specialization,
       headline: headline,
@@ -339,19 +351,19 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
               CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.grey[200],
-                backgroundImage: _imageBytes != null
-                    ? MemoryImage(_imageBytes!)
+                backgroundImage: _imageUrl != null
+                    ? NetworkImage(_imageUrl!) // <-- Use the data URL here
                     : null,
-                child: _imageBytes == null
+                child: _imageUrl == null
                     ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
                     : null,
               ),
-              if (_imageBytes != null)
+              if (_imageUrl != null)
                 Positioned(
                   top: 1,
                   right: 1,
                   child: IconButton(
-                    onPressed: () => setState(() => _imageBytes = null),
+                    onPressed: () => setState(() => _imageUrl = null),
                     icon: Icon(Icons.cancel_outlined, color: Colors.red),
                   ),
                 ),

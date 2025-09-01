@@ -111,7 +111,8 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     final lastName = _lastNameController.text.trim();
     final username = _usernameController.text.trim();
     final phone = _mobileNumberController.text.trim();
-    final educationLevel = _selectedEducationLevel!;
+    // final educationLevel = _selectedEducationLevel!;
+    final educationLevel = 'university';
     final specialization = _specializationController.text.trim();
     final headline = _headlineController.text.trim();
     final experiences = _experiencesController.text.trim();
@@ -183,7 +184,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     _selectedEducationLevel = widget.teacher.educationLevel;
 
     // Set the profile image if it exists
-    _imageBytes = widget.teacher.image as Uint8List?;
+    // _imageBytes = widget.teacher.image as Uint8List?;
 
     final apiClient = ApiClient(
       baseUrl: "http://127.0.0.1:8000/api",

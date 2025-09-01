@@ -1,13 +1,15 @@
 import 'dart:ui';
 
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/services/auth_service.dart';
 import 'package:control_panel_2/pages/login_screen.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:otp_text_field/otp_field.dart';
 
 class ResetPasswordPage extends StatefulWidget {
-  final bool forget;
-  const ResetPasswordPage({super.key, required this.forget});
+  const ResetPasswordPage({super.key});
 
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
@@ -27,6 +29,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool _obsecure = true;
   bool _codeSent = false;
   bool _verifiedCode = false;
+  String? otpCode;
+  bool _isSending = false;
+  bool _isVerifying = false;
+  bool _isResetting = false;
 
   void _showPassword() {
     setState(() {
@@ -57,6 +63,155 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return 'كلمات المرور غير متطابقة';
     }
     return null;
+  }
+
+  // APIs
+  Future<void> _sendOTP() async {
+    if (_isSending) return;
+
+    setState(() {
+      _isSending = true;
+    });
+
+    try {
+      await _authService.sendOTP(_usernameController.text.trim());
+      setState(() {
+        _codeSent = true;
+      });
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إرسال رمز التحقق'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSending = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _verifyOTP() async {
+    if (_isVerifying) return;
+
+    if (otpCode == null || otpCode!.isEmpty) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في التحقق'),
+            content: Text('يجب إدخال رمز التحقق كاملاً'),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isVerifying = true;
+    });
+
+    try {
+      await _authService.verifyOTP(_usernameController.text.trim(), otpCode!);
+      setState(() {
+        _verifiedCode = true;
+      });
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في التحقق من الرمز'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isVerifying = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    if (_isResetting) return;
+
+    setState(() {
+      _isResetting = true;
+    });
+
+    try {
+      await _authService.resetPassword(
+        _usernameController.text.trim(),
+        otpCode!,
+        _passwordController.text,
+      );
+      setState(() {
+        _verifiedCode = true;
+      });
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إعادة تعيين كلمة المرور'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isResetting = false;
+        });
+      }
+    }
+  }
+
+  late AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _authService = AuthService(apiClient: apiClient);
   }
 
   @override
@@ -224,7 +379,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             width: MediaQuery.of(context).size.width,
             fieldWidth: 40,
             style: TextStyle(fontSize: 17),
-            onCompleted: (pin) {},
+            onChanged: (_) {},
+            onCompleted: (pin) {
+              setState(() {
+                otpCode = pin;
+              });
+            },
           ),
         ),
       ),
@@ -238,15 +398,21 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              // Add form submission logic here
-              setState(() {
-                _codeSent = true;
-              });
+              _sendOTP();
             }
           },
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 13),
-            child: Text("إرسال رمز التحقق"),
+            child: _isSending
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text("إرسال رمز التحقق"),
           ),
         ),
       ),
@@ -258,16 +424,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       Expanded(
         child: ElevatedButton(
           onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              // Add form submission logic here
-              setState(() {
-                _verifiedCode = true;
-              });
-            }
+            _verifyOTP();
           },
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 13),
-            child: Text("التحقق من الرمز"),
+            child: _isVerifying
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text("التحقق من الرمز"),
           ),
         ),
       ),
@@ -346,7 +516,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               // Add form submission logic here
-              Navigator.pop(context);
+              _resetPassword();
+              // Navigator.pop(context);
             }
           },
           child: Padding(

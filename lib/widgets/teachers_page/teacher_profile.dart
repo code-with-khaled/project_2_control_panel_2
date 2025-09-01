@@ -30,9 +30,9 @@ class _TeacherProfileState extends State<TeacherProfile> {
   bool _isDeleting = false;
 
   // Variables for API integration
-  late TeacherService _teachersService;
+  late TeacherService _teacherService;
 
-  Future<void> _deleteStudent() async {
+  Future<void> _deleteTeacher() async {
     if (_isDeleting) return;
 
     final confirmed = await showDialog<bool>(
@@ -63,7 +63,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
 
     try {
       final token = TokenHelper.getToken();
-      _teachersService.deleteTeacher(token, widget.teacher.id!);
+      _teacherService.deleteTeacher(token, widget.teacher.id!);
 
       if (mounted) {
         ScaffoldMessenger.of(
@@ -92,7 +92,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
       httpClient: http.Client(),
     );
 
-    _teachersService = TeacherService(apiClient: apiClient);
+    _teacherService = TeacherService(apiClient: apiClient);
   }
 
   @override
@@ -283,7 +283,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
 
         // Delete button
         InkWell(
-          onTap: () => _deleteStudent(),
+          onTap: () => _deleteTeacher(),
           child: Container(
             padding: EdgeInsets.all(7.5),
             decoration: BoxDecoration(

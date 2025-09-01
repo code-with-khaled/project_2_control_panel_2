@@ -46,4 +46,51 @@ class CourseService {
       throw Exception('$message$detailedErrors');
     }
   }
+
+  Future<void> createCourse(String? token, Course course) async {
+    final response = await apiClient.post(
+      "dashboard/courses",
+      // body: course.toJson(),
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+    } else {
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
+    }
+  }
+
+  Future<void> deleteCourse(String? token, int id) async {
+    final response = await apiClient.delete(
+      "dashboard/courses/$id",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+    } else {
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
+    }
+  }
 }
