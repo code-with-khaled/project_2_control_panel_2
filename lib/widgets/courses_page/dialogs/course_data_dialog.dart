@@ -31,7 +31,7 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 1000, // Wider dialog for profile content
+          maxWidth: 800,
           maxHeight:
               MediaQuery.of(context).size.height * 0.8, // 80% screen height
         ),
@@ -64,6 +64,7 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
   // Builds dialog header with title and action buttons
   Widget _buildHeader() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Flexible(
@@ -72,7 +73,7 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        Spacer(),
+
         IconButton(
           icon: Icon(Icons.close, size: 20),
           onPressed: () => Navigator.pop(context),

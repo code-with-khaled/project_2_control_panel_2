@@ -74,10 +74,14 @@ class StudentService {
     }
   }
 
-  Future<void> editStudent(String? token, int id, Student student) async {
+  Future<void> editStudent(
+    String? token,
+    int id,
+    Map<String, dynamic> student,
+  ) async {
     final response = await apiClient.put(
       "dashboard/students/$id",
-      body: student.toJson(),
+      body: student,
       token: token,
     );
 

@@ -156,10 +156,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (context) => EnrollStudentDialog(
-            name: widget.student.fullName,
-            username: widget.student.username,
-          ),
+          builder: (context) => EnrollStudentDialog(student: widget.student),
         );
       },
       style: ElevatedButton.styleFrom(

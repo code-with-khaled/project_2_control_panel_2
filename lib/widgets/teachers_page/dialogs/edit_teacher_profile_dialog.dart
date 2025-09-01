@@ -101,38 +101,19 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
   late TeacherService _teachersService;
 
   Future<void> _editTeacher() async {
-    if (_isEditing) return;
+    if (_isEditing || !_hasChanges) return;
 
     setState(() {
       _isEditing = true;
     });
 
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
-    final username = _usernameController.text.trim();
-    final phone = _mobileNumberController.text.trim();
-    // final educationLevel = _selectedEducationLevel!;
-    final educationLevel = 'university';
-    final specialization = _specializationController.text.trim();
-    final headline = _headlineController.text.trim();
-    final experiences = _experiencesController.text.trim();
-    final description = _descriptionController.text.trim();
-
-    final teacher = Teacher(
-      firstName: firstName,
-      lastName: lastName,
-      username: username,
-      phone: phone,
-      educationLevel: educationLevel,
-      specialization: specialization,
-      headline: headline,
-      experiences: experiences,
-      description: description,
-    );
-
     try {
       final token = TokenHelper.getToken();
-      await _teachersService.editTeacher(token, widget.teacher.id!, teacher);
+      await _teachersService.editTeacher(
+        token,
+        widget.teacher.id!,
+        _changedFields,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(
@@ -181,10 +162,14 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     _descriptionController.text = widget.teacher.description;
 
     // Set the education level dropdown value
-    _selectedEducationLevel = widget.teacher.educationLevel;
+    _selectedEducationLevel = widget.teacher.educationLevel == "جامعي"
+        ? "university"
+        : widget.teacher.educationLevel;
 
     // Set the profile image if it exists
     // _imageBytes = widget.teacher.image as Uint8List?;
+
+    _addControllerListeners();
 
     final apiClient = ApiClient(
       baseUrl: "http://127.0.0.1:8000/api",
@@ -192,6 +177,79 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     );
 
     _teachersService = TeacherService(apiClient: apiClient);
+  }
+
+  final Map<String, dynamic> _changedFields = {};
+  bool _hasChanges = false;
+
+  void _addControllerListeners() {
+    _firstNameController.addListener(() {
+      if (_firstNameController.text != widget.teacher.firstName) {
+        _changedFields['first_name'] = _firstNameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('first_name');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _lastNameController.addListener(() {
+      if (_lastNameController.text != widget.teacher.lastName) {
+        _changedFields['last_name'] = _lastNameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('last_name');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _usernameController.addListener(() {
+      if (_usernameController.text != widget.teacher.username) {
+        _changedFields['username'] = _usernameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('username');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _mobileNumberController.addListener(() {
+      if (_mobileNumberController.text != widget.teacher.phone) {
+        _changedFields['phone'] = _mobileNumberController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('phone');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _specializationController.addListener(() {
+      if (_specializationController.text != widget.teacher.specialization) {
+        _changedFields['specialization'] = _specializationController.text;
+        _hasChanges = true;
+      }
+    });
+
+    _headlineController.addListener(() {
+      if (_headlineController.text != widget.teacher.headline) {
+        _changedFields['headline'] = _headlineController.text;
+        _hasChanges = true;
+      }
+    });
+
+    _experiencesController.addListener(() {
+      if (_experiencesController.text != widget.teacher.experiences) {
+        _changedFields['experiences'] = _experiencesController.text;
+        _hasChanges = true;
+      }
+    });
+
+    _descriptionController.addListener(() {
+      if (_experiencesController.text != widget.teacher.description) {
+        _changedFields['description'] = _descriptionController.text;
+        _hasChanges = true;
+      }
+    });
   }
 
   @override
@@ -448,13 +506,20 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['غير ذلك', 'دراسات عليا', 'جامعي', 'ثانوي', 'إعدادي'].map((
+        items: ['غير ذلك', 'دراسات عليا', 'university', 'ثانوي', 'إعدادي'].map((
           String value,
         ) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
+          if (newValue != widget.teacher.educationLevel) {
+            _changedFields['education_level'] = newValue;
+            _hasChanges = true;
+          } else {
+            _changedFields.remove('education_level');
+            _hasChanges = _changedFields.isNotEmpty;
+          }
         },
         validator: (value) => _validateNotEmpty(value, "المستوى التعليمي"),
       ),
@@ -522,6 +587,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             _editTeacher();
+            // print(_changedFields.toString());
           }
         },
         child: _isEditing

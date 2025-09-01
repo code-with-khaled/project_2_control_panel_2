@@ -72,10 +72,14 @@ class TeacherService {
     }
   }
 
-  Future<void> editTeacher(String? token, int id, Teacher student) async {
+  Future<void> editTeacher(
+    String? token,
+    int id,
+    Map<String, dynamic> teacher,
+  ) async {
     final response = await apiClient.put(
       "dashboard/teachers/$id",
-      body: student.toJson(),
+      body: teacher,
       token: token,
     );
 
@@ -119,7 +123,7 @@ class TeacherService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchCourse(String? token, int id) async {
+  Future<List<Map<String, dynamic>>> fetchCourses(String? token, int id) async {
     final response = await apiClient.get(
       "dashboard/teachers/$id/courses",
       token: token,

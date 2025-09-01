@@ -1,3 +1,4 @@
+import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_in_course_table.dart';
 import 'package:flutter/material.dart';
@@ -6,14 +7,9 @@ import 'package:flutter/material.dart';
 ///
 /// Requires [name] and [username] of the student to be enrolled
 class EnrollStudentDialog extends StatefulWidget {
-  final String name;
-  final String username;
+  final Student student;
 
-  const EnrollStudentDialog({
-    super.key,
-    required this.name,
-    required this.username,
-  });
+  const EnrollStudentDialog({super.key, required this.student});
 
   @override
   State<EnrollStudentDialog> createState() => _EnrollStudentDialogState();
@@ -104,7 +100,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
           style: TextStyle(color: Colors.black54),
         ),
         Text(
-          widget.name,
+          widget.student.fullName,
           style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w900),
         ),
       ],
@@ -116,7 +112,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
     showCustomToast(
       context,
       'تم تحديث التسجيل!', // 'Enrollment Updated!'
-      'تم تسجيل ${widget.name} في الدورة بنجاح!', // Success message
+      'تم تسجيل ${widget.student.fullName} في الدورة بنجاح!', // Success message
     );
   }
 

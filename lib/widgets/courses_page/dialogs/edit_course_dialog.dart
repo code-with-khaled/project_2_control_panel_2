@@ -2,6 +2,7 @@ import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EditCourseDialog extends StatefulWidget {
   final Course course;
@@ -17,13 +18,84 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
 
   // Controllers for all form fields
   final TextEditingController _courseNameController = TextEditingController();
+  final TextEditingController _levelController = TextEditingController();
   final TextEditingController _courseDescriptionController =
       TextEditingController();
   final TextEditingController _coursePriceController = TextEditingController();
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
 
   // State variables
   String? _selectedCategory;
   String? _selectedTeacher;
+  DateTime? _selectedStartDate;
+  DateTime? _selectedEndDate;
+
+  // Date picker functions
+  Future<void> _selectStartDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: DateTime(now.year + 2, now.month, now.day),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey[300]!,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Colors.blue),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedStartDate) {
+      setState(() {
+        _selectedStartDate = picked;
+        _startDateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  Future<void> _selectEndDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime endDate = DateTime(now.year, now.month, now.day + 1);
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: endDate,
+      firstDate: endDate,
+      lastDate: DateTime(endDate.year + 3, endDate.month, endDate.day),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey[300]!,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Colors.blue),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedEndDate) {
+      setState(() {
+        _selectedEndDate = picked;
+        _endDateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -44,7 +116,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 600,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -62,7 +134,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "تعديل معلومات الكورس",
+                        "تعديل معلومات الدورة",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -83,8 +155,12 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
                   _buildCourseNameField(),
                   SizedBox(height: 25),
 
-                  // Category's Name field
+                  // Category Name field
                   _buildCategoryField(),
+                  SizedBox(height: 25),
+
+                  // Level's field
+                  _buildLevelField(),
                   SizedBox(height: 25),
 
                   // Teacher's field
@@ -97,6 +173,15 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
 
                   // Description field
                   _buildDescriptionField(),
+                  SizedBox(height: 25),
+
+                  Row(
+                    children: [
+                      Expanded(child: _buildStartDate()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildEndDate()),
+                    ],
+                  ),
                   SizedBox(height: 25),
 
                   // Submit button
@@ -113,10 +198,10 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
   Widget _buildCourseNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الاسم الكورس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      Text("الاسم الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
       CustomTextField(
-        hintText: "أدخل اسم الكورس",
+        hintText: "أدخل اسم الدورة",
         controller: _courseNameController,
         // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
       ),
@@ -127,7 +212,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("التصنيف *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       DropdownButtonFormField<String>(
         value: _selectedCategory,
         decoration: InputDecoration(
@@ -164,11 +249,24 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     ],
   );
 
+  Widget _buildLevelField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("مستوى الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      CustomTextField(
+        hintText: "أدخل اسم الدورة",
+        controller: _levelController,
+        // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+      ),
+    ],
+  );
+
   Widget _buildTeacherField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("المدرس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       DropdownButtonFormField<String>(
         value: _selectedTeacher,
         decoration: InputDecoration(
@@ -201,7 +299,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("سعر التسجيل *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل سعر التسجيل",
         controller: _coursePriceController,
@@ -213,13 +311,67 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
   Widget _buildDescriptionField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("وصف الكورس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
+      Text("وصف الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
       CustomTextField(
-        hintText: "أدخل وصف  قصير للكورس",
+        hintText: "أدخل وصف  قصير للدورة",
         maxLines: 3,
         controller: _courseDescriptionController,
         // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+      ),
+    ],
+  );
+
+  Widget _buildStartDate() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("تاريخ البدء *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      TextFormField(
+        controller: _startDateController,
+        decoration: InputDecoration(
+          hintText: 'mm/dd/yyyy',
+          suffixIcon: Icon(Icons.calendar_today),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black87),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        readOnly: true,
+        onTap: () => _selectStartDate(context),
+        // validator: _validateStartDate,
+      ),
+    ],
+  );
+
+  Widget _buildEndDate() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("تاريخ الإنتهاء *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      TextFormField(
+        controller: _endDateController,
+        decoration: InputDecoration(
+          hintText: 'mm/dd/yyyy',
+          suffixIcon: Icon(Icons.calendar_today),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black87),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        readOnly: true,
+        onTap: () => _selectEndDate(context),
+        // validator: _validateEndDate,
       ),
     ],
   );

@@ -152,7 +152,7 @@ class _AccountProfileDetailsState extends State<AccountProfileDetails> {
         children: [
           Text("رقم الموبايل:", style: TextStyle(color: Colors.grey)),
           Text(
-            widget.account.phoneNumber,
+            widget.account.phone,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
@@ -203,7 +203,7 @@ class _AccountProfileDetailsState extends State<AccountProfileDetails> {
         children: [
           Text("المستوى الدراسي:", style: TextStyle(color: Colors.grey)),
           Text(
-            widget.account.education,
+            widget.account.educationLevel,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ],

@@ -23,7 +23,7 @@ class _AttendanceSectionState extends State<AttendanceSection> {
         children: [
           _buildHeader(),
           SizedBox(height: 25),
-          AttendanceAndAbsenceTable(),
+          Center(child: AttendanceAndAbsenceTable()),
         ],
       ),
     );

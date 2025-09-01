@@ -73,8 +73,15 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = DateFormat('MM/dd/yyyy').format(picked);
+        _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
+      if (picked != widget.student.birthDate) {
+        _changedFields['birth_date'] = DateFormat('yyyy-MM-dd').format(picked);
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('birth_date');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
     }
   }
 
@@ -135,39 +142,19 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
   late StudentService _studentService;
 
   Future<void> _editStudent() async {
-    if (_isEditing) return;
+    if (_isEditing || !_hasChanges) return;
 
     setState(() {
       _isEditing = true;
     });
 
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
-    final middleName = _middleNameController.text.trim();
-    final parentPhone = _parentNumberController.text.trim();
-    final username = _usernameController.text.trim();
-    final phone = _mobileNumberController.text.trim();
-    final educationLevel = _selectedEducationLevel == "بكالوريوس"
-        ? 'university'
-        : '';
-    final gender = _selectedGender;
-    final birthDate = _selectedDate;
-
-    final student = Student(
-      username: username,
-      firstName: firstName,
-      middleName: middleName,
-      lastName: lastName,
-      phone: phone,
-      parentPhone: parentPhone,
-      educationLevel: educationLevel,
-      gender: gender!,
-      birthDate: birthDate!,
-    );
-
     try {
       final token = TokenHelper.getToken();
-      await _studentService.editStudent(token, widget.student.id!, student);
+      await _studentService.editStudent(
+        token,
+        widget.student.id!,
+        _changedFields,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(
@@ -226,12 +213,80 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
         : '';
     _selectedDate = widget.student.birthDate;
 
+    // Add listeners to track changes
+    _addControllerListeners();
+
     final apiClient = ApiClient(
       baseUrl: "http://127.0.0.1:8000/api",
       httpClient: http.Client(),
     );
 
     _studentService = StudentService(apiClient: apiClient);
+  }
+
+  final Map<String, dynamic> _changedFields = {};
+  bool _hasChanges = false;
+
+  void _addControllerListeners() {
+    _firstNameController.addListener(() {
+      if (_firstNameController.text != widget.student.firstName) {
+        _changedFields['first_name'] = _firstNameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('first_name');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _lastNameController.addListener(() {
+      if (_lastNameController.text != widget.student.lastName) {
+        _changedFields['last_name'] = _lastNameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('last_name');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _middleNameController.addListener(() {
+      if (_middleNameController.text != widget.student.middleName) {
+        _changedFields['middle_name'] = _middleNameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('middle_name');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _parentNumberController.addListener(() {
+      if (_parentNumberController.text != widget.student.parentPhone) {
+        _changedFields['parent_phone'] = _parentNumberController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('parent_phone');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _usernameController.addListener(() {
+      if (_usernameController.text != widget.student.username) {
+        _changedFields['username'] = _usernameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('username');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _mobileNumberController.addListener(() {
+      if (_mobileNumberController.text != widget.student.phone) {
+        _changedFields['phone'] = _mobileNumberController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('phone');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
   }
 
   @override
@@ -445,6 +500,13 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
         }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedGender = newValue);
+          if (newValue != widget.student.gender) {
+            _changedFields['gender'] = newValue;
+            _hasChanges = true;
+          } else {
+            _changedFields.remove('gender');
+            _hasChanges = _changedFields.isNotEmpty;
+          }
         },
         validator: _validateGender,
       ),
@@ -580,6 +642,15 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
             }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
+          if (newValue != widget.student.educationLevel) {
+            _changedFields['education_level'] = newValue == 'بكالوريوس'
+                ? 'university'
+                : newValue;
+            _hasChanges = true;
+          } else {
+            _changedFields.remove('education_level');
+            _hasChanges = _changedFields.isNotEmpty;
+          }
         },
         validator: (value) => _validateNotEmpty(value, "المستوى التعليمي"),
       ),
@@ -614,6 +685,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
             _editStudent();
+            // print(_changedFields.toString());
           }
         },
         child: _isEditing

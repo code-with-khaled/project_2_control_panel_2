@@ -120,7 +120,7 @@ class _AccountProfileState extends State<AccountProfile> {
           ),
           Flexible(
             child: Text(
-              widget.account.education,
+              widget.account.educationLevel,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -132,7 +132,7 @@ class _AccountProfileState extends State<AccountProfile> {
         children: [
           Text("رقم الهاتف:", style: TextStyle(color: Colors.grey)),
           Text(
-            widget.account.phoneNumber,
+            widget.account.phone,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ],

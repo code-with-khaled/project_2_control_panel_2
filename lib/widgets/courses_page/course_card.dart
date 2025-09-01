@@ -141,11 +141,7 @@ class _CourseCardState extends State<CourseCard> {
                           builder: (context) =>
                               EditCourseDialog(course: widget.course),
                         ),
-                        icon: Icon(Icons.edit_document),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.file_upload_outlined),
+                        icon: Icon(Icons.edit_document, color: Colors.blue),
                       ),
                       IconButton(
                         onPressed: () => showDialog(
@@ -161,7 +157,10 @@ class _CourseCardState extends State<CourseCard> {
                           builder: (context) =>
                               CourseDataDialog(course: widget.course),
                         ),
-                        icon: Icon(Icons.insert_chart_outlined_outlined),
+                        icon: Icon(
+                          Icons.insert_chart_outlined_outlined,
+                          color: Colors.green,
+                        ),
                       ),
                       IconButton(
                         onPressed: () {

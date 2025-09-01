@@ -1,6 +1,5 @@
 import 'package:control_panel_2/models/student_model.dart';
-import 'package:control_panel_2/widgets/students_page/sections/overview/overview_left.dart';
-import 'package:control_panel_2/widgets/students_page/sections/overview/overview_right.dart';
+import 'package:control_panel_2/widgets/students_page/sections/overview/overview_row.dart';
 import 'package:control_panel_2/widgets/students_page/statistic_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -13,56 +12,31 @@ class OverviewSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth > 600) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: OverviewLeft(
-                      birthDate: DateFormat(
-                        'MMM dd, yyyy',
-                        'ar',
-                      ).format(student.birthDate),
-                      completedCoursesCount: student.completedCoursesCount
-                          .toString(),
-                      phone: student.phone,
-                      gender: student.gender,
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: OverviewRight(
-                      specialization: "-",
-                      level: student.educationLevel,
-                    ),
-                  ),
-                ],
-              );
-            } else {
-              return Column(
-                children: [
-                  OverviewLeft(
-                    birthDate: DateFormat(
-                      'MMM dd, yyyy',
-                      'ar',
-                    ).format(student.birthDate),
-                    completedCoursesCount: student.completedCoursesCount
-                        .toString(),
-                    phone: student.phone,
-                    gender: student.gender,
-                  ),
-                  SizedBox(height: 20),
-                  OverviewRight(
-                    specialization: "-",
-                    level: student.educationLevel,
-                  ),
-                ],
-              );
-            }
-          },
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.person_outline),
+            SizedBox(width: 6),
+            Text(
+              "المعلومات الشخصية",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        SizedBox(height: 5),
+        OverviewRow(
+          left: "ولد في:",
+          right: DateFormat('MMM dd, yyyy', 'ar').format(student.birthDate),
+        ),
+        OverviewRow(left: "رقم الهاتف:", right: student.phone),
+        OverviewRow(left: "الجنس:", right: student.gender),
+        OverviewRow(left: "المستوى التعليمي:", right: student.educationLevel),
+        OverviewRow(
+          left: "عدد الدورات المكتملة:",
+          right: student.completedCoursesCount.toString(),
         ),
         SizedBox(height: 10),
         _buildStatisticsSection(),

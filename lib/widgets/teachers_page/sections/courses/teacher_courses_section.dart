@@ -19,6 +19,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
   bool _isLoading = false;
 
   // Date formatter instance
+  // ignore: unused_field
   final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy', 'ar');
 
   List<Map<String, dynamic>> _filteredCourses = [];
@@ -30,7 +31,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
 
     try {
       final token = TokenHelper.getToken();
-      _filteredCourses = await _teacherService.fetchCourse(token, widget.id);
+      _filteredCourses = await _teacherService.fetchCourses(token, widget.id);
     } catch (e) {
       if (mounted) {
         showDialog(
@@ -159,7 +160,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
     required String title,
     required int enrolledCount,
     required dynamic rating,
-    required DateTime date,
+    required String date,
   }) {
     return Container(
       padding: EdgeInsets.all(20),
@@ -193,6 +194,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
 
           // Stats row
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Enrolled count
               Row(
@@ -223,7 +225,8 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                     color: Colors.grey,
                   ),
                   SizedBox(width: 4),
-                  Text(_dateFormatter.format(date)),
+                  // Text(_dateFormatter.format(date)),
+                  Text(date),
                 ],
               ),
             ],

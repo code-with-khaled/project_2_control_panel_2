@@ -66,6 +66,7 @@ class _CourseEnrollmentsDialogState extends State<CourseEnrollmentsDialog> {
   /// Builds the dialog header with title and close button
   Widget _buildHeader() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Flexible(
@@ -74,7 +75,7 @@ class _CourseEnrollmentsDialogState extends State<CourseEnrollmentsDialog> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        Spacer(),
+
         IconButton(
           icon: Icon(Icons.close, size: 20),
           onPressed: () => Navigator.pop(context),

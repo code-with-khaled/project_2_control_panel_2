@@ -133,12 +133,12 @@ class _StudentProfileState extends State<StudentProfile> {
               // SizedBox(height: 7),
 
               // Progress bar visualization
-              // EvaluationBar(),
-              // SizedBox(height: 15),
 
               // Rating display
               _buildRatingSection(),
               SizedBox(height: 10),
+              EvaluationBar(rating: widget.student.feedbacksAvg!),
+              SizedBox(height: 15),
 
               Divider(color: Colors.black12),
               SizedBox(height: 10),
@@ -262,9 +262,12 @@ class _StudentProfileState extends State<StudentProfile> {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("4/8", style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
-              "50% اكتمال",
+              "${widget.student.completedCoursesCount!}/8",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "${(widget.student.completedCoursesCount! * 100 / 8)}% اكتمال",
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -335,21 +338,22 @@ class _StudentProfileState extends State<StudentProfile> {
 
 /// Visual progress bar showing course completion ratio
 class EvaluationBar extends StatefulWidget {
-  const EvaluationBar({super.key});
+  final int rating;
+
+  const EvaluationBar({super.key, required this.rating});
 
   @override
   EvaluationBarState createState() => EvaluationBarState();
 }
 
 class EvaluationBarState extends State<EvaluationBar> {
-  double rating = 4; // Current progress value
-  double maxRating = 8; // Maximum possible value
+  double maxRating = 5; // Maximum possible value
 
   @override
   Widget build(BuildContext context) {
     return LinearProgressIndicator(
       borderRadius: BorderRadius.circular(5),
-      value: rating / maxRating, // Convert to 0-1 range
+      value: widget.rating / maxRating, // Convert to 0-1 range
       minHeight: 8,
       backgroundColor: Colors.grey[300],
       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
