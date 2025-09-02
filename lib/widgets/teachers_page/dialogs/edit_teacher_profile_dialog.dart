@@ -97,6 +97,21 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     return null;
   }
 
+  String _getEducationLevel(String? level) {
+    switch (level) {
+      case "إعدادي":
+        return "preparatory";
+      case "ثانوي":
+        return "secondary";
+      case "جامعي":
+        return "university";
+      case "دراسات عليا":
+        return "postgraduate";
+      default:
+        return "other";
+    }
+  }
+
   // Variables for API integration
   late TeacherService _teachersService;
 
@@ -162,9 +177,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
     _descriptionController.text = widget.teacher.description;
 
     // Set the education level dropdown value
-    _selectedEducationLevel = widget.teacher.educationLevel == "جامعي"
-        ? "university"
-        : widget.teacher.educationLevel;
+    _selectedEducationLevel = widget.teacher.educationLevel;
 
     // Set the profile image if it exists
     // _imageBytes = widget.teacher.image as Uint8List?;
@@ -506,7 +519,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['غير ذلك', 'دراسات عليا', 'university', 'ثانوي', 'إعدادي'].map((
+        items: ['غير ذلك', 'دراسات عليا', 'جامعي', 'ثانوي', 'إعدادي'].map((
           String value,
         ) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
@@ -514,7 +527,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
           if (newValue != widget.teacher.educationLevel) {
-            _changedFields['education_level'] = newValue;
+            _changedFields['education_level'] = _getEducationLevel(newValue);
             _hasChanges = true;
           } else {
             _changedFields.remove('education_level');

@@ -83,11 +83,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
+            shape: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide.none,
+            ),
             title: Text('خطأ في إرسال رمز التحقق'),
             content: Text(e.toString().replaceFirst('Exception: ', '')),
             actions: [
               TextButton(
-                child: Text('موافق'),
+                child: Text('موافق', style: TextStyle(color: Colors.blue)),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -111,11 +115,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
+            shape: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide.none,
+            ),
             title: Text('خطأ في التحقق'),
             content: Text('يجب إدخال رمز التحقق كاملاً'),
             actions: [
               TextButton(
-                child: Text('موافق'),
+                child: Text('موافق', style: TextStyle(color: Colors.blue)),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -139,11 +147,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
+            shape: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide.none,
+            ),
             title: Text('خطأ في التحقق من الرمز'),
             content: Text(e.toString().replaceFirst('Exception: ', '')),
             actions: [
               TextButton(
-                child: Text('موافق'),
+                child: Text('موافق', style: TextStyle(color: Colors.blue)),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -240,61 +252,87 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ),
           ),
 
-          Form(
-            key: _formKey,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 540),
-                child: SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black26),
-                      borderRadius: BorderRadius.circular(6),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "مرحباً بك",
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-
-                        Text(
-                          "أدخل معلومات حسابك لتصل للوحة تحكم مسار",
-                          style: TextStyle(fontSize: 15, color: Colors.grey),
-                        ),
-                        SizedBox(height: 30),
-
-                        if (!_codeSent && !_verifiedCode) _buildCodeNotSent(),
-
-                        if (_codeSent && !_verifiedCode) _buildCodeIsSent(),
-
-                        if (_verifiedCode) _buildSetNewPassword(),
-
-                        SizedBox(height: 20),
-
-                        _buildBackToLoginButton(),
-                      ],
+          SingleChildScrollView(
+            padding: EdgeInsets.only(top: 20),
+            child: Column(
+              children: [
+                Container(
+                  height: 120,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    image: DecorationImage(
+                      image: AssetImage("assets/logo.png"),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-              ),
+                Form(
+                  key: _formKey,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 540),
+                        child: SingleChildScrollView(
+                          child: Container(
+                            padding: EdgeInsets.all(30),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black26),
+                              borderRadius: BorderRadius.circular(6),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "مرحباً بك",
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+
+                                Text(
+                                  "أدخل معلومات حسابك لتصل للوحة تحكم مسار",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(height: 30),
+
+                                if (!_codeSent && !_verifiedCode)
+                                  _buildCodeNotSent(),
+
+                                if (_codeSent && !_verifiedCode)
+                                  _buildCodeIsSent(),
+
+                                if (_verifiedCode) _buildSetNewPassword(),
+
+                                SizedBox(height: 20),
+
+                                _buildBackToLoginButton(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

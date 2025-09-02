@@ -38,12 +38,11 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
 
   // Variables for storing the advertisement image
   String? _imageUrl;
-  String? _fileName; // Stores the name of the uploaded file
+  String? _fileName;
 
   /// Opens file picker to select an image for the advertisement
   ///
   /// Sets [_imageUrl] and [_fileName] when a file is selected
-  // ignore: unused_element
 
   Future<void> _pickImage() async {
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();

@@ -70,7 +70,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(""),
+                      Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          image: DecorationImage(
+                            image: AssetImage("assets/logo.png"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
                       ElevatedButton(
                         onPressed: () => _logout(),
                         style: ElevatedButton.styleFrom(

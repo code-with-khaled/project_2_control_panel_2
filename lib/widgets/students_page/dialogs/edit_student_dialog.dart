@@ -36,8 +36,6 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
   late TextEditingController _usernameController;
   late TextEditingController _mobileNumberController;
   late TextEditingController _dateController;
-  final TextEditingController _specializationController =
-      TextEditingController();
 
   // State variables
   String? _selectedGender;
@@ -131,11 +129,19 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
     return null;
   }
 
-  String? _validateSpecialization(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'التخصص مطلوب';
+  String _getEducationLevel(String? level) {
+    switch (level) {
+      case "إعدادي":
+        return "preparatory";
+      case "ثانوي":
+        return "secondary";
+      case "جامعي":
+        return "university";
+      case "دراسات عليا":
+        return "postgraduate";
+      default:
+        return "other";
     }
-    return null;
   }
 
   // Variables for API integration
@@ -208,9 +214,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
     );
 
     _selectedGender = widget.student.gender;
-    _selectedEducationLevel = widget.student.educationLevel == "جامعي"
-        ? 'بكالوريوس'
-        : '';
+    _selectedEducationLevel = widget.student.educationLevel;
     _selectedDate = widget.student.birthDate;
 
     // Add listeners to track changes
@@ -377,13 +381,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
                   SizedBox(height: 20),
 
                   // Education Level field
-                  Row(
-                    children: [
-                      Expanded(child: _buildEducationLevelField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildSpecializationField()),
-                    ],
-                  ),
+                  _buildEducationLevelField(),
                   SizedBox(height: 25),
 
                   // Submit button
@@ -629,23 +627,15 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items:
-            [
-              'الثانوية العامة',
-              'دبلوم',
-              'بكالوريوس',
-              'ماجستير',
-              'دكتوراه',
-              'أخرى',
-            ].map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            }).toList(),
+        items: ['إعدادي', 'ثانوي', 'جامعي', 'دراسات عليا', 'غير ذلك'].map((
+          String value,
+        ) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
+        }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
           if (newValue != widget.student.educationLevel) {
-            _changedFields['education_level'] = newValue == 'بكالوريوس'
-                ? 'university'
-                : newValue;
+            _changedFields['education_level'] = _getEducationLevel(newValue);
             _hasChanges = true;
           } else {
             _changedFields.remove('education_level');
@@ -656,26 +646,6 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
       ),
     ],
   );
-
-  Widget _buildSpecializationField() {
-    if (_selectedEducationLevel == 'الثانوية العامة' ||
-        _selectedEducationLevel == null) {
-      return SizedBox.shrink();
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("التخصص *", style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 5),
-          CustomTextField(
-            hintText: "مثال: رياضيات، فنون، إعلام",
-            controller: _specializationController,
-            validator: _validateSpecialization,
-          ),
-        ],
-      );
-    }
-  }
 
   Widget _buildSubmitButton() => Row(
     mainAxisAlignment: MainAxisAlignment.end,

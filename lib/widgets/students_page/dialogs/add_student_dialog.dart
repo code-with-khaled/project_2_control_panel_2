@@ -34,8 +34,6 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final TextEditingController _specializationController =
-      TextEditingController();
 
   // State variables
   bool _obsecure = true;
@@ -153,11 +151,19 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     return null;
   }
 
-  String? _validateSpecialization(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'التخصص مطلوب';
+  String _getEducationLevel(String? level) {
+    switch (level) {
+      case "إعدادي":
+        return "preparatory";
+      case "ثانوي":
+        return "secondary";
+      case "جامعي":
+        return "university";
+      case "دراسات عليا":
+        return "postgraduate";
+      default:
+        return "other";
     }
-    return null;
   }
 
   // Variables for API integration
@@ -176,9 +182,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
     final parentPhone = _parentNumberController.text.trim();
     final username = _usernameController.text.trim();
     final phone = _mobileNumberController.text.trim();
-    final educationLevel = _selectedEducationLevel == "بكالوريوس"
-        ? 'university'
-        : '';
+    final educationLevel = _getEducationLevel(_selectedEducationLevel);
     final gender = _selectedGender;
     final birthDate = _selectedDate;
     final password = _passwordController.text.trim();
@@ -254,7 +258,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 600,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -343,13 +347,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   SizedBox(height: 20),
 
                   // Education Level field
-                  Row(
-                    children: [
-                      Expanded(child: _buildEducationLevelField()),
-                      SizedBox(width: 15),
-                      Expanded(child: _buildSpecializationField()),
-                    ],
-                  ),
+                  _buildEducationLevelField(),
                   SizedBox(height: 25),
 
                   // Submit button
@@ -549,9 +547,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       CircleAvatar(
         radius: 40,
         backgroundColor: Colors.grey[200],
-        backgroundImage: _imageUrl != null
-            ? NetworkImage(_imageUrl!) // <-- Use the data URL here
-            : null,
+        backgroundImage: _imageUrl != null ? NetworkImage(_imageUrl!) : null,
         child: _imageUrl == null
             ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
             : null,
@@ -639,17 +635,11 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items:
-            [
-              'الثانوية العامة',
-              'دبلوم',
-              'بكالوريوس',
-              'ماجستير',
-              'دكتوراه',
-              'أخرى',
-            ].map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            }).toList(),
+        items: ['إعدادي', 'ثانوي', 'جامعي', 'دراسات عليا', 'غير ذلك'].map((
+          String value,
+        ) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
+        }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedEducationLevel = newValue);
         },
@@ -657,26 +647,6 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
       ),
     ],
   );
-
-  Widget _buildSpecializationField() {
-    if (_selectedEducationLevel == 'الثانوية العامة' ||
-        _selectedEducationLevel == null) {
-      return SizedBox.shrink();
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("التخصص *", style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 5),
-          CustomTextField(
-            hintText: "مثال: رياضيات، فنون، إعلام",
-            controller: _specializationController,
-            validator: _validateSpecialization,
-          ),
-        ],
-      );
-    }
-  }
 
   Widget _buildSubmitButton() => Row(
     mainAxisAlignment: MainAxisAlignment.end,

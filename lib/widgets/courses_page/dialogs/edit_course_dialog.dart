@@ -4,6 +4,9 @@ import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+
 class EditCourseDialog extends StatefulWidget {
   final Course course;
   const EditCourseDialog({super.key, required this.course});
@@ -21,6 +24,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
   final TextEditingController _levelController = TextEditingController();
   final TextEditingController _courseDescriptionController =
       TextEditingController();
+  final TextEditingController _hoursController = TextEditingController();
   final TextEditingController _coursePriceController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
@@ -30,6 +34,30 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
   String? _selectedTeacher;
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
+
+  // Variables for storing the course image
+  String? _imageUrl;
+  String? _fileName;
+
+  Future<void> _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
+      });
+    });
+  }
 
   // Date picker functions
   Future<void> _selectStartDate(BuildContext context) async {
@@ -167,6 +195,10 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
                   _buildTeacherField(),
                   SizedBox(height: 25),
 
+                  // Hourse.No field
+                  _buildNumberOfHoursField(),
+                  SizedBox(height: 25),
+
                   // Price field
                   _buildPriceField(),
                   SizedBox(height: 25),
@@ -174,6 +206,9 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
                   // Description field
                   _buildDescriptionField(),
                   SizedBox(height: 25),
+
+                  _buildImageSection(),
+                  SizedBox(height: 20),
 
                   Row(
                     children: [
@@ -198,7 +233,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
   Widget _buildCourseNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الاسم الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("اسم الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
       CustomTextField(
         hintText: "أدخل اسم الدورة",
@@ -295,6 +330,20 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     ],
   );
 
+  Widget _buildNumberOfHoursField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("عدد الساعات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      CustomTextField(
+        hintText: "أدخل ساعات الدورة",
+        controller: _hoursController,
+        prefixIcon: Icon(Icons.timer_outlined, color: Colors.grey.shade600),
+        // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+      ),
+    ],
+  );
+
   Widget _buildPriceField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -318,6 +367,65 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
         maxLines: 3,
         controller: _courseDescriptionController,
         // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+      ),
+    ],
+  );
+
+  /// Builds the image upload section with preview capability
+  Widget _buildImageSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("صورة الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+          if (_imageUrl != null)
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _imageUrl = null;
+                });
+              },
+              child: Icon(Icons.delete_forever, color: Colors.red),
+            ),
+        ],
+      ),
+      SizedBox(height: 5),
+      InkWell(
+        onTap: _pickImage,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 50),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: _imageUrl == null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.file_upload_outlined,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                    Text(
+                      "اضغط لتحميل الصورة",
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.photo, color: Colors.black54),
+                    SizedBox(width: 10),
+                    Text(_fileName!, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+        ),
       ),
     ],
   );

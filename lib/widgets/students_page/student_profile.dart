@@ -43,6 +43,10 @@ class _StudentProfileState extends State<StudentProfile> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide.none,
+        ),
         title: Text('تأكيد الحذف'),
         content: Text(
           'هل أنت متأكد من رغبتك في حذف حساب ${widget.student.fullName}؟',
@@ -50,7 +54,7 @@ class _StudentProfileState extends State<StudentProfile> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء'),
+            child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -129,8 +133,8 @@ class _StudentProfileState extends State<StudentProfile> {
               SizedBox(height: 10),
 
               // Course progress section
-              // _buildCourseProgress(),
-              // SizedBox(height: 7),
+              _buildCompletedCourses(),
+              SizedBox(height: 7),
 
               // Progress bar visualization
 
@@ -185,10 +189,10 @@ class _StudentProfileState extends State<StudentProfile> {
       mainAxisSize: MainAxisSize.min,
       children: [
         CircleAvatar(
-          radius: 22,
+          radius: 27,
           backgroundImage: widget.student.image != null
               ? NetworkImage(
-                  "http://127.0.0.1:8000${widget.student.image!}",
+                  "http://127.0.0.1:58808${widget.student.image!}",
                   scale: 1.0,
                 )
               : null,
@@ -205,6 +209,7 @@ class _StudentProfileState extends State<StudentProfile> {
                 context,
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 3),
             Text(
               widget.student.username,
               style: Theme.of(
@@ -246,7 +251,7 @@ class _StudentProfileState extends State<StudentProfile> {
   }
 
   // Builds course progress section
-  Widget _buildCourseProgress() {
+  Widget _buildCompletedCourses() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -255,24 +260,12 @@ class _StudentProfileState extends State<StudentProfile> {
           children: [
             Icon(Icons.menu_book, color: Colors.blue, size: 17),
             SizedBox(width: 8),
-            Text("الكورسات"),
+            Text("الكورسات المكتملة"),
           ],
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "${widget.student.completedCoursesCount!}/8",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              "${(widget.student.completedCoursesCount! * 100 / 8)}% اكتمال",
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-            ),
-          ],
+        Text(
+          "${widget.student.completedCoursesCount!}",
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -288,7 +281,7 @@ class _StudentProfileState extends State<StudentProfile> {
           children: [
             Icon(Icons.star_border, size: 17, color: Colors.yellow),
             SizedBox(width: 8),
-            Text("متوسط التقييم"),
+            Text("متوسط التقييمات"),
           ],
         ),
         Text(

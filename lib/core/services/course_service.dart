@@ -47,10 +47,10 @@ class CourseService {
     }
   }
 
-  Future<void> createCourse(String? token, Course course) async {
+  Future<void> createCourse(String? token, Map<String, dynamic> course) async {
     final response = await apiClient.post(
       "dashboard/courses",
-      // body: course.toJson(),
+      body: course,
       token: token,
     );
 

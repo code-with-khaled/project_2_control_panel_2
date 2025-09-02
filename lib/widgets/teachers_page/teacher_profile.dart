@@ -38,6 +38,10 @@ class _TeacherProfileState extends State<TeacherProfile> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide.none,
+        ),
         title: Text('تأكيد الحذف'),
         content: Text(
           'هل أنت متأكد من رغبتك في حذف حساب ${widget.teacher.fullName}؟',
@@ -45,7 +49,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء'),
+            child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -166,7 +170,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         CircleAvatar(
-          radius: 22,
+          radius: 26,
           backgroundImage: widget.teacher.image != null
               ? NetworkImage(widget.teacher.fullImageUrl)
               : null,

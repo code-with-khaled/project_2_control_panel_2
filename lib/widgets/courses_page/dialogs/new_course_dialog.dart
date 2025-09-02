@@ -1,10 +1,20 @@
 import 'package:control_panel_2/constants/all_teachers.dart';
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
+import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+
 class NewCourseDialog extends StatefulWidget {
-  const NewCourseDialog({super.key});
+  final VoidCallback callback;
+
+  const NewCourseDialog({super.key, required this.callback});
 
   @override
   State<NewCourseDialog> createState() => _NewCourseDialogState();
@@ -19,6 +29,7 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
   final TextEditingController _levelController = TextEditingController();
   final TextEditingController _courseDescriptionController =
       TextEditingController();
+  final TextEditingController _hoursController = TextEditingController();
   final TextEditingController _coursePriceController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
@@ -28,6 +39,32 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
   String? _selectedTeacher;
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
+
+  // Variables for storing the course image
+  String? _imageUrl;
+  String? _fileName;
+
+  bool _isSubmitting = false;
+
+  Future<void> _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
+      });
+    });
+  }
 
   // Date picker functions
   Future<void> _selectStartDate(BuildContext context) async {
@@ -95,6 +132,90 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
     }
   }
 
+  Future<void> _createCourse() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final name = _courseNameController.text.trim();
+    final price = _coursePriceController.text.trim();
+    final hourse = _hoursController.text.trim();
+    final description = _courseDescriptionController.text.trim();
+    final levelId = 1;
+    final teacherId = 1;
+    final categoryId = 1;
+    final startDate = _startDateController.text.trim();
+    final endDate = _endDateController.text.trim();
+
+    final course = {
+      // 'translations[ar][name]': name,
+      // 'translations[ar][description]': description,
+      'translations': {
+        'ar': {'name': name, 'description': description},
+      },
+      'image': _imageUrl,
+      'price': price,
+      'number_of_hours': hourse,
+      'category_id': categoryId,
+      'teacher_id': teacherId,
+      'level_id': levelId,
+      'start_date': startDate,
+      'end_date': endDate,
+    };
+
+    try {
+      final token = TokenHelper.getToken();
+      await _courseService.createCourse(token, course);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء الدورة بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء الدورة'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  // Variables for API integration
+  late CourseService _courseService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _courseService = CourseService(apiClient: apiClient);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -121,7 +242,7 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "إنشاء كورس جديد",
+                        "إنشاء دورة جديد",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -154,6 +275,10 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
                   _buildTeacherField(),
                   SizedBox(height: 25),
 
+                  // Hourse.No field
+                  _buildNumberOfHoursField(),
+                  SizedBox(height: 25),
+
                   // Price field
                   _buildPriceField(),
                   SizedBox(height: 25),
@@ -161,6 +286,9 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
                   // Description field
                   _buildDescriptionField(),
                   SizedBox(height: 25),
+
+                  _buildImageSection(),
+                  SizedBox(height: 20),
 
                   Row(
                     children: [
@@ -185,10 +313,10 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
   Widget _buildCourseNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("الاسم الكورس *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("اسم دورة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       CustomTextField(
-        hintText: "أدخل اسم الكورس",
+        hintText: "أدخل اسم دورة",
         controller: _courseNameController,
         // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
       ),
@@ -282,6 +410,20 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
     ],
   );
 
+  Widget _buildNumberOfHoursField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("عدد الساعات *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      CustomTextField(
+        hintText: "أدخل ساعات الدورة",
+        controller: _hoursController,
+        prefixIcon: Icon(Icons.timer_outlined, color: Colors.grey.shade600),
+        // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+      ),
+    ],
+  );
+
   Widget _buildPriceField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -299,13 +441,72 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
   Widget _buildDescriptionField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("وصف الكورس *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("وصف دورة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       CustomTextField(
-        hintText: "أدخل وصف  قصير للكورس",
+        hintText: "أدخل وصف  قصير دورة",
         maxLines: 3,
         controller: _courseDescriptionController,
         // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
+      ),
+    ],
+  );
+
+  /// Builds the image upload section with preview capability
+  Widget _buildImageSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("صورة الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+          if (_imageUrl != null)
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _imageUrl = null;
+                });
+              },
+              child: Icon(Icons.delete_forever, color: Colors.red),
+            ),
+        ],
+      ),
+      SizedBox(height: 5),
+      InkWell(
+        onTap: _pickImage,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 50),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: _imageUrl == null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.file_upload_outlined,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                    Text(
+                      "اضغط لتحميل الصورة",
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.photo, color: Colors.black54),
+                    SizedBox(width: 10),
+                    Text(_fileName!, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+        ),
       ),
     ],
   );
@@ -371,11 +572,12 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
+            _createCourse();
           }
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء كورس جديد"),
+          child: Text("إنشاء دورة جديد"),
         ),
       ),
     ],

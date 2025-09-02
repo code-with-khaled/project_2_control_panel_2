@@ -159,7 +159,7 @@ class _CoursesPageState extends State<CoursesPage> {
           children: [
             Flexible(
               child: Text(
-                "إدارة الكورسات",
+                "إدارة الدورات",
                 style: GoogleFonts.montserrat(
                   color: Colors.black,
                   fontSize: 32,
@@ -172,7 +172,8 @@ class _CoursesPageState extends State<CoursesPage> {
               child: ElevatedButton(
                 onPressed: () => showDialog(
                   context: context,
-                  builder: (context) => NewCourseDialog(),
+                  builder: (context) =>
+                      NewCourseDialog(callback: _refreshCourses),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -180,7 +181,7 @@ class _CoursesPageState extends State<CoursesPage> {
                     children: [
                       Icon(Icons.add),
                       SizedBox(width: 10),
-                      Text("إنشاء كورس جديد"),
+                      Text("إنشاء دورة جديدة"),
                     ],
                   ),
                 ),
@@ -189,7 +190,7 @@ class _CoursesPageState extends State<CoursesPage> {
           ],
         ),
         Text(
-          "إدارة الكورسات ومتابعة تقدم الطلاب",
+          "إدارة الدورات ومتابعة تقدم الطلاب",
           style: Theme.of(
             context,
           ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
@@ -219,7 +220,7 @@ class _CoursesPageState extends State<CoursesPage> {
       ),
       child: SearchField(
         controller: _searchController,
-        hintText: "ابحث عن الكورس بالاسم أو اسم المدرس أو التصنيف",
+        hintText: "ابحث عن الدورة بالاسم أو اسم المدرس أو التصنيف",
       ),
     );
   }

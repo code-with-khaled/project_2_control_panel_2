@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Masar Dashboard',
         debugShowCheckedModeBanner: false,
         supportedLocales: [Locale('ar')],
         localizationsDelegates: [

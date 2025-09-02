@@ -127,8 +127,23 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     return null;
   }
 
+  String _getEducationLevel(String? level) {
+    switch (level) {
+      case "إعدادي":
+        return "preparatory";
+      case "ثانوي":
+        return "secondary";
+      case "جامعي":
+        return "university";
+      case "دراسات عليا":
+        return "postgraduate";
+      default:
+        return "other";
+    }
+  }
+
   // Variables for API integration
-  late TeacherService _teachersService;
+  late TeacherService _teacherService;
 
   Future<void> _createTeacher() async {
     if (_isSubmitting) return;
@@ -142,9 +157,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     final lastName = _lastNameController.text.trim();
     final username = _usernameController.text.trim();
     final phone = _mobileNumberController.text.trim();
-    // final educationLevel = _selectedEducationLevel;
-    final educationLevel = 'university';
-
+    final educationLevel = _getEducationLevel(_selectedEducationLevel);
     final password = _passwordController.text.trim();
     final specialization = _specializationController.text.trim();
     final headline = _headlineController.text.trim();
@@ -167,12 +180,12 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
 
     try {
       final token = TokenHelper.getToken();
-      await _teachersService.createTeacher(token, teacher);
+      await _teacherService.createTeacher(token, teacher);
 
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('تم إنشاء حساب الطالب بنجاح')));
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء حساب المدرس بنجاح')));
         widget.callback();
         Navigator.pop(context);
       }
@@ -181,7 +194,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('خطأ في إنشاء حساب الطالب الطالب'),
+            title: Text('خطأ في إنشاء حساب المدرس'),
             content: Text(e.toString().replaceFirst('Exception: ', '')),
             actions: [
               TextButton(
@@ -210,7 +223,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       httpClient: http.Client(),
     );
 
-    _teachersService = TeacherService(apiClient: apiClient);
+    _teacherService = TeacherService(apiClient: apiClient);
   }
 
   @override
