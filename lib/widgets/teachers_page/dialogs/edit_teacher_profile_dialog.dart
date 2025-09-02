@@ -124,7 +124,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
 
     try {
       final token = TokenHelper.getToken();
-      await _teachersService.editTeacher(
+      await _teachersService.updateTeacher(
         token,
         widget.teacher.id!,
         _changedFields,

@@ -29,6 +29,10 @@ class _CourseCardState extends State<CourseCard> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide.none,
+        ),
         title: Text('تأكيد الحذف'),
         content: Text(
           'هل أنت متأكد من رغبتك في حذف دورة ${widget.course.name}؟',
@@ -36,7 +40,7 @@ class _CourseCardState extends State<CourseCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء'),
+            child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -213,7 +217,7 @@ class _CourseCardState extends State<CourseCard> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
-                  widget.course.category,
+                  widget.course.categoryName,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),

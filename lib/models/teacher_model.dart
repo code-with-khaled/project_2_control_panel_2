@@ -14,7 +14,7 @@ class Teacher {
   final String headline;
   final String experiences;
   final String description;
-  final double? rate;
+  final int? rate;
   final int roleId;
 
   const Teacher({
@@ -47,7 +47,7 @@ class Teacher {
       headline: json['headline'] as String,
       experiences: json['experiences'] as String,
       description: json['description'] as String,
-      rate: double.parse(json['rate'] as String),
+      rate: json['rate'],
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/models/selected_teacher_model.dart';
 import 'package:control_panel_2/models/teacher_feedback_model.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 
@@ -48,6 +49,22 @@ class TeacherService {
     }
   }
 
+  Future<List<SelectedTeacher>> fetchTeachersToSelect(String? token) async {
+    final response = await apiClient.get(
+      "dashboard/list-teachers",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> teachers = json['data'];
+
+      return teachers.map((json) => SelectedTeacher.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch teachers to select failed');
+    }
+  }
+
   Future<void> createTeacher(String? token, Teacher teacher) async {
     final response = await apiClient.post(
       "dashboard/teachers",
@@ -72,7 +89,7 @@ class TeacherService {
     }
   }
 
-  Future<void> editTeacher(
+  Future<void> updateTeacher(
     String? token,
     int id,
     Map<String, dynamic> teacher,

@@ -156,7 +156,7 @@ class _EditStudentDialogState extends State<EditStudentDialog> {
 
     try {
       final token = TokenHelper.getToken();
-      await _studentService.editStudent(
+      await _studentService.updateStudent(
         token,
         widget.student.id!,
         _changedFields,

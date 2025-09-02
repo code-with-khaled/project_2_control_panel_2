@@ -2,31 +2,47 @@ class Course {
   final int? id;
   final String name;
   final String image;
-  final String category;
-  // final String description;
+  final String categoryName;
+  final String description;
   final CourseTeacher teacher;
-  final String rating;
+  final double rating;
   final int enrollments;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int price;
+  final String level;
+  final String numberOfHours;
 
   const Course({
     this.id,
     required this.name,
     required this.image,
-    required this.category,
-    // required this.description,
+    required this.description,
+    required this.categoryName,
+    required this.price,
     required this.teacher,
     required this.rating,
+    required this.startDate,
+    required this.endDate,
+    required this.level,
     required this.enrollments,
+    required this.numberOfHours,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) => Course(
     id: json['id'],
     name: json['name'],
     image: json['image'],
-    category: json['category_name'],
+    description: json['description'],
+    categoryName: json['category_name'],
     teacher: CourseTeacher.fromJson(json['teacher']),
     rating: json['rating'],
     enrollments: json['number_of_students'],
+    startDate: DateTime.parse(json['start_date']),
+    endDate: DateTime.parse(json['end_date']),
+    price: json['price'],
+    level: json['level'],
+    numberOfHours: json['number_of_hours'],
   );
 }
 

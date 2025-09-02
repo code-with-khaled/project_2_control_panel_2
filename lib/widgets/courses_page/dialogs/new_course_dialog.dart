@@ -1,8 +1,8 @@
-import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/course_service.dart';
-import 'package:control_panel_2/models/course_model.dart';
+import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/select_teacher_dialog.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -26,7 +26,6 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
 
   // Controllers for all form fields
   final TextEditingController _courseNameController = TextEditingController();
-  final TextEditingController _levelController = TextEditingController();
   final TextEditingController _courseDescriptionController =
       TextEditingController();
   final TextEditingController _hoursController = TextEditingController();
@@ -36,7 +35,9 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
 
   // State variables
   String? _selectedCategory;
+  String? _selectedLevel;
   String? _selectedTeacher;
+  int? _selectedTeacherId;
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
 
@@ -45,6 +46,26 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
   String? _fileName;
 
   bool _isSubmitting = false;
+
+  String _getLevelId(String level) {
+    switch (level) {
+      case "متوسط":
+        return "2";
+      case "متقدم":
+        return "3";
+      default:
+        return "1";
+    }
+  }
+
+  void _selectTeacher(SelectedTeacher? teacher) {
+    if (teacher != null) {
+      setState(() {
+        _selectedTeacher = teacher.fullName;
+        _selectedTeacherId = teacher.id;
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
@@ -141,25 +162,22 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
 
     final name = _courseNameController.text.trim();
     final price = _coursePriceController.text.trim();
-    final hourse = _hoursController.text.trim();
+    final hours = _hoursController.text.trim();
     final description = _courseDescriptionController.text.trim();
-    final levelId = 1;
-    final teacherId = 1;
+    final levelId = _getLevelId(_selectedLevel!);
+    final teacherId = _selectedTeacherId;
     final categoryId = 1;
     final startDate = _startDateController.text.trim();
     final endDate = _endDateController.text.trim();
 
     final course = {
-      // 'translations[ar][name]': name,
-      // 'translations[ar][description]': description,
-      'translations': {
-        'ar': {'name': name, 'description': description},
-      },
-      'image': _imageUrl,
+      'translations[ar][name]': name,
+      'translations[ar][description]': description,
+      'image': _imageUrl!,
       'price': price,
-      'number_of_hours': hourse,
-      'category_id': categoryId,
-      'teacher_id': teacherId,
+      'number_of_hours': hours,
+      'category_id': categoryId.toString(),
+      'teacher_id': teacherId.toString(),
       'level_id': levelId,
       'start_date': startDate,
       'end_date': endDate,
@@ -167,7 +185,7 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
 
     try {
       final token = TokenHelper.getToken();
-      await _courseService.createCourse(token, course);
+      await _courseService.createCourse(token, course, _imageUrl, _fileName);
 
       if (mounted) {
         ScaffoldMessenger.of(
@@ -238,49 +256,40 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header section with close button
+                  _buildHeader(),
+                  SizedBox(height: 25),
+
+                  // Course Name field
+                  // Category's Name field
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "إنشاء دورة جديد",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.close, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                      ),
+                      Expanded(child: _buildCourseNameField()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildCategoryField()),
                     ],
                   ),
                   SizedBox(height: 25),
 
-                  // Course Name field
-                  _buildCourseNameField(),
-                  SizedBox(height: 25),
-
-                  // Category's Name field
-                  _buildCategoryField(),
-                  SizedBox(height: 25),
-
                   // Level's field
-                  _buildLevelField(),
-                  SizedBox(height: 25),
-
                   // Teacher's field
-                  _buildTeacherField(),
+                  Row(
+                    children: [
+                      Expanded(child: _buildLevelField()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildTeacherField()),
+                    ],
+                  ),
                   SizedBox(height: 25),
 
                   // Hourse.No field
-                  _buildNumberOfHoursField(),
-                  SizedBox(height: 25),
-
                   // Price field
-                  _buildPriceField(),
+                  Row(
+                    children: [
+                      Expanded(child: _buildNumberOfHoursField()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildPriceField()),
+                    ],
+                  ),
                   SizedBox(height: 25),
 
                   // Description field
@@ -309,6 +318,23 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
       ),
     );
   }
+
+  Widget _buildHeader() => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "إنشاء دورة جديد",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      Spacer(),
+      IconButton(
+        icon: Icon(Icons.close, size: 20),
+        onPressed: () => Navigator.pop(context),
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(),
+      ),
+    ],
+  );
 
   Widget _buildCourseNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,24 +395,11 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
     children: [
       Text("مستوى الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
-      CustomTextField(
-        hintText: "أدخل اسم الدورة",
-        controller: _levelController,
-        // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
-      ),
-    ],
-  );
-
-  Widget _buildTeacherField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("المدرس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
       DropdownButtonFormField<String>(
-        value: _selectedTeacher,
+        value: _selectedLevel,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر المدرس',
+          hintText: 'اختر المستوى',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -397,17 +410,53 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: allTeachers.map((teacher) => teacher.fullName).map((
-          String value,
-        ) {
+        items: ['مبتدئ', 'متوسط', 'متقدم'].map((String value) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedTeacher = newValue);
+          setState(() => _selectedLevel = newValue);
         },
         // validator: _validateGender,
       ),
     ],
+  );
+
+  Widget _buildTeacherField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("المدرس *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      InkWell(
+        onTap: () => _selectTeacherDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedTeacher == null
+                  ? Text("اختر المدرس", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedTeacher!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+
+  void _selectTeacherDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectTeacherDialog(callback: _selectTeacher),
   );
 
   Widget _buildNumberOfHoursField() => Column(
@@ -575,10 +624,19 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
             _createCourse();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء دورة جديد"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء دورة جديد"),
+              ),
       ),
     ],
   );

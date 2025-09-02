@@ -1,5 +1,6 @@
-import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/models/course_model.dart';
+import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/select_teacher_dialog.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -31,13 +32,37 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
 
   // State variables
   String? _selectedCategory;
+  String? _selectedLevel;
   String? _selectedTeacher;
+  // ignore: unused_field
+  int? _selectedTeacherId;
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
 
   // Variables for storing the course image
   String? _imageUrl;
   String? _fileName;
+
+  // ignore: unused_element
+  String _getLevelId(String level) {
+    switch (level) {
+      case "متوسط":
+        return "2";
+      case "متقدم":
+        return "3";
+      default:
+        return "1";
+    }
+  }
+
+  void _selectTeacher(SelectedTeacher? teacher) {
+    if (teacher != null) {
+      setState(() {
+        _selectedTeacher = teacher.fullName;
+        _selectedTeacherId = teacher.id;
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
@@ -130,10 +155,100 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     super.initState();
 
     _courseNameController.text = widget.course.name;
-    _selectedCategory = widget.course.category;
+    _selectedCategory = widget.course.categoryName;
+    _selectedLevel = widget.course.level;
     _selectedTeacher = widget.course.teacher.fullName;
-    // _coursePriceController.text = widget.course.price.toString();
-    // _courseDescriptionController.text = widget.course.description;
+    _hoursController.text = widget.course.numberOfHours;
+    _coursePriceController.text = widget.course.price.toString();
+    _courseDescriptionController.text = widget.course.description;
+
+    _startDateController.text = DateFormat(
+      'yyyy-MM-dd',
+    ).format(widget.course.startDate);
+    _endDateController.text = DateFormat(
+      'yyyy-MM-dd',
+    ).format(widget.course.endDate);
+    _selectedStartDate = widget.course.startDate;
+    _selectedEndDate = widget.course.endDate;
+
+    _addControllerListeners();
+  }
+
+  final Map<String, String> _changedFields = {};
+  // ignore: unused_field
+  bool _hasChanges = false;
+
+  void _addControllerListeners() {
+    _courseNameController.addListener(() {
+      if (_courseNameController.text != widget.course.name) {
+        _changedFields['translations[ar][name]'] = _courseNameController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('translations[ar][name]');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _courseDescriptionController.addListener(() {
+      if (_courseDescriptionController.text != widget.course.description) {
+        _changedFields['translations[ar][description]'] =
+            _courseDescriptionController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('translations[ar][description]');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _hoursController.addListener(() {
+      if (_hoursController.text != widget.course.numberOfHours) {
+        _changedFields['number_of_hours'] = _hoursController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('number_of_hours');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _coursePriceController.addListener(() {
+      if (_coursePriceController.text != widget.course.price.toString()) {
+        _changedFields['price'] = _coursePriceController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('price');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _levelController.addListener(() {
+      if (_levelController.text != widget.course.level) {
+        _changedFields['level'] = _levelController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('level');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _startDateController.addListener(() {
+      if (_startDateController.text != widget.course.level) {
+        _changedFields['start_date'] = _startDateController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('start_date');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _endDateController.addListener(() {
+      if (_endDateController.text != widget.course.level) {
+        _changedFields['end_date'] = _endDateController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('end_date');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
   }
 
   @override
@@ -158,49 +273,40 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header section with close button
+                  _buildHeader(),
+                  SizedBox(height: 25),
+
+                  // Course Name field
+                  // Category's Name field
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "تعديل معلومات الدورة",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.close, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                      ),
+                      Expanded(child: _buildCourseNameField()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildCategoryField()),
                     ],
                   ),
                   SizedBox(height: 25),
 
-                  // Course Name field
-                  _buildCourseNameField(),
-                  SizedBox(height: 25),
-
-                  // Category Name field
-                  _buildCategoryField(),
-                  SizedBox(height: 25),
-
                   // Level's field
-                  _buildLevelField(),
-                  SizedBox(height: 25),
-
                   // Teacher's field
-                  _buildTeacherField(),
+                  Row(
+                    children: [
+                      Expanded(child: _buildLevelField()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildTeacherField()),
+                    ],
+                  ),
                   SizedBox(height: 25),
 
                   // Hourse.No field
-                  _buildNumberOfHoursField(),
-                  SizedBox(height: 25),
-
                   // Price field
-                  _buildPriceField(),
+                  Row(
+                    children: [
+                      Expanded(child: _buildNumberOfHoursField()),
+                      SizedBox(width: 10),
+                      Expanded(child: _buildPriceField()),
+                    ],
+                  ),
                   SizedBox(height: 25),
 
                   // Description field
@@ -229,6 +335,23 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
       ),
     );
   }
+
+  Widget _buildHeader() => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "إنشاء دورة جديد",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      Spacer(),
+      IconButton(
+        icon: Icon(Icons.close, size: 20),
+        onPressed: () => Navigator.pop(context),
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(),
+      ),
+    ],
+  );
 
   Widget _buildCourseNameField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,6 +401,13 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
             }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedCategory = newValue);
+          if (newValue != widget.course.categoryName) {
+            _changedFields['category_name'] = newValue!;
+            _hasChanges = true;
+          } else {
+            _changedFields.remove('category_name');
+            _hasChanges = _changedFields.isNotEmpty;
+          }
         },
         // validator: _validateGender,
       ),
@@ -289,24 +419,11 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     children: [
       Text("مستوى الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
-      CustomTextField(
-        hintText: "أدخل اسم الدورة",
-        controller: _levelController,
-        // validator: (value) => _validateNotEmpty(value, "الاسم الأول"),
-      ),
-    ],
-  );
-
-  Widget _buildTeacherField() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("المدرس *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
       DropdownButtonFormField<String>(
-        value: _selectedTeacher,
+        value: _selectedLevel,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
-          hintText: 'اختر المدرس',
+          hintText: 'اختر المستوى',
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black26),
@@ -317,17 +434,53 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: allTeachers.map((teacher) => teacher.fullName).map((
-          String value,
-        ) {
+        items: ['مبتدئ', 'متوسط', 'متقدم'].map((String value) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (String? newValue) {
-          setState(() => _selectedTeacher = newValue);
+          setState(() => _selectedLevel = newValue);
         },
         // validator: _validateGender,
       ),
     ],
+  );
+
+  Widget _buildTeacherField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("المدرس *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      InkWell(
+        onTap: () => _selectTeacherDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedTeacher == null
+                  ? Text("اختر المدرس", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedTeacher!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+
+  void _selectTeacherDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectTeacherDialog(callback: _selectTeacher),
   );
 
   Widget _buildNumberOfHoursField() => Column(
@@ -491,6 +644,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
+            print(_changedFields.toString());
           }
         },
         child: Padding(

@@ -22,7 +22,7 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 700,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -135,7 +135,7 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      widget.course.category,
+                      widget.course.categoryName,
                       style: TextStyle(fontSize: 19),
                     ),
                   ],
@@ -159,9 +159,11 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                 ),
               ),
               SizedBox(height: 5),
-              Text(
-                "'دورة تمهيدية لتعلم أساسيات تطوير التطبيقات باستخدام Flutter، مناسبة للمبتدئين في البرمجة متعددة المنصات.'",
-                style: TextStyle(fontSize: 17),
+              Flexible(
+                child: Text(
+                  widget.course.description,
+                  style: TextStyle(fontSize: 17),
+                ),
               ),
             ],
           ),
@@ -192,7 +194,7 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                           ),
                         ),
                         Text(
-                          "أ. ${widget.course.teacher}",
+                          "أ. ${widget.course.teacher.fullName}",
                           style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.bold,
@@ -255,7 +257,7 @@ class _CourseDetailsDialogState extends State<CourseDetailsDialog> {
                     ),
                   ),
                   Text(
-                    "1 300 000",
+                    widget.course.price.toString(),
                     style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
                   ),
                 ],

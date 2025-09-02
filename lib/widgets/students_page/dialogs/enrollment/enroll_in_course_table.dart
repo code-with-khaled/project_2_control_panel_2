@@ -100,7 +100,7 @@ class _CoursesTableState extends State<CoursesTable> {
                       decoration: BoxDecoration(color: Colors.white),
                       children: [
                         _buildCourseNameCell(course.name),
-                        _buildCategoryCell(Text(course.category)),
+                        _buildCategoryCell(Text(course.categoryName)),
                         _buildTeacherCell(course.teacher.fullName),
                         _buildActionCell(
                           ElevatedButton(

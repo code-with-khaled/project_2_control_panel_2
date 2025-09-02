@@ -15,7 +15,7 @@ class StudentFeedback {
       StudentFeedback(
         id: json['id'],
         body: json['body'],
-        date: json['feedbacked_at'],
+        date: DateTime.parse(json['feedbacked_at']),
         rating: json['rating'],
       );
 }

@@ -264,17 +264,24 @@ class _CoursesPageState extends State<CoursesPage> {
       return _buildEmptyState();
     }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: displayedCourses.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: 10),
-          child: CourseCard(
-            course: displayedCourses[index],
-            callback: _refreshCourses,
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const double itemWidth = 350;
+        int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
+        itemsPerRow = itemsPerRow.clamp(1, 3);
+
+        return Wrap(
+          spacing: 20,
+          runSpacing: 20,
+          children: [
+            for (final course in displayedCourses)
+              SizedBox(
+                width:
+                    (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
+                    itemsPerRow,
+                child: CourseCard(course: course, callback: _refreshCourses),
+              ),
+          ],
         );
       },
     );

@@ -74,7 +74,7 @@ class StudentService {
     }
   }
 
-  Future<void> editStudent(
+  Future<void> updateStudent(
     String? token,
     int id,
     Map<String, dynamic> student,
