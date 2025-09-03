@@ -2,7 +2,7 @@ class TeacherFeedback {
   final int? id;
   final String body;
   final DateTime date;
-  final double rating;
+  final int rating;
   final TeacherFeedbackStudent student;
 
   TeacherFeedback({

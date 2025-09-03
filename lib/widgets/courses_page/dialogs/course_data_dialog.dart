@@ -1,5 +1,6 @@
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/courses_page/sections/attendance_section.dart';
+import 'package:control_panel_2/widgets/courses_page/sections/course_feedbacks_section.dart';
 import 'package:control_panel_2/widgets/courses_page/sections/exams_section.dart';
 import 'package:control_panel_2/widgets/courses_page/sections/students_receipts_section.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
@@ -143,7 +144,7 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
       case "الإيصالات":
         return StudentsReceiptsSection();
       case "الاستبيانات والمراجعات":
-        return Text('');
+        return CourseFeedbacksSection(id: widget.course.id!);
       default:
         return AttendanceSection(course: widget.course);
     }

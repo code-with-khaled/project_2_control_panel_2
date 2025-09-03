@@ -1,11 +1,11 @@
-class StudentFeedback {
+class CourseFeedback {
   final int? id;
   final String body;
   final DateTime date;
   final int rating;
-  final FeedbackStudent student;
+  final CourseFeedbackStudent student;
 
-  StudentFeedback({
+  CourseFeedback({
     this.id,
     required this.body,
     required this.date,
@@ -13,29 +13,28 @@ class StudentFeedback {
     required this.student,
   });
 
-  factory StudentFeedback.fromJson(Map<String, dynamic> json) =>
-      StudentFeedback(
-        id: json['id'],
-        body: json['body'],
-        date: DateTime.parse(json['feedbacked_at']),
-        rating: json['rating'],
-        student: FeedbackStudent.fromJson(json['student']),
-      );
+  factory CourseFeedback.fromJson(Map<String, dynamic> json) => CourseFeedback(
+    id: json['id'],
+    body: json['body'],
+    date: DateTime.parse(json['feedbacked_at']),
+    rating: json['rating'],
+    student: CourseFeedbackStudent.fromJson(json['student']),
+  );
 }
 
-class FeedbackStudent {
+class CourseFeedbackStudent {
   final int id;
   final String firstName;
   final String lastName;
 
-  FeedbackStudent({
+  CourseFeedbackStudent({
     required this.id,
     required this.firstName,
     required this.lastName,
   });
 
-  factory FeedbackStudent.fromJson(Map<String, dynamic> json) =>
-      FeedbackStudent(
+  factory CourseFeedbackStudent.fromJson(Map<String, dynamic> json) =>
+      CourseFeedbackStudent(
         id: json['id'],
         firstName: json['first_name'],
         lastName: json['last_name'],

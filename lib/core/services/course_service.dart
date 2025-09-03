@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/models/attendance_model.dart';
+import 'package:control_panel_2/models/course_feedback_model.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/models/lecture_model.dart';
 import 'package:http/http.dart' as http;
@@ -163,6 +164,32 @@ class CourseService {
       return data.map((json) => Attendance.fromJson(json)).toList();
     } else {
       throw Exception('Fetch lectures failed');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCourseFeedbacks(
+    String? token,
+    int id,
+  ) async {
+    final response = await apiClient.get(
+      "dashboard/courses/$id/feedbacks",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final data = json['data'];
+      final feedbacks = (data['feedbacks'] as List<dynamic>)
+          .map((json) => CourseFeedback.fromJson(json))
+          .toList();
+
+      return {
+        'count': data['count'],
+        'average': data['average'],
+        'feedbacks': feedbacks,
+      };
+    } else {
+      throw Exception('Fetch coruse feedbacks failed');
     }
   }
 }

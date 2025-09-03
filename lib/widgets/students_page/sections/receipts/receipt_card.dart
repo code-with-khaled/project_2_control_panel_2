@@ -82,7 +82,7 @@ class _ReceiptCardState extends State<ReceiptCard> {
                     "التاريخ:",
                     style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
-                  Text(DateFormat('MMM dd, yyyy', 'ar').format(receipt.date)),
+                  Text(DateFormat('yyyy-MM-dd').format(receipt.date)),
                 ],
               ),
               SizedBox(height: 10),

@@ -5,7 +5,7 @@ import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/students_page/sections/courses/courses_section.dart';
 import 'package:control_panel_2/widgets/students_page/sections/overview/overview_section.dart';
 import 'package:control_panel_2/widgets/students_page/sections/receipts/receipts_section.dart';
-import 'package:control_panel_2/widgets/students_page/sections/feedbacks/feedbacks_section.dart';
+import 'package:control_panel_2/widgets/students_page/sections/feedbacks/student_feedbacks_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -272,7 +272,7 @@ class _StudentProfileDialogState extends State<StudentProfileDialog> {
       case "الدورات":
         return CoursesSection(id: widget.student.id!);
       case "المراجعات":
-        return FeedbacksSection(id: widget.student.id!);
+        return StudentFeedbacksSection(id: widget.student.id!);
       default:
         return OverviewSection(student: widget.student);
     }

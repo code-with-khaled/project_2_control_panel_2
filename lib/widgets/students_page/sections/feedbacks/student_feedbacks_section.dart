@@ -1,30 +1,31 @@
 import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/teacher_service.dart';
-import 'package:control_panel_2/models/teacher_feedback_model.dart';
+import 'package:control_panel_2/core/services/student_service.dart';
+import 'package:control_panel_2/models/student_feedback_model.dart';
 import 'package:control_panel_2/widgets/other/rating_stars.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class TeacherReviewsSection extends StatefulWidget {
+class StudentFeedbacksSection extends StatefulWidget {
   final int id;
 
-  const TeacherReviewsSection({super.key, required this.id});
+  const StudentFeedbacksSection({super.key, required this.id});
 
   @override
-  State<TeacherReviewsSection> createState() => _TeacherReviewsSectionState();
+  State<StudentFeedbacksSection> createState() =>
+      _StudentFeedbacksSectionState();
 }
 
-class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
+class _StudentFeedbacksSectionState extends State<StudentFeedbacksSection> {
   bool _isLoading = false;
   int _feedbackCount = 0;
   double _feedbackAverage = 0.0;
-  List<TeacherFeedback> _feedbacks = [
-    TeacherFeedback(
+  List<StudentFeedback> _feedbacks = [
+    StudentFeedback(
       body: "body",
       date: DateTime.now(),
-      rating: 4,
-      student: TeacherFeedbackStudent(
+      rating: 3,
+      student: FeedbackStudent(
         id: 1,
         firstName: "firstName",
         lastName: "lastName",
@@ -35,14 +36,14 @@ class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
   // Date formatter instance
   final DateFormat _dateFormatter = DateFormat('yyyy-MM-dd');
 
-  Future<void> _fetchFeedbacks() async {
+  Future<void> _fetchCourses() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       final token = TokenHelper.getToken();
-      final result = await _teacherService.fetchTeacherFeedbacks(
+      final result = await _studentService.fetchStudentFeedbacks(
         token,
         widget.id,
       );
@@ -67,7 +68,7 @@ class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
     }
   }
 
-  late TeacherService _teacherService;
+  late StudentService _studentService;
 
   @override
   void initState() {
@@ -75,9 +76,9 @@ class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
 
     final apiClient = ApiHelper.getClient();
 
-    _teacherService = TeacherService(apiClient: apiClient);
+    _studentService = StudentService(apiClient: apiClient);
 
-    _fetchFeedbacks();
+    _fetchCourses();
   }
 
   @override
@@ -93,7 +94,6 @@ class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
         : _feedbacks.isEmpty
         ? Center(child: Text("لا يوجد مراجعات"))
         : Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -108,10 +108,8 @@ class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
                     children: [
                       Icon(Icons.star, color: Colors.yellow),
                       SizedBox(width: 5),
-
                       Text("متوسط التقييم"),
                       SizedBox(width: 5),
-
                       Text(_feedbackAverage.toString()),
                     ],
                   ),
@@ -122,45 +120,44 @@ class _TeacherReviewsSectionState extends State<TeacherReviewsSection> {
               Wrap(
                 runSpacing: 10,
                 children: [
-                  for (var feedback in _feedbacks) _buildReview(feedback),
+                  for (var feedback in _feedbacks)
+                    _buildStudentFeedback(feedback),
                 ],
               ),
             ],
           );
   }
 
-  Widget _buildReview(TeacherFeedback feedback) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black26),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                feedback.student.fullName,
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-              RatingStars(rating: feedback.rating.toInt()),
-            ],
-          ),
-          SizedBox(height: 10),
+  Widget _buildStudentFeedback(StudentFeedback feedback) => Container(
+    padding: EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.black26),
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              feedback.student.fullName,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            RatingStars(rating: feedback.rating.toInt()),
+          ],
+        ),
+        SizedBox(height: 10),
 
-          Text(feedback.body),
-          SizedBox(height: 9),
+        Text(feedback.body),
+        SizedBox(height: 9),
 
-          Text(
-            _dateFormatter.format(feedback.date),
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
+        Text(
+          _dateFormatter.format(feedback.date),
+          style: TextStyle(fontSize: 13, color: Colors.grey),
+        ),
+      ],
+    ),
+  );
 }
