@@ -64,6 +64,8 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
         _selectedTeacher = teacher.fullName;
         _selectedTeacherId = teacher.id;
       });
+      print(_selectedTeacher);
+      print(_selectedTeacherId);
     }
   }
 

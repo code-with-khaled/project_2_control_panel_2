@@ -5,7 +5,7 @@ class Course {
   final String categoryName;
   final String description;
   final CourseTeacher teacher;
-  final double rating;
+  final int rating;
   final int enrollments;
   final DateTime startDate;
   final DateTime endDate;
@@ -50,13 +50,13 @@ class CourseTeacher {
   final int id;
   final String firstName;
   final String lastName;
-  final String image;
+  final String? image;
 
   CourseTeacher({
     required this.id,
     required this.firstName,
     required this.lastName,
-    required this.image,
+    this.image,
   });
 
   factory CourseTeacher.fromJson(Map<String, dynamic> json) => CourseTeacher(

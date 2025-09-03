@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class CourseDataDialog extends StatefulWidget {
   final Course course;
+
   const CourseDataDialog({super.key, required this.course});
 
   @override
@@ -144,7 +145,7 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
       case "الاستبيانات والمراجعات":
         return Text('');
       default:
-        return AttendanceSection();
+        return AttendanceSection(course: widget.course);
     }
   }
 }

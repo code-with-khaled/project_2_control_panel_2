@@ -1,5 +1,5 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/course_model.dart';
@@ -8,7 +8,6 @@ import 'package:control_panel_2/widgets/courses_page/dialogs/new_course_dialog.d
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 
 class CoursesPage extends StatefulWidget {
   const CoursesPage({super.key});
@@ -89,10 +88,7 @@ class _CoursesPageState extends State<CoursesPage> {
       });
     });
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _courseService = CourseService(apiClient: apiClient);
 
@@ -254,9 +250,8 @@ class _CoursesPageState extends State<CoursesPage> {
     if (_searchQuery.isNotEmpty) {
       displayedCourses = _courses.where((course) {
         final name = course.name.toString().toLowerCase();
-        final id = course.id.toString().toLowerCase();
         final query = _searchQuery.toLowerCase();
-        return name.contains(query) || id.contains(query);
+        return name.contains(query);
       }).toList();
     }
 

@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 ///
 /// Takes an [onEnroll] callback that triggers when enrollment is initiated
 class CoursesTable extends StatefulWidget {
-  final void Function() onEnroll;
+  final Future<bool> Function(int, String) onEnroll;
 
   const CoursesTable({super.key, required this.onEnroll});
 
@@ -104,12 +104,17 @@ class _CoursesTableState extends State<CoursesTable> {
                         _buildTeacherCell(course.teacher.fullName),
                         _buildActionCell(
                           ElevatedButton(
-                            onPressed: () {
-                              widget.onEnroll();
-                              setState(() {
-                                _isLoading = true;
-                                _fetchCourses();
-                              });
+                            onPressed: () async {
+                              final isEnrolled = await widget.onEnroll(
+                                course.id!,
+                                course.name,
+                              );
+                              if (isEnrolled) {
+                                setState(() {
+                                  _isLoading = true;
+                                  _fetchCourses();
+                                });
+                              }
                             }, // Trigger enrollment callback
                             child: Text("تسجيل"), // "Enroll"
                           ),

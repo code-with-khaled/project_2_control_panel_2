@@ -1,11 +1,17 @@
+// ignore_for_file: unused_local_variable
+
+import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_in_course_table.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 /// Dialog for enrolling a student in available courses
 ///
-/// Requires [name] and [username] of the student to be enrolled
+/// Requires [student] of the student to be enrolled
 class EnrollStudentDialog extends StatefulWidget {
   final Student student;
 
@@ -18,6 +24,66 @@ class EnrollStudentDialog extends StatefulWidget {
 class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
   // Controller for course search functionality
   final TextEditingController _searchController = TextEditingController();
+
+  Future<bool> _enrollStudent(int id, String courseName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide.none,
+        ),
+        title: Text('تأكيد الحذف'),
+        content: Text(
+          'هل أنت متأكد من رغبتك في تسجيل ${widget.student.fullName} في دورة $courseName ؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('إلغاء', style: TextStyle(color: Colors.red)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('تأكيد', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
+    if (mounted) {
+      if (confirmed == true) {
+        try {
+          final token = TokenHelper.getToken();
+          final response = await _courseService.enrollStudent(token, id);
+
+          if (mounted) {
+            showCustomToast(
+              context,
+              'تم تحديث التسجيل!',
+              'تم تسجيل ${widget.student.fullName} في الدورة بنجاح!', // Success message
+            );
+            return true;
+          }
+        } catch (e) {
+          throw Exception(e);
+        }
+      }
+    }
+    return false;
+  }
+
+  late CourseService _courseService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiClient(
+      baseUrl: "http://127.0.0.1:8000/api",
+      httpClient: http.Client(),
+    );
+
+    _courseService = CourseService(apiClient: apiClient);
+  }
 
   @override
   void dispose() {
@@ -33,7 +99,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800, // Dialog max width
+          maxWidth: 800,
           maxHeight:
               MediaQuery.of(context).size.height * 0.8, // 80% of screen height
         ),
@@ -61,7 +127,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
                 SizedBox(height: 16),
 
                 // Courses table with enrollment capability
-                CoursesTable(onEnroll: () => _showEnrollmentSuccessToast()),
+                CoursesTable(onEnroll: _enrollStudent),
               ],
             ),
           ),
@@ -104,15 +170,6 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
           style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w900),
         ),
       ],
-    );
-  }
-
-  // Shows toast notification when enrollment succeeds
-  void _showEnrollmentSuccessToast() {
-    showCustomToast(
-      context,
-      'تم تحديث التسجيل!', // 'Enrollment Updated!'
-      'تم تسجيل ${widget.student.fullName} في الدورة بنجاح!', // Success message
     );
   }
 

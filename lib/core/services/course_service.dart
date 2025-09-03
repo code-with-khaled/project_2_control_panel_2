@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/models/attendance_model.dart';
 import 'package:control_panel_2/models/course_model.dart';
+import 'package:control_panel_2/models/lecture_model.dart';
 import 'package:http/http.dart' as http;
 
 class CourseService {
@@ -124,6 +126,43 @@ class CourseService {
         }
       });
       throw Exception('$message$detailedErrors');
+    }
+  }
+
+  Future<void> enrollStudent(String? token, int id) async {
+    // ignore: unused_local_variable
+    final response = await apiClient.delete("dashboard/enroll", token: token);
+  }
+
+  Future<List<Lecture>> fetchLectures(String? token, int id) async {
+    final response = await apiClient.get(
+      "dashboard/courses/$id/lectures",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => Lecture.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch lectures failed');
+    }
+  }
+
+  Future<List<Attendance>> fetchAttendances(String? token, int id) async {
+    final response = await apiClient.get(
+      "dashboard/lectures/$id/attendances",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => Attendance.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch lectures failed');
     }
   }
 }
