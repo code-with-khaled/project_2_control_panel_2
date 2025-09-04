@@ -1,5 +1,3 @@
-import 'package:control_panel_2/constants/all_courses.dart';
-import 'package:control_panel_2/constants/all_students.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/classifications_page/tables/categories_table.dart';
 import 'package:control_panel_2/widgets/classifications_page/dialogs/add_category_dialog.dart';
@@ -16,6 +14,20 @@ class ClassificationsPage extends StatefulWidget {
 
 class _ClassificationsPageState extends State<ClassificationsPage> {
   final TextEditingController _searchController = TextEditingController();
+
+  int? _totalCategories;
+  int? _totalCourses;
+  int? _totalStudents;
+
+  bool _isLoadingOverview = true;
+  void _getOverview(int totalCategories, int totalCourses, int totalStudents) {
+    setState(() {
+      _totalCategories = totalCategories;
+      _totalCourses = totalCourses;
+      _totalStudents = totalStudents;
+      _isLoadingOverview = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +82,7 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
               child: ElevatedButton(
                 onPressed: () => showDialog(
                   context: context,
-                  builder: (context) => AddCategoryDialog(),
+                  builder: (context) => AddCategoryDialog(callback: initState),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -97,6 +109,16 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
   }
 
   Widget _buildOverviewCards() {
+    if (_isLoadingOverview) {
+      return Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= 800) {
@@ -105,7 +127,7 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
               Expanded(
                 child: _buildOverviewCard(
                   "مجمل التصنيفات",
-                  "4",
+                  _totalCategories!.toString(),
                   Icon(
                     Icons.import_contacts_rounded,
                     color: Colors.blue,
@@ -117,7 +139,7 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
               Expanded(
                 child: _buildOverviewCard(
                   "مجمل الكورسات",
-                  courses.length.toString(),
+                  _totalCourses!.toString(),
                   Icon(
                     Icons.import_contacts_rounded,
                     color: Colors.green,
@@ -129,16 +151,8 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
               Expanded(
                 child: _buildOverviewCard(
                   "مجمل الطلاب",
-                  allStudents.length.toString(),
+                  _totalStudents!.toString(),
                   Icon(Icons.group_outlined, color: Colors.purple, size: 32),
-                ),
-              ),
-              SizedBox(width: 15),
-              Expanded(
-                child: _buildOverviewCard(
-                  "مجمل العائدات",
-                  "\$22000",
-                  Icon(Icons.attach_money, color: Colors.yellow, size: 32),
                 ),
               ),
             ],
@@ -152,7 +166,7 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
                   Expanded(
                     child: _buildOverviewCard(
                       "مجمل التصنيفات",
-                      "4",
+                      _totalCategories!.toString(),
                       Icon(
                         Icons.import_contacts_rounded,
                         color: Colors.blue,
@@ -164,7 +178,7 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
                   Expanded(
                     child: _buildOverviewCard(
                       "مجمل الكورسات",
-                      courses.length.toString(),
+                      _totalCourses!.toString(),
                       Icon(
                         Icons.import_contacts_rounded,
                         color: Colors.green,
@@ -180,20 +194,12 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
                   Expanded(
                     child: _buildOverviewCard(
                       "مجمل الطلاب",
-                      allStudents.length.toString(),
+                      _totalStudents!.toString(),
                       Icon(
                         Icons.group_outlined,
                         color: Colors.purple,
                         size: 32,
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 15),
-                  Expanded(
-                    child: _buildOverviewCard(
-                      "مجمل العائدات",
-                      "\$22000",
-                      Icon(Icons.attach_money, color: Colors.yellow, size: 32),
                     ),
                   ),
                 ],
@@ -271,7 +277,10 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
           Row(
             children: [
               Expanded(
-                child: CategoriesTable(searchQuery: _searchController.text),
+                child: CategoriesTable(
+                  searchQuery: _searchController.text,
+                  callback: _getOverview,
+                ),
               ),
             ],
           ),

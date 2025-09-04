@@ -1,14 +1,12 @@
 import 'dart:ui';
 
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/pages/home_page.dart';
-import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/services/auth_service.dart';
 import 'package:control_panel_2/pages/reset_password_page.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
-
-import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -55,6 +53,17 @@ class _LoginScreenState extends State<LoginScreen>
     return null;
   }
 
+  int _getRoleId(String role) {
+    switch (role) {
+      case "administrative":
+        return 2;
+      case "accountant":
+        return 3;
+      default:
+        return 1;
+    }
+  }
+
   // Login
   Future<void> _login() async {
     setState(() {
@@ -62,17 +71,14 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     try {
-      final apiClient = ApiClient(
-        baseUrl: "http://127.0.0.1:8000/api",
-        httpClient: http.Client(),
-      );
+      final apiClient = ApiHelper.getClient();
 
       final authService = AuthService(apiClient: apiClient);
 
       final token = await authService.login(
         username: _usernameController.text.trim(),
         password: _passwordController.text.trim(),
-        roleId: 1,
+        roleId: _getRoleId(_selectedRole),
       );
 
       TokenHelper.storeToken(token);

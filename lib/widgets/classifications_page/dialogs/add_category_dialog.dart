@@ -1,8 +1,13 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/category_service.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class AddCategoryDialog extends StatefulWidget {
-  const AddCategoryDialog({super.key});
+  final VoidCallback callback;
+
+  const AddCategoryDialog({super.key, required this.callback});
 
   @override
   State<AddCategoryDialog> createState() => _AddCategoryDialogState();
@@ -14,6 +19,50 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
 
   // Controllers for managing text input fields
   final TextEditingController _titleController = TextEditingController();
+
+  bool _isSubmitting = false;
+
+  Future<void> _createCategory() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      await _categoryService.createCategory(
+        token,
+        _titleController.text.trim(),
+      );
+
+      widget.callback();
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  late CategoryService _categoryService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+    _categoryService = CategoryService(apiClient: apiClient);
+  }
 
   @override
   void dispose() {
@@ -29,7 +78,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 500,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -104,12 +153,19 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
+            _createCategory();
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء التصنيف"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء التصنيف"),
+              ),
       ),
     ],
   );

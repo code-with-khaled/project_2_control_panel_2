@@ -1,0 +1,113 @@
+import 'package:control_panel_2/models/teacher_disbursement_model.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class TeacherReceiptCard extends StatefulWidget {
+  final TeacherDisbursement receipt;
+
+  const TeacherReceiptCard({super.key, required this.receipt});
+
+  @override
+  State<TeacherReceiptCard> createState() => _TeacherReceiptCardState();
+}
+
+class _TeacherReceiptCardState extends State<TeacherReceiptCard> {
+  // State variables
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final receipt = widget.receipt;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: InkWell(
+        onTap: () {},
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                      offset: Offset(0, 4),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    receipt.name,
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: _getTypeColor("صرف"),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "صرف",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "التاريخ:",
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  Text(DateFormat('yyyy-MM-dd').format(receipt.date)),
+                ],
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "القيمة:",
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  Text(
+                    receipt.amount.toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getTypeColor(String status) {
+    switch (status) {
+      case "دفع":
+        return Colors.green.shade900;
+      default:
+        return Colors.yellow.shade900;
+    }
+  }
+}

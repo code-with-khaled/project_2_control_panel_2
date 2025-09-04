@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/models/teacher_disbursement_model.dart';
 import 'package:control_panel_2/models/teacher_feedback_model.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 
@@ -179,6 +180,25 @@ class TeacherService {
       };
     } else {
       throw Exception('Fetch student feedbacks Failed');
+    }
+  }
+
+  Future<List<TeacherDisbursement>> fetchTeacherReciepts(
+    String? token,
+    int id,
+  ) async {
+    final response = await apiClient.get(
+      "dashboard/students/$id/receipts",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => TeacherDisbursement.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch student reciepts Failed');
     }
   }
 }

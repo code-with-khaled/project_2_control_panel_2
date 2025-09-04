@@ -1,38 +1,34 @@
 import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/student_service.dart';
-import 'package:control_panel_2/models/student_receipt_model.dart';
-import 'package:control_panel_2/widgets/students_page/sections/receipts/student_receipt_card.dart';
+import 'package:control_panel_2/core/services/teacher_service.dart';
+import 'package:control_panel_2/models/teacher_disbursement_model.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/disbursements/teacher_receipt_card.dart';
 import 'package:flutter/material.dart';
 
-class ReceiptsSection extends StatefulWidget {
+class TeacherDisbursementsSection extends StatefulWidget {
   final int id;
 
-  const ReceiptsSection({super.key, required this.id});
+  const TeacherDisbursementsSection({super.key, required this.id});
 
   @override
-  State<ReceiptsSection> createState() => _ReceiptsSectionState();
+  State<TeacherDisbursementsSection> createState() =>
+      _TeacherDisbursementsSectionState();
 }
 
-class _ReceiptsSectionState extends State<ReceiptsSection> {
+class _TeacherDisbursementsSectionState
+    extends State<TeacherDisbursementsSection> {
   bool _isLoading = false;
 
-  List<StudentReceipt> _receipts = [
-    StudentReceipt(
+  List<TeacherDisbursement> _receipts = [
+    TeacherDisbursement(
       id: 1,
-      firstName: "firstName",
-      lastName: "lastName",
-      phone: "phone",
-      type: "دورة",
       name: "name",
-      transactionId: 1,
-      amount: 500000.00,
+      amount: 500000,
       date: DateTime.now(),
-      status: "status",
     ),
   ];
 
-  late StudentService _studentService;
+  late TeacherService _teacherService;
 
   Future<void> _fetchReceipts() async {
     setState(() {
@@ -41,7 +37,7 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
 
     try {
       final token = TokenHelper.getToken();
-      _receipts += await _studentService.fetchStudentReciepts(token, widget.id);
+      _receipts += await _teacherService.fetchTeacherReciepts(token, widget.id);
     } catch (e) {
       if (mounted) {
         showDialog(
@@ -65,7 +61,7 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
 
     final apiClient = ApiHelper.getClient();
 
-    _studentService = StudentService(apiClient: apiClient);
+    _teacherService = TeacherService(apiClient: apiClient);
 
     _fetchReceipts();
   }
@@ -93,7 +89,7 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
                   SizedBox(width: 6),
 
                   Text(
-                    "فواتير الطلاب",
+                    "فواتير المدرس",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -104,7 +100,7 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
                 runSpacing: 10,
                 children: [
                   for (var receipt in _receipts)
-                    StudentReceiptCard(receipt: receipt),
+                    TeacherReceiptCard(receipt: receipt),
                 ],
               ),
             ],

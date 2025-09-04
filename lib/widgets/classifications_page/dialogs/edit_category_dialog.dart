@@ -1,10 +1,19 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/category_service.dart';
+import 'package:control_panel_2/models/category_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class EditCategoryDialog extends StatefulWidget {
-  final String category;
+  final Category category;
+  final VoidCallback callback;
 
-  const EditCategoryDialog({super.key, required this.category});
+  const EditCategoryDialog({
+    super.key,
+    required this.category,
+    required this.callback,
+  });
 
   @override
   State<EditCategoryDialog> createState() => _EditCategoryDialogState();
@@ -17,10 +26,48 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
   // Controllers for managing text input fields
   final TextEditingController _titleController = TextEditingController();
 
+  bool _isSubmitting = false;
+
+  Future<void> _editCategory() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      await _categoryService.editCategory(
+        token,
+        widget.category.id,
+        _titleController.text.trim(),
+      );
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  late CategoryService _categoryService;
+
   @override
   void initState() {
     super.initState();
-    _titleController.text = widget.category;
+    _titleController.text = widget.category.name;
+
+    final apiClient = ApiHelper.getClient();
+    _categoryService = CategoryService(apiClient: apiClient);
   }
 
   @override
@@ -112,12 +159,19 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
+            _editCategory;
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("حفظ التعديلات"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("حفظ التعديلات"),
+              ),
       ),
     ],
   );

@@ -1,6 +1,7 @@
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/courses/teacher_courses_section.dart';
+import 'package:control_panel_2/widgets/teachers_page/sections/disbursements/teacher_disbursements_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/info/teacher_info_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/feedbacks/teacher_feedbacks_section.dart';
 import 'package:control_panel_2/widgets/teachers_page/sections/stat_panel/teacher_stat_panel_section.dart';
@@ -196,27 +197,11 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
       case "المراجعات":
         return TeacherReviewsSection(id: widget.teacher.id!);
       case "الفواتير":
-        return TeacherReceiptsSection(id: widget.teacher.id!);
+        return TeacherDisbursementsSection(id: widget.teacher.id!);
       case "اللوحة الإحصائية":
         return TeacherStatPanelSection();
       default:
         return TeacherInfoSection(teacher: widget.teacher);
     }
-  }
-}
-
-class TeacherReceiptsSection extends StatefulWidget {
-  final int id;
-
-  const TeacherReceiptsSection({super.key, required this.id});
-
-  @override
-  State<TeacherReceiptsSection> createState() => _TeacherReceiptsSectionState();
-}
-
-class _TeacherReceiptsSectionState extends State<TeacherReceiptsSection> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }

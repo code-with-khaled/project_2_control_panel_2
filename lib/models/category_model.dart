@@ -1,22 +1,23 @@
 class Category {
   final int id;
   final String name;
-  final String? status;
-  final int? courses;
-  final int? students;
-  final int? revenue;
-  final double? rating;
+  final int courses;
+  final int students;
+  final double rating;
 
   const Category({
     required this.id,
     required this.name,
-    this.status,
-    this.courses,
-    this.students,
-    this.revenue,
-    this.rating,
+    required this.courses,
+    required this.students,
+    required this.rating,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) =>
-      Category(id: json['id'], name: json['name']);
+  factory Category.fromJson(Map<String, dynamic> json) => Category(
+    id: json['id'],
+    name: json['name'],
+    courses: json['courses_count'],
+    students: json['students_count'],
+    rating: json['courses_feedbacks_avg_rating'],
+  );
 }

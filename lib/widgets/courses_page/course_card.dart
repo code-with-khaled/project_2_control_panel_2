@@ -57,7 +57,7 @@ class _CourseCardState extends State<CourseCard> {
 
     try {
       final token = TokenHelper.getToken();
-      _courseService.deleteCourse(token, widget.course.id!);
+      await _courseService.deleteCourse(token, widget.course.id!);
 
       if (mounted) {
         ScaffoldMessenger.of(

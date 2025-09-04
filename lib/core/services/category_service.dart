@@ -11,8 +11,6 @@ class CategoryService {
   Future<List<Category>> fetchCategories(String? token) async {
     final response = await apiClient.get('dashboard/categories', token: token);
 
-    print(jsonDecode(response.body));
-
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       final List<dynamic> data = responseBody['data'];
@@ -20,6 +18,41 @@ class CategoryService {
       return data.map((json) => Category.fromJson(json)).toList();
     } else {
       throw Exception('Fetch categories failed');
+    }
+  }
+
+  Future<void> createCategory(String? token, String name) async {
+    final response = await apiClient.post(
+      'dashboard/categories',
+      token: token,
+      body: {"translations[ar][name]": name},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Category create failed');
+    }
+  }
+
+  Future<void> editCategory(String? token, int id, String name) async {
+    final response = await apiClient.post(
+      'dashboard/categories/$id',
+      token: token,
+      body: {"translations[ar][name]": name, "_method": "PUT"},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Category edit failed');
+    }
+  }
+
+  Future<void> deleteCategory(String? token, int id) async {
+    final response = await apiClient.delete(
+      'dashboard/categories/$id',
+      token: token,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Category delete failed');
     }
   }
 }
