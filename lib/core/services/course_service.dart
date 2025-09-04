@@ -4,6 +4,7 @@ import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/models/attendance_model.dart';
 import 'package:control_panel_2/models/course_feedback_model.dart';
 import 'package:control_panel_2/models/course_model.dart';
+import 'package:control_panel_2/models/course_receipt_mode.dart';
 import 'package:control_panel_2/models/lecture_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -99,11 +100,15 @@ class CourseService {
     }
 
     request.fields.addAll(course);
+    request.fields['_method'] = 'PUT';
 
     final response = await request.send();
+    final body = await response.stream.bytesToString();
+    // ignore: avoid_print
+    print(jsonDecode(body));
 
     if (response.statusCode != 200) {
-      throw Exception('Course create failed');
+      throw Exception('Course update failed');
     }
   }
 
@@ -164,6 +169,22 @@ class CourseService {
       return data.map((json) => Attendance.fromJson(json)).toList();
     } else {
       throw Exception('Fetch lectures failed');
+    }
+  }
+
+  Future<List<CourseReceipt>> fetchCourseReciepts(String? token, int id) async {
+    final response = await apiClient.get(
+      "dashboard/courses/$id/receipts",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => CourseReceipt.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch course reciepts Failed');
     }
   }
 

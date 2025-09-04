@@ -1,10 +1,9 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class SpecificTeacherSection extends StatefulWidget {
   final Function(int?) onMessageChanged;
@@ -53,15 +52,18 @@ class _SpecificTeacherSectionState extends State<SpecificTeacherSection> {
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
       if (mounted) {
         showDialog(
           context: context,
           builder: (_) =>
               AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
 
@@ -73,10 +75,7 @@ class _SpecificTeacherSectionState extends State<SpecificTeacherSection> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     teachersService = TeacherService(apiClient: apiClient);
 
@@ -92,7 +91,13 @@ class _SpecificTeacherSectionState extends State<SpecificTeacherSection> {
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.blue,
+              padding: EdgeInsets.all(20),
+            ),
+          )
         : Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,

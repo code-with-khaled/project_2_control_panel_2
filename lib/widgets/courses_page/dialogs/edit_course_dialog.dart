@@ -1,5 +1,10 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
+import 'package:control_panel_2/models/category_model.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/select_category_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/select_teacher_dialog.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +14,14 @@ import 'package:intl/intl.dart';
 import 'dart:html' as html;
 
 class EditCourseDialog extends StatefulWidget {
+  final VoidCallback callback;
   final Course course;
-  const EditCourseDialog({super.key, required this.course});
+
+  const EditCourseDialog({
+    super.key,
+    required this.course,
+    required this.callback,
+  });
 
   @override
   State<EditCourseDialog> createState() => _EditCourseDialogState();
@@ -32,6 +43,8 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
 
   // State variables
   String? _selectedCategory;
+  // ignore: unused_field
+  int? _selectedCategoryId;
   String? _selectedLevel;
   String? _selectedTeacher;
   // ignore: unused_field
@@ -42,6 +55,8 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
   // Variables for storing the course image
   String? _imageUrl;
   String? _fileName;
+
+  bool _isEditing = false;
 
   // ignore: unused_element
   String _getLevelId(String level) {
@@ -55,12 +70,23 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     }
   }
 
+  void _selectCategory(Category? category) {
+    if (category != null) {
+      setState(() {
+        _selectedCategory = category.name;
+        _selectedCategoryId = category.id;
+      });
+      _checkCategoryChange(category.name);
+    }
+  }
+
   void _selectTeacher(SelectedTeacher? teacher) {
     if (teacher != null) {
       setState(() {
         _selectedTeacher = teacher.fullName;
         _selectedTeacherId = teacher.id;
       });
+      _checkTeacherChange(teacher.fullName);
     }
   }
 
@@ -150,6 +176,55 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     }
   }
 
+  Future<void> _editCourse() async {
+    if (_isEditing || !_hasChanges) return;
+
+    setState(() {
+      _isEditing = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      await _courseService.updateCourse(
+        token,
+        widget.course.id!,
+        _changedFields,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم تعديل معلومات الدورة بنجاح')),
+        );
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في تعديل الدورة'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isEditing = false;
+        });
+      }
+    }
+  }
+
+  late CourseService _courseService;
+
   @override
   void initState() {
     super.initState();
@@ -170,6 +245,9 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     ).format(widget.course.endDate);
     _selectedStartDate = widget.course.startDate;
     _selectedEndDate = widget.course.endDate;
+
+    final apiClient = ApiHelper.getClient();
+    _courseService = CourseService(apiClient: apiClient);
 
     _addControllerListeners();
   }
@@ -231,7 +309,10 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     });
 
     _startDateController.addListener(() {
-      if (_startDateController.text != widget.course.level) {
+      final originalStartDate = DateFormat(
+        'yyyy-MM-dd',
+      ).format(widget.course.startDate);
+      if (_startDateController.text != originalStartDate) {
         _changedFields['start_date'] = _startDateController.text;
         _hasChanges = true;
       } else {
@@ -241,7 +322,10 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     });
 
     _endDateController.addListener(() {
-      if (_endDateController.text != widget.course.level) {
+      final originalEndDate = DateFormat(
+        'yyyy-MM-dd',
+      ).format(widget.course.endDate);
+      if (_endDateController.text != originalEndDate) {
         _changedFields['end_date'] = _endDateController.text;
         _hasChanges = true;
       } else {
@@ -249,6 +333,39 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
         _hasChanges = _changedFields.isNotEmpty;
       }
     });
+  }
+
+  void _checkTeacherChange(String? newTeacher) {
+    final originalTeacher = widget.course.teacher.fullName;
+    if (newTeacher != originalTeacher) {
+      _changedFields['teacher_id'] = _selectedTeacherId.toString();
+      _hasChanges = true;
+    } else {
+      _changedFields.remove('teacher_id');
+      _hasChanges = _changedFields.isNotEmpty;
+    }
+  }
+
+  void _checkCategoryChange(String? newCategory) {
+    final originalCategory = widget.course.categoryName;
+    if (newCategory != originalCategory) {
+      _changedFields['category_id'] = _selectedCategoryId.toString();
+      _hasChanges = true;
+    } else {
+      _changedFields.remove('category_id');
+      _hasChanges = _changedFields.isNotEmpty;
+    }
+  }
+
+  void _checkLevelChange(String? newLevel) {
+    final originalLevel = widget.course.level;
+    if (newLevel != originalLevel) {
+      _changedFields['level'] = _getLevelId(newLevel!);
+      _hasChanges = true;
+    } else {
+      _changedFields.remove('level');
+      _hasChanges = _changedFields.isNotEmpty;
+    }
   }
 
   @override
@@ -370,48 +487,38 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text("التصنيف *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      DropdownButtonFormField<String>(
-        value: _selectedCategory,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر التصنيف',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
+      SizedBox(height: 2),
+      InkWell(
+        onTap: () => _selectCategoryDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedCategory == null
+                  ? Text("اختر التصنيف", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedCategory!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
           ),
         ),
-        items:
-            [
-              'الرياضيات',
-              'العلوم',
-              'البرمجة',
-              'اللغات',
-              'العلوم الإنسانية',
-              'الفنون والإبداع',
-              'الأعمال والاقتصاد',
-              'التحضير للاختبارات',
-            ].map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedCategory = newValue);
-          if (newValue != widget.course.categoryName) {
-            _changedFields['category_name'] = newValue!;
-            _hasChanges = true;
-          } else {
-            _changedFields.remove('category_name');
-            _hasChanges = _changedFields.isNotEmpty;
-          }
-        },
-        // validator: _validateGender,
       ),
     ],
+  );
+
+  void _selectCategoryDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectCategoryDialog(callback: _selectCategory),
   );
 
   Widget _buildLevelField() => Column(
@@ -439,6 +546,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
         }).toList(),
         onChanged: (String? newValue) {
           setState(() => _selectedLevel = newValue);
+          _checkLevelChange(newValue);
         },
         // validator: _validateGender,
       ),
@@ -644,13 +752,23 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
-            print(_changedFields.toString());
+            _editCourse();
+            // print(_changedFields.toString());
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("حفظ التعديلات"),
-        ),
+        child: _isEditing
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("حفظ التعديلات"),
+              ),
       ),
     ],
   );

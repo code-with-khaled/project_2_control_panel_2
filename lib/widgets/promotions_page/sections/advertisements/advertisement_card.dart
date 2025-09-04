@@ -1,14 +1,20 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/advertisements_service.dart';
 import 'package:control_panel_2/models/advertisement_model.dart';
+import 'package:control_panel_2/widgets/promotions_page/dialogs/edit_advertisement_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class AdvertisementCard extends StatefulWidget {
+  final VoidCallback callback;
   final Advertisement advertisement;
 
-  const AdvertisementCard({super.key, required this.advertisement});
+  const AdvertisementCard({
+    super.key,
+    required this.advertisement,
+    required this.callback,
+  });
 
   @override
   State<AdvertisementCard> createState() => _AdvertisementCardState();
@@ -23,12 +29,16 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide.none,
+        ),
         title: Text('تأكيد الحذف'),
         content: Text('هل أنت متأكد من رغبتك في حذف الإعلان ؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء'),
+            child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -56,7 +66,7 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
           context,
         ).showSnackBar(SnackBar(content: Text('تم حذف الإعلان بنجاح')));
 
-        // widget.callback();
+        widget.callback();
 
         setState(() {
           _isDeleting = false;
@@ -86,67 +96,111 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _advertisementsService = AdvertisementsService(apiClient: apiClient);
   }
 
+  bool isHovered = false;
+
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 630),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Advertisement image placeholder
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 75),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Center(
-              child: Container(
-                padding: EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(60),
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 100),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: isHovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                    offset: Offset(0, 4),
+                  ),
+                ]
+              : [],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Advertisement image placeholder
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 75),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.all(30),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(60),
+                  ),
+                  child: Icon(Icons.image_outlined, color: Colors.grey),
                 ),
-                child: Icon(Icons.image_outlined, color: Colors.grey),
               ),
             ),
-          ),
 
-          // Advertisement details
-          Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "المعسكر التدريبي الصيفي للبرمجة",
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "تعلم html, css, javascript في 12 اسبوع فقط",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                SizedBox(height: 20),
+            // Advertisement details
+            Container(
+              padding: EdgeInsets.all(20),
 
-                // Action buttons
-                _buildFooter(),
-              ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "من:",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 5),
+
+                          Text(
+                            (DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(widget.advertisement.startDate)),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "إلى:",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 5),
+
+                          Text(
+                            (DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(widget.advertisement.endDate)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+
+                  // Action buttons
+                  _buildFooter(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -164,6 +218,13 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
     return ElevatedButton(
       onPressed: () {
         // Open AddAdvertisementDialog but with existing data
+        showDialog(
+          context: context,
+          builder: (context) => EditAdvertisementDialog(
+            callback: widget.callback,
+            advertisement: widget.advertisement,
+          ),
+        );
       },
       style: ElevatedButton.styleFrom(
         elevation: 0,
@@ -180,7 +241,7 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.edit_outlined),
+            Icon(Icons.edit_outlined, color: Colors.green),
             SizedBox(width: 3),
             Flexible(child: Text("تعديل")),
           ],

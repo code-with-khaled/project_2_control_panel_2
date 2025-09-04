@@ -1,5 +1,5 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
@@ -9,8 +9,6 @@ import 'package:control_panel_2/widgets/students_page/dialogs/add_student_dialog
 import 'package:control_panel_2/widgets/students_page/student_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'package:http/http.dart' as http;
 
 /// Main page for student management system
 ///
@@ -46,11 +44,7 @@ class _StudentsPageState extends State<StudentsPage> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
-
+    final apiClient = ApiHelper.getClient();
     _studentService = StudentService(apiClient: apiClient);
 
     _loadStudents();
@@ -226,7 +220,11 @@ class _StudentsPageState extends State<StudentsPage> {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(40),
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
       ),
     );
   }

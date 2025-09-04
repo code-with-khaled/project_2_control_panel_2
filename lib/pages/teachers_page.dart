@@ -206,7 +206,11 @@ class _TeachersPageState extends State<TeachersPage> {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(40),
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
       ),
     );
   }

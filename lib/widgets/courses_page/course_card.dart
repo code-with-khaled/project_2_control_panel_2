@@ -1,4 +1,4 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/course_model.dart';
@@ -7,7 +7,6 @@ import 'package:control_panel_2/widgets/courses_page/dialogs/course_details_dial
 import 'package:control_panel_2/widgets/courses_page/dialogs/course_enrollments_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/edit_course_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class CourseCard extends StatefulWidget {
   final VoidCallback callback;
@@ -84,10 +83,7 @@ class _CourseCardState extends State<CourseCard> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _courseService = CourseService(apiClient: apiClient);
   }
@@ -167,8 +163,10 @@ class _CourseCardState extends State<CourseCard> {
                       IconButton(
                         onPressed: () => showDialog(
                           context: context,
-                          builder: (context) =>
-                              EditCourseDialog(course: widget.course),
+                          builder: (context) => EditCourseDialog(
+                            callback: widget.callback,
+                            course: widget.course,
+                          ),
                         ),
                         icon: Icon(Icons.edit_document, color: Colors.blue),
                       ),

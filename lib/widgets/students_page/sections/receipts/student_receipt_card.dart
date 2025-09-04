@@ -3,16 +3,16 @@ import 'package:control_panel_2/widgets/students_page/sections/receipts/receipt_
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class ReceiptCard extends StatefulWidget {
+class StudentReceiptCard extends StatefulWidget {
   final StudentReceipt receipt;
 
-  const ReceiptCard({super.key, required this.receipt});
+  const StudentReceiptCard({super.key, required this.receipt});
 
   @override
-  State<ReceiptCard> createState() => _ReceiptCardState();
+  State<StudentReceiptCard> createState() => _StudentReceiptCardState();
 }
 
-class _ReceiptCardState extends State<ReceiptCard> {
+class _StudentReceiptCardState extends State<StudentReceiptCard> {
   // State variables
   bool _isHovered = false;
 

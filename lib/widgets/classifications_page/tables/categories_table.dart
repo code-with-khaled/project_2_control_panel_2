@@ -158,10 +158,6 @@ class _CategoriesTableState extends State<CategoriesTable> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.pie_chart),
-                            ),
-                            IconButton(
                               onPressed: () => showDialog(
                                 context: context,
                                 builder: (context) =>

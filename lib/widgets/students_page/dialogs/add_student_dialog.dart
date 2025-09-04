@@ -1,10 +1,9 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 // ignore: deprecated_member_use, avoid_web_libraries_in_flutter
@@ -242,11 +241,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
-
+    final apiClient = ApiHelper.getClient();
     _studentService = StudentService(apiClient: apiClient);
   }
 

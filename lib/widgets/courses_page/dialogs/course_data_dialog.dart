@@ -2,7 +2,7 @@ import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/widgets/courses_page/sections/attendance_section.dart';
 import 'package:control_panel_2/widgets/courses_page/sections/course_feedbacks_section.dart';
 import 'package:control_panel_2/widgets/courses_page/sections/exams_section.dart';
-import 'package:control_panel_2/widgets/courses_page/sections/students_receipts_section.dart';
+import 'package:control_panel_2/widgets/courses_page/sections/course_receipts_section.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:flutter/material.dart';
 
@@ -142,7 +142,7 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
       case "الاختبارات":
         return ExamsSection();
       case "الإيصالات":
-        return StudentsReceiptsSection();
+        return StudentsReceiptsSection(id: widget.course.id!);
       case "الاستبيانات والمراجعات":
         return CourseFeedbacksSection(id: widget.course.id!);
       default:

@@ -9,23 +9,22 @@ import 'dart:html' as html;
 
 import 'package:intl/intl.dart';
 
-/// A dialog widget for creating new advertisements
-///
-/// This dialog contains form fields for advertisement details including:
-/// - Title
-/// - Content
-/// - Image upload
-/// - Target audience selection
-class AddAdvertisementDialog extends StatefulWidget {
+class EditAdvertisementDialog extends StatefulWidget {
   final VoidCallback callback;
+  final Advertisement advertisement;
 
-  const AddAdvertisementDialog({super.key, required this.callback});
+  const EditAdvertisementDialog({
+    super.key,
+    required this.callback,
+    required this.advertisement,
+  });
 
   @override
-  State<AddAdvertisementDialog> createState() => _AddAdvertisementDialogState();
+  State<EditAdvertisementDialog> createState() =>
+      _EditAdvertisementDialogState();
 }
 
-class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
+class _EditAdvertisementDialogState extends State<EditAdvertisementDialog> {
   // Form key for validation and form state management
   final _formKey = GlobalKey<FormState>();
 
@@ -149,25 +148,19 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
   late AdvertisementsService advertisementsService;
   bool _isSubmitting = false;
 
-  Future<void> _createAdvertisement() async {
+  Future<void> _editAdvertisement() async {
     if (_isSubmitting) return;
 
     setState(() {
       _isSubmitting = true;
     });
 
-    final advertisement = Advertisement(
-      media: _imageUrl!,
-      type: "image",
-      startDate: _selectedStartDate!,
-      endDate: _selectedEndDate!,
-    );
-
     try {
       final token = TokenHelper.getToken();
-      await advertisementsService.createAdvertisement(
+      await advertisementsService.editAdvertisement(
         token,
-        advertisement,
+        widget.advertisement.id!,
+        _changedFields,
         _imageUrl,
         _fileName,
       );
@@ -207,9 +200,49 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiHelper.getClient();
+    _startDateController.text = DateFormat(
+      'yyyy-MM-dd',
+    ).format(widget.advertisement.startDate);
+    _endDateController.text = DateFormat(
+      'yyyy-MM-dd',
+    ).format(widget.advertisement.endDate);
 
+    final apiClient = ApiHelper.getClient();
     advertisementsService = AdvertisementsService(apiClient: apiClient);
+
+    _addControllerListeners();
+  }
+
+  final Map<String, String> _changedFields = {};
+  // ignore: unused_field
+  bool _hasChanges = false;
+
+  void _addControllerListeners() {
+    _startDateController.addListener(() {
+      final originalStartDate = DateFormat(
+        'yyyy-MM-dd',
+      ).format(widget.advertisement.startDate);
+      if (_startDateController.text != originalStartDate) {
+        _changedFields['start_date'] = _startDateController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('start_date');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
+
+    _endDateController.addListener(() {
+      final originalEndDate = DateFormat(
+        'yyyy-MM-dd',
+      ).format(widget.advertisement.endDate);
+      if (_endDateController.text != originalEndDate) {
+        _changedFields['end_date'] = _endDateController.text;
+        _hasChanges = true;
+      } else {
+        _changedFields.remove('end_date');
+        _hasChanges = _changedFields.isNotEmpty;
+      }
+    });
   }
 
   @override
@@ -258,7 +291,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "إنشاء إعلان جديد",
+          "تعديل معلومات الإعلان",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         Spacer(),
@@ -410,23 +443,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
     children: [
       ElevatedButton(
         onPressed: () {
-          if (_imageUrl == null) {
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Text('خطأ في إنشاء الإعلان'),
-                content: Text("يجب اختيار صورة للإعلان"),
-                actions: [
-                  TextButton(
-                    child: Text('موافق'),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            );
-          } else if (_formKey.currentState!.validate()) {
-            _createAdvertisement();
-          }
+          _editAdvertisement();
         },
         child: _isSubmitting
             ? SizedBox(
@@ -439,7 +456,7 @@ class _AddAdvertisementDialogState extends State<AddAdvertisementDialog> {
               )
             : Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: Text("إنشاء الإعلان"),
+                child: Text("حفظ التعديلات"),
               ),
       ),
     ],

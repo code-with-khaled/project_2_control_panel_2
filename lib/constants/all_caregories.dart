@@ -2,7 +2,7 @@ import 'package:control_panel_2/models/category_model.dart';
 
 const List<Category> categories = [
   Category(
-    id: 'cat101',
+    id: 1,
     name: 'تطوير تطبيقات الهاتف',
     status: "فعال",
     courses: 15,
@@ -11,7 +11,7 @@ const List<Category> categories = [
     rating: 4.6,
   ),
   Category(
-    id: 'cat102',
+    id: 2,
     name: 'التصميم الجرافيكي',
     status: "فعال",
     courses: 9,
@@ -20,7 +20,7 @@ const List<Category> categories = [
     rating: 4.3,
   ),
   Category(
-    id: 'cat103',
+    id: 3,
     name: 'الأمن السيبراني',
     status: "فعال",
     courses: 6,
@@ -29,7 +29,7 @@ const List<Category> categories = [
     rating: 4.8,
   ),
   Category(
-    id: 'cat104',
+    id: 4,
     name: 'استراتيجيات الأعمال',
     status: "فعال",
     courses: 12,
@@ -38,7 +38,7 @@ const List<Category> categories = [
     rating: 4.5,
   ),
   Category(
-    id: 'cat105',
+    id: 5,
     name: 'الذكاء الاصطناعي',
     status: "غير فعال",
     courses: 8,

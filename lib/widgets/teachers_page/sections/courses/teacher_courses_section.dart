@@ -1,8 +1,7 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class TeacherCoursesSection extends StatefulWidget {
@@ -19,7 +18,6 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
   bool _isLoading = false;
 
   // Date formatter instance
-  // ignore: unused_field
   final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy', 'ar');
 
   List<Map<String, dynamic>> _filteredCourses = [];
@@ -55,11 +53,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
-
+    final apiClient = ApiHelper.getClient();
     _teacherService = TeacherService(apiClient: apiClient);
 
     _fetchCourses();
@@ -92,7 +86,13 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.blue,
+              padding: EdgeInsets.all(20),
+            ),
+          )
         : _filteredCourses.isEmpty
         ? Center(child: Text("لا يوجد دورات"))
         : Column(
@@ -145,7 +145,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                         title: course['name'],
                         enrolledCount: course['number_of_students'],
                         rating: course['rating'],
-                        date: course['start_date'],
+                        date: DateTime.parse(course['start_date']),
                       ),
                       SizedBox(height: 16),
                     ],
@@ -160,7 +160,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
     required String title,
     required int enrolledCount,
     required dynamic rating,
-    required String date,
+    required DateTime date,
   }) {
     return Container(
       padding: EdgeInsets.all(20),
@@ -225,8 +225,7 @@ class _TeacherCoursesSectionState extends State<TeacherCoursesSection> {
                     color: Colors.grey,
                   ),
                   SizedBox(width: 4),
-                  // Text(_dateFormatter.format(date)),
-                  Text(date),
+                  Text(_dateFormatter.format(date)),
                 ],
               ),
             ],

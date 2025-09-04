@@ -157,12 +157,21 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
             ),
           ),
 
-          // Discounts tab
+          // Feedbacks tab
           Expanded(
             child: NavButton(
               navkey: "المراجعات",
               isActive: _activeFilter == "المراجعات",
               onTap: () => _setFilter("المراجعات"),
+            ),
+          ),
+
+          // Receipts tab
+          Expanded(
+            child: NavButton(
+              navkey: "الفواتير",
+              isActive: _activeFilter == "الفواتير",
+              onTap: () => _setFilter("الفواتير"),
             ),
           ),
 
@@ -186,10 +195,28 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
         return TeacherCoursesSection(id: widget.teacher.id!);
       case "المراجعات":
         return TeacherReviewsSection(id: widget.teacher.id!);
+      case "الفواتير":
+        return TeacherReceiptsSection(id: widget.teacher.id!);
       case "اللوحة الإحصائية":
         return TeacherStatPanelSection();
       default:
         return TeacherInfoSection(teacher: widget.teacher);
     }
+  }
+}
+
+class TeacherReceiptsSection extends StatefulWidget {
+  final int id;
+
+  const TeacherReceiptsSection({super.key, required this.id});
+
+  @override
+  State<TeacherReceiptsSection> createState() => _TeacherReceiptsSectionState();
+}
+
+class _TeacherReceiptsSectionState extends State<TeacherReceiptsSection> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

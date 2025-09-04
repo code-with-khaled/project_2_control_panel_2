@@ -2,7 +2,7 @@ import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_receipt_model.dart';
-import 'package:control_panel_2/widgets/students_page/sections/receipts/receipt_card.dart';
+import 'package:control_panel_2/widgets/students_page/sections/receipts/student_receipt_card.dart';
 import 'package:flutter/material.dart';
 
 class ReceiptsSection extends StatefulWidget {
@@ -106,7 +106,7 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
                   for (var receipt in _receipts.where(
                     (receipt) => receipt.type != "صرف",
                   ))
-                    ReceiptCard(receipt: receipt),
+                    StudentReceiptCard(receipt: receipt),
                 ],
               ),
             ],

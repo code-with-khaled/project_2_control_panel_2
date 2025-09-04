@@ -1,4 +1,4 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/notification_service.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
@@ -6,7 +6,6 @@ import 'package:control_panel_2/widgets/other/nav_button.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/notifications/sections/specific_student_section.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/notifications/sections/specific_teacher_section.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class AddNotificationDialog extends StatefulWidget {
   const AddNotificationDialog({super.key});
@@ -109,10 +108,7 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _notificationService = NotificationService(apiClient: apiClient);
   }
@@ -125,7 +121,7 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 600,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -352,11 +348,17 @@ class _AddNotificationDialogState extends State<AddNotificationDialog> {
                 showDialog(
                   context: context,
                   builder: (_) => AlertDialog(
+                    shape: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                     title: Text('خطأ في إرسال الإشعار'),
                     content: Text("يجب اختيار مستخدم محدد لإرسال الإشعار"),
                     actions: [
                       TextButton(
-                        child: Text('موافق'),
+                        child: Text(
+                          'موافق',
+                          style: TextStyle(color: Colors.blue),
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],

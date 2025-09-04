@@ -2,8 +2,8 @@ class Advertisement {
   final int? id;
   final String media;
   final String type;
-  final String startDate;
-  final String endDate;
+  final DateTime startDate;
+  final DateTime endDate;
 
   Advertisement({
     this.id,
@@ -14,10 +14,11 @@ class Advertisement {
   });
 
   factory Advertisement.fromJson(Map<String, dynamic> json) => Advertisement(
+    id: json['id'],
     media: json['media'],
     type: json['type'],
-    startDate: json['start_date'],
-    endDate: json['end_date'],
+    startDate: DateTime.parse(json['start_date']),
+    endDate: DateTime.parse(json['end_date']),
   );
 
   Map<String, dynamic> toJson() => {

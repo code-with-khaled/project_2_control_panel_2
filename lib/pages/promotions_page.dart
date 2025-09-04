@@ -1,8 +1,8 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/other/nav_button.dart';
+import 'package:control_panel_2/widgets/promotions_page/dialogs/add_notification_dialog.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/advertisements/advertisement_section.dart';
 import 'package:control_panel_2/widgets/promotions_page/sections/discounts/discounts_section.dart';
-import 'package:control_panel_2/widgets/promotions_page/sections/notifications/notifications_section.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -54,27 +54,62 @@ class _PromotionsPageState extends State<PromotionsPage> {
 
   Widget _buildPageHeader() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Icon(Icons.campaign_outlined, size: 40),
-        SizedBox(width: 7),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "الحسومات والعروض الترويجية",
-              style: GoogleFonts.montserrat(
-                color: Colors.black,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+        // Remove Flexible from this Row and use Expanded instead
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.campaign_outlined, size: 40),
+              SizedBox(width: 7),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "الحسومات والعروض الترويجية",
+                      style: GoogleFonts.montserrat(
+                        color: Colors.black,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "إدارة الحملات الترويجية، إشعارات الإعلانات وبرامج الخصومات",
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+        ),
+        SizedBox(width: 16), // Add some spacing
+        ElevatedButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AddNotificationDialog(),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.add),
+                SizedBox(width: 10),
+                Text("إنشاء إشعار"),
+              ],
             ),
-            Text(
-              "إدارة الحملات الترويجية، إشعارات الإعلانات وبرامج الخصومات",
-              style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),
-          ],
+          ),
         ),
       ],
     );
@@ -107,15 +142,6 @@ class _PromotionsPageState extends State<PromotionsPage> {
               onTap: () => _setFilter("الحسومات"),
             ),
           ),
-
-          // Notifications tab
-          Expanded(
-            child: NavButton(
-              navkey: "الإشعارات",
-              isActive: _activeFilter == "الإشعارات",
-              onTap: () => _setFilter("الإشعارات"),
-            ),
-          ),
         ],
       ),
     );
@@ -126,8 +152,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
     switch (_activeFilter) {
       case "الحسومات":
         return DiscountsSection();
-      case "الإشعارات":
-        return NotificationsSection();
+
       default:
         return AdvertisementSection();
     }

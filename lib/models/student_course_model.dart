@@ -4,7 +4,7 @@ class StudentCourse {
   final String name;
   final String category;
   final String studentCount;
-  final double rating;
+  final int rating;
   final CourseTeacher teacher;
 
   StudentCourse({

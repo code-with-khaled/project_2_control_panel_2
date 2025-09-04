@@ -1,38 +1,36 @@
 import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/teacher_service.dart';
-import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/core/services/category_service.dart';
+import 'package:control_panel_2/models/category_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 
-class SelectTeacherDialog extends StatefulWidget {
-  final Function(SelectedTeacher?) callback;
+class SelectCategoryDialog extends StatefulWidget {
+  final Function(Category?) callback;
 
-  const SelectTeacherDialog({super.key, required this.callback});
+  const SelectCategoryDialog({super.key, required this.callback});
 
   @override
-  State<SelectTeacherDialog> createState() => _SelectTeacherDialogState();
+  State<SelectCategoryDialog> createState() => _SelectCategoryDialogState();
 }
 
-class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
+class _SelectCategoryDialogState extends State<SelectCategoryDialog> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   // Variables for API integration
-  late TeacherService teachersService;
-  List<SelectedTeacher> _teachers = [];
-  SelectedTeacher? _selectedTeacher;
+  late CategoryService categoryService;
+  List<Category> _categories = [];
+  Category? _selectedCategory;
   bool _isLoading = true;
 
-  List<SelectedTeacher> get _filteredTeachers {
-    List<SelectedTeacher> result = _teachers;
+  List<Category> get _filteredCategories {
+    List<Category> result = _categories;
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
-      result = _teachers.where((teacher) {
-        final name = teacher.fullName.toString().toLowerCase();
-        // final username = teacher.username.toString().toLowerCase();
+      result = _categories.where((category) {
+        final name = category.name.toString().toLowerCase();
         final query = _searchQuery.toLowerCase();
-        // return name.contains(query) || username.contains(query);
         return name.contains(query);
       }).toList();
     }
@@ -40,16 +38,16 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     return result;
   }
 
-  Future<void> _loadTeachers() async {
+  Future<void> _loadCategories() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       final token = TokenHelper.getToken();
-      final response = await teachersService.fetchTeachersToSelect(token);
+      final response = await categoryService.fetchCategories(token);
       setState(() {
-        _teachers = response;
+        _categories = response;
         _isLoading = false;
       });
     } catch (e) {
@@ -66,7 +64,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     }
 
     // ignore: avoid_print
-    print(_teachers);
+    print(_categories);
   }
 
   @override
@@ -75,9 +73,9 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
 
     final apiClient = ApiHelper.getClient();
 
-    teachersService = TeacherService(apiClient: apiClient);
+    categoryService = CategoryService(apiClient: apiClient);
 
-    _loadTeachers();
+    _loadCategories();
 
     _searchController.addListener(() {
       setState(() {
@@ -112,48 +110,46 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
 
                       SearchField(
                         controller: _searchController,
-                        hintText: "ابحث عن المعلمين بالاسم أو اسم المستخدم",
+                        hintText: "ابحث عن التصنيفات بالاسم",
                       ),
                       SizedBox(height: 20),
 
                       // Teachers list
-                      if (_filteredTeachers.isEmpty)
-                        Center(child: Text('لا يوجد معلمين'))
+                      if (_filteredCategories.isEmpty)
+                        Center(child: Text('لا يوجد تصنيفات'))
                       else
                         ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: 300),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: _filteredTeachers.length,
+                            itemCount: _filteredCategories.length,
                             itemBuilder: (BuildContext context, int index) {
-                              final teacher = _filteredTeachers[index];
+                              final category = _filteredCategories[index];
                               final isSelected =
-                                  _selectedTeacher?.id == teacher.id;
+                                  _selectedCategory?.id == category.id;
 
                               return ListTile(
-                                title: Text(teacher.fullName),
-                                // subtitle: Text(teacher.username),
+                                title: Text(category.name),
+
                                 leading: isSelected
                                     ? Icon(
                                         Icons.check_circle,
                                         color: Colors.green,
                                       )
-                                    : Icon(Icons.person_outline),
+                                    : Icon(Icons.category_outlined),
                                 tileColor: isSelected ? Colors.blue[50] : null,
                                 onTap: () {
                                   setState(() {
-                                    _selectedTeacher = teacher;
+                                    _selectedCategory = category;
                                   });
-
-                                  // widget.onMessageChanged(teacher.id);
                                 },
                               );
                             },
                           ),
                         ),
 
-                      if (_selectedTeacher != null) SizedBox(height: 16),
-                      if (_selectedTeacher != null)
+                      if (_selectedCategory != null) SizedBox(height: 16),
+                      if (_selectedCategory != null)
                         _buildSelectedTeacherSection(),
 
                       SizedBox(height: 25),
@@ -170,7 +166,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        "اختر مدرس الدورة",
+        "اختر تصنيف الدورة",
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       Spacer(),
@@ -188,7 +184,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'المعلم المحدد:',
+          'التصنيف المحدد:',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         SizedBox(height: 8),
@@ -201,18 +197,16 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
           ),
           child: Row(
             children: [
-              Icon(Icons.person, color: Colors.green),
+              Icon(Icons.category_outlined, color: Colors.green),
               SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _selectedTeacher!.fullName,
+                      _selectedCategory!.name,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-
-                    // Text('@${_selectedTeacher!.username}'),
                   ],
                 ),
               ),
@@ -220,10 +214,8 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
                 icon: Icon(Icons.close, size: 20),
                 onPressed: () {
                   setState(() {
-                    _selectedTeacher = null;
+                    _selectedCategory = null;
                   });
-
-                  // widget.onMessageChanged(null);
                 },
               ),
             ],
@@ -238,7 +230,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     children: [
       ElevatedButton(
         onPressed: () {
-          widget.callback(_selectedTeacher);
+          widget.callback(_selectedCategory);
           Navigator.pop(context);
         },
         child: Padding(

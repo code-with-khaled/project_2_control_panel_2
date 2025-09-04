@@ -17,7 +17,19 @@ class CoursesSection extends StatefulWidget {
 class _CoursesSectionState extends State<CoursesSection> {
   bool _isLoading = false;
 
-  List<StudentCourse> _courses = [];
+  List<StudentCourse> _courses = [
+    StudentCourse(
+      name: "name",
+      category: "category",
+      studentCount: "10",
+      rating: 3,
+      teacher: CourseTeacher(
+        id: 1,
+        firstName: "firstName",
+        lastName: "lastName",
+      ),
+    ),
+  ];
 
   Future<void> _fetchCourses() async {
     setState(() {
@@ -26,7 +38,7 @@ class _CoursesSectionState extends State<CoursesSection> {
 
     try {
       final token = TokenHelper.getToken();
-      _courses = await _studentService.fetchStudentCourses(token, widget.id);
+      _courses += await _studentService.fetchStudentCourses(token, widget.id);
     } catch (e) {
       if (mounted) {
         showDialog(
@@ -63,7 +75,13 @@ class _CoursesSectionState extends State<CoursesSection> {
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.blue,
+              padding: EdgeInsets.all(20),
+            ),
+          )
         : _courses.isEmpty
         ? Center(child: Text("لا يوجد دورات"))
         : Column(
@@ -125,7 +143,7 @@ class CourseCard extends StatefulWidget {
 }
 
 class _CourseCardState extends State<CourseCard> {
-  bool isHovered = false; // Tracks hover state for visual feedback
+  bool isHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +151,7 @@ class _CourseCardState extends State<CourseCard> {
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 100),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.black26),
@@ -167,7 +185,6 @@ class _CourseCardState extends State<CourseCard> {
                 ),
               ),
             ),
-            SizedBox(height: 12),
 
             Container(
               padding: EdgeInsets.all(20),
@@ -177,7 +194,7 @@ class _CourseCardState extends State<CourseCard> {
                 children: [
                   Text(
                     widget.course.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                   ),
                   SizedBox(height: 15),
 
@@ -187,10 +204,7 @@ class _CourseCardState extends State<CourseCard> {
                       CircleAvatar(child: Icon(Icons.person)),
                       SizedBox(width: 10),
 
-                      Text(
-                        widget.course.teacher.fullName,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      Text(widget.course.teacher.fullName),
                     ],
                   ),
                   SizedBox(height: 15),
@@ -207,6 +221,7 @@ class _CourseCardState extends State<CourseCard> {
                             color: Colors.grey.shade700,
                           ),
                           SizedBox(width: 3),
+
                           Text(
                             '${widget.course.studentCount} مسجلين',
                             style: TextStyle(
@@ -219,12 +234,13 @@ class _CourseCardState extends State<CourseCard> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.yellow),
-                          SizedBox(width: 5),
                           Text(
                             widget.course.rating.toString(),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
+                          SizedBox(width: 5),
+
+                          Icon(Icons.star, color: Colors.yellow),
                         ],
                       ),
                     ],

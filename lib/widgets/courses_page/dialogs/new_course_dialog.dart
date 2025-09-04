@@ -1,7 +1,9 @@
 import 'package:control_panel_2/core/api/api_client.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/course_service.dart';
+import 'package:control_panel_2/models/category_model.dart';
 import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/select_category_dialog.dart';
 import 'package:control_panel_2/widgets/courses_page/dialogs/select_teacher_dialog.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,7 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
 
   // State variables
   String? _selectedCategory;
+  int? _selectedCategoryId;
   String? _selectedLevel;
   String? _selectedTeacher;
   int? _selectedTeacherId;
@@ -58,14 +61,21 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
     }
   }
 
+  void _selectCategory(Category? category) {
+    if (category != null) {
+      setState(() {
+        _selectedCategory = category.name;
+        _selectedCategoryId = category.id;
+      });
+    }
+  }
+
   void _selectTeacher(SelectedTeacher? teacher) {
     if (teacher != null) {
       setState(() {
         _selectedTeacher = teacher.fullName;
         _selectedTeacherId = teacher.id;
       });
-      print(_selectedTeacher);
-      print(_selectedTeacherId);
     }
   }
 
@@ -168,7 +178,7 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
     final description = _courseDescriptionController.text.trim();
     final levelId = _getLevelId(_selectedLevel!);
     final teacherId = _selectedTeacherId;
-    final categoryId = 1;
+    final categoryId = _selectedCategoryId;
     final startDate = _startDateController.text.trim();
     final endDate = _endDateController.text.trim();
 
@@ -356,40 +366,37 @@ class _NewCourseDialogState extends State<NewCourseDialog> {
     children: [
       Text("التصنيف *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
-      DropdownButtonFormField<String>(
-        value: _selectedCategory,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر التصنيف',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
+      InkWell(
+        onTap: () => _selectCategoryDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedCategory == null
+                  ? Text("اختر التصنيف", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedCategory!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
           ),
         ),
-        items:
-            [
-              'الرياضيات',
-              'العلوم',
-              'البرمجة',
-              'اللغات',
-              'العلوم الإنسانية',
-              'الفنون والإبداع',
-              'الأعمال والاقتصاد',
-              'التحضير للاختبارات',
-            ].map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedCategory = newValue);
-        },
-        // validator: _validateGender,
       ),
     ],
+  );
+
+  void _selectCategoryDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectCategoryDialog(callback: _selectCategory),
   );
 
   Widget _buildLevelField() => Column(
