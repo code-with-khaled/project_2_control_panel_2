@@ -82,54 +82,58 @@ class _AccountProfileDetailsState extends State<AccountProfileDetails> {
     ],
   );
 
-  Widget _buildProfilePicture() => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundColor: Colors.grey[200],
-          backgroundImage: _imageBytes != null
-              ? MemoryImage(_imageBytes!)
-              : null,
-          child: _imageBytes == null
-              ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
-              : null,
-        ),
-        SizedBox(height: 10),
-        Text(
-          widget.account.fullName,
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 5),
-        Text(
-          widget.account.username,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(color: Colors.grey),
-        ),
-        SizedBox(height: 10),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-          decoration: BoxDecoration(
-            color: _getStatusBgColor(widget.account.type),
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildProfilePicture() {
+    final type = widget.account.type == "staff" ? "إداري" : "محاسب";
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: _imageBytes != null
+                ? MemoryImage(_imageBytes!)
+                : null,
+            child: _imageBytes == null
+                ? Icon(Icons.camera_alt_outlined, color: Colors.grey)
+                : null,
           ),
-          child: Text(
-            widget.account.type,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-              color: _getStatusColor(widget.account.type),
+          SizedBox(height: 10),
+          Text(
+            widget.account.fullName,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 5),
+          Text(
+            widget.account.username,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: Colors.grey),
+          ),
+          SizedBox(height: 10),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+            decoration: BoxDecoration(
+              color: _getStatusBgColor(type),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              type,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: _getStatusColor(type),
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 
   Widget _buildContactInfo() => Column(
     mainAxisSize: MainAxisSize.min,
@@ -192,7 +196,7 @@ class _AccountProfileDetailsState extends State<AccountProfileDetails> {
         children: [
           Text("الدور:", style: TextStyle(color: Colors.grey)),
           Text(
-            widget.account.type,
+            widget.account.type!,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ],

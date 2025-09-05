@@ -1,13 +1,12 @@
 // ignore_for_file: unused_element
 
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/edit_student_dialog.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/student_profile_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 /// Compact student profile card that expands to full dialog on tap
@@ -96,10 +95,7 @@ class _StudentProfileState extends State<StudentProfile> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _studentService = StudentService(apiClient: apiClient);
   }
@@ -192,7 +188,7 @@ class _StudentProfileState extends State<StudentProfile> {
           radius: 27,
           backgroundImage: widget.student.image != null
               ? NetworkImage(
-                  "http://127.0.0.1:58808${widget.student.image!}",
+                  "http://127.0.0.1:8000${widget.student.image!}",
                   scale: 1.0,
                 )
               : null,

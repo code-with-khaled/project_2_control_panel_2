@@ -1,4 +1,3 @@
-import 'package:control_panel_2/constants/all_teachers.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/financial_reports/dialogs/edit_method_dialog.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +14,35 @@ class TeacherCommissionTable extends StatefulWidget {
 class _TeacherCommissionTableState extends State<TeacherCommissionTable> {
   final ScrollController _horizontalScrollController = ScrollController();
 
+  final List<Teacher> _teachers = [
+    Teacher(
+      firstName: "firstName",
+      lastName: "lastName",
+      username: "username",
+      phone: "phone",
+      educationLevel: "educationLevel",
+      specialization: "specialization",
+      headline: "headline",
+      experiences: "experiences",
+      description: "description",
+    ),
+    Teacher(
+      firstName: "firstName2",
+      lastName: "lastName2",
+      username: "username2",
+      phone: "phone2",
+      educationLevel: "educationLevel2",
+      specialization: "specialization2",
+      headline: "headline2",
+      experiences: "experiences2",
+      description: "description2",
+    ),
+  ];
+
   List<Teacher> get _filteredTeachers {
-    if (widget.searchQuery.isEmpty) return allTeachers;
+    if (widget.searchQuery.isEmpty) return _teachers;
     final query = widget.searchQuery.toLowerCase();
-    return allTeachers.where((teacher) {
+    return _teachers.where((teacher) {
       return teacher.fullName.toString().toLowerCase().contains(query);
     }).toList();
   }
@@ -147,38 +171,57 @@ class _TeacherCommissionTableState extends State<TeacherCommissionTable> {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: _getTypeColor("عمولة"),
+                                color: teacher.firstName == "firstName"
+                                    ? _getTypeColor("عمولة")
+                                    : _getTypeColor("راتب"),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Text(
-                                "عمولة",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: "عمولة" == "عمولة"
-                                      ? Colors.white
-                                      : Colors.black54,
-                                ),
-                              ),
+                              child: teacher.firstName == "firstName"
+                                  ? Text(
+                                      "عمولة",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: "عمولة" == "عمولة"
+                                            ? Colors.white
+                                            : Colors.black54,
+                                      ),
+                                    )
+                                  : Text(
+                                      "راتب",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: "راتب" == "عمولة"
+                                            ? Colors.white
+                                            : Colors.black54,
+                                      ),
+                                    ),
                             ),
                           ),
                           DataCell(
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black12),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text("60%"),
-                            ),
+                            teacher.firstName == "firstName"
+                                ? Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.black12),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text("60%"),
+                                  )
+                                : Text("N/A"),
                           ),
-                          DataCell(Text("N/A")),
+                          DataCell(
+                            teacher.firstName == "firstName"
+                                ? Text("N/A")
+                                : Text("150000"),
+                          ),
                           DataCell(
                             Text(
-                              "1200\$",
+                              "1200000",
                               style: TextStyle(
                                 color: Colors.deepOrange,
                                 fontWeight: FontWeight.bold,

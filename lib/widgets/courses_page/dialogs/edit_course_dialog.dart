@@ -233,7 +233,7 @@ class _EditCourseDialogState extends State<EditCourseDialog> {
     _selectedCategory = widget.course.categoryName;
     _selectedLevel = widget.course.level;
     _selectedTeacher = widget.course.teacher.fullName;
-    _hoursController.text = widget.course.numberOfHours;
+    _hoursController.text = widget.course.numberOfHours.toString();
     _coursePriceController.text = widget.course.price.toString();
     _courseDescriptionController.text = widget.course.description;
 

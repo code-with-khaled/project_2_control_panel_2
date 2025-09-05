@@ -5,15 +5,16 @@ import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ClassificationsPage extends StatefulWidget {
-  const ClassificationsPage({super.key});
+class CategoriesPage extends StatefulWidget {
+  const CategoriesPage({super.key});
 
   @override
-  State<ClassificationsPage> createState() => _ClassificationsPageState();
+  State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
-class _ClassificationsPageState extends State<ClassificationsPage> {
+class _CategoriesPageState extends State<CategoriesPage> {
   final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<CategoriesTableState> _categoriesTableKey = GlobalKey();
 
   int? _totalCategories;
   int? _totalCourses;
@@ -27,6 +28,10 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
       _totalStudents = totalStudents;
       _isLoadingOverview = false;
     });
+  }
+
+  void _refreshCategories() {
+    _categoriesTableKey.currentState?.refreshCategories();
   }
 
   @override
@@ -82,7 +87,8 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
               child: ElevatedButton(
                 onPressed: () => showDialog(
                   context: context,
-                  builder: (context) => AddCategoryDialog(callback: initState),
+                  builder: (context) =>
+                      AddCategoryDialog(callback: _refreshCategories),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -278,6 +284,7 @@ class _ClassificationsPageState extends State<ClassificationsPage> {
             children: [
               Expanded(
                 child: CategoriesTable(
+                  key: _categoriesTableKey,
                   searchQuery: _searchController.text,
                   callback: _getOverview,
                 ),

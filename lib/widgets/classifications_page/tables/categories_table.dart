@@ -16,15 +16,19 @@ class CategoriesTable extends StatefulWidget {
   });
 
   @override
-  State<CategoriesTable> createState() => _CategoriesTableState();
+  State<CategoriesTable> createState() => CategoriesTableState();
 }
 
-class _CategoriesTableState extends State<CategoriesTable> {
+class CategoriesTableState extends State<CategoriesTable> {
   final ScrollController _horizontalScrollController = ScrollController();
 
   bool _isLoading = false;
   bool _isDeleting = false;
   List<Category> _categories = [];
+
+  void refreshCategories() {
+    _loadCategories();
+  }
 
   List<Category> get _filteredCategories {
     if (widget.searchQuery.isEmpty) return _categories;
@@ -296,7 +300,7 @@ class _CategoriesTableState extends State<CategoriesTable> {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(40),
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(color: Colors.blue, strokeWidth: 2),
       ),
     );
   }

@@ -5,17 +5,16 @@ import 'package:control_panel_2/models/course_receipt_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class StudentsReceiptsSection extends StatefulWidget {
+class CourseReceiptsSection extends StatefulWidget {
   final int id;
 
-  const StudentsReceiptsSection({super.key, required this.id});
+  const CourseReceiptsSection({super.key, required this.id});
 
   @override
-  State<StudentsReceiptsSection> createState() =>
-      _StudentsReceiptsSectionState();
+  State<CourseReceiptsSection> createState() => _CourseReceiptsSectionState();
 }
 
-class _StudentsReceiptsSectionState extends State<StudentsReceiptsSection> {
+class _CourseReceiptsSectionState extends State<CourseReceiptsSection> {
   bool _isLoading = false;
 
   List<CourseReceipt> _receipts = [
@@ -94,7 +93,7 @@ class _StudentsReceiptsSectionState extends State<StudentsReceiptsSection> {
                   SizedBox(width: 6),
 
                   Text(
-                    "فواتير الطلاب",
+                    "فواتير الدورة",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],

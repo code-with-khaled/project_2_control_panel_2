@@ -200,7 +200,10 @@ class _CoursesPageState extends State<CoursesPage> {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(40),
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
       ),
     );
   }

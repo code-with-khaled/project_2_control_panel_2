@@ -1,5 +1,8 @@
 import 'package:control_panel_2/constants/all_accounts.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/account_service.dart';
 import 'package:control_panel_2/models/account_model.dart';
 import 'package:control_panel_2/widgets/accounts_page/account_profile.dart';
 import 'package:control_panel_2/widgets/accounts_page/dialogs/new_account_dialog.dart';
@@ -22,6 +25,9 @@ class _AccountsPageState extends State<AccountsPage> {
   // Current search query value
   String _searchQuery = '';
 
+  List<Account> _accounts = [];
+  bool _isLoading = true;
+
   // Currently selected filter value from dropdown
   String? dropdownValue = "جميع الحسابات";
 
@@ -30,7 +36,7 @@ class _AccountsPageState extends State<AccountsPage> {
   /// 2. Selected account type filter (admin, accountant, or all)
   List<Account> get _filteredAccounts {
     // Initial filtering by search query
-    List<Account> results = allAccounts.where((account) {
+    List<Account> results = _accounts.where((account) {
       final name = account.fullName.toString().toLowerCase();
       final username = account.username.toString().toLowerCase();
       final query = _searchQuery.toLowerCase();
@@ -40,10 +46,12 @@ class _AccountsPageState extends State<AccountsPage> {
     // Apply additional filtering based on selected account type
     switch (dropdownValue!) {
       case 'الإداريين': // Filter for admin accounts only
-        results = results.where((account) => account.type == "إداري").toList();
+        results = results.where((account) => account.type == "staff").toList();
         break;
       case 'المحاسبين': // Filter for accountant accounts only
-        results = results.where((account) => account.type == "محاسب").toList();
+        results = results
+            .where((account) => account.type == "finance")
+            .toList();
         break;
       default: // 'جميع الحسابات' - show all accounts without additional filtering
         break;
@@ -51,6 +59,47 @@ class _AccountsPageState extends State<AccountsPage> {
 
     return results;
   }
+
+  Future<void> _loadAccounts() async {
+    try {
+      final token = TokenHelper.getToken();
+      final response = await _accountService.fetchAccounts(token);
+
+      if (mounted) {
+        setState(() {
+          _accounts += response;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في تحميل الحسابات'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _refreshAccounts() {
+    _loadAccounts();
+  }
+
+  late AccountService _accountService;
 
   @override
   void initState() {
@@ -61,6 +110,11 @@ class _AccountsPageState extends State<AccountsPage> {
         _searchQuery = _searchController.text;
       });
     });
+
+    final apiClient = ApiHelper.getClient();
+    _accountService = AccountService(apiClient: apiClient);
+
+    _loadAccounts();
   }
 
   @override
@@ -81,16 +135,20 @@ class _AccountsPageState extends State<AccountsPage> {
                   _buildPageHeader(),
                   SizedBox(height: 25),
 
-                  // Overview cards showing account statistics
-                  _buildOverviewCards(),
-                  SizedBox(height: 25),
+                  if (_isLoading) _buildLoadingState(),
 
-                  // Search and filter controls section
-                  _buildSearchSection(),
-                  SizedBox(height: 20),
+                  if (!_isLoading) ...[
+                    // Overview cards showing account statistics
+                    _buildOverviewCards(),
+                    SizedBox(height: 25),
 
-                  // Grid displaying filtered accounts
-                  _buildAccountsGrid(),
+                    // Search and filter controls section
+                    _buildSearchSection(),
+                    SizedBox(height: 20),
+
+                    // Grid displaying filtered accounts
+                    _buildAccountsGrid(),
+                  ],
                 ],
               ),
             ),
@@ -126,7 +184,8 @@ class _AccountsPageState extends State<AccountsPage> {
               child: ElevatedButton(
                 onPressed: () => showDialog(
                   context: context,
-                  builder: (context) => NewAccountDialog(),
+                  builder: (context) =>
+                      NewAccountDialog(callback: _refreshAccounts),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -152,13 +211,27 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
+  // Build loading state
+  Widget _buildLoadingState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
+      ),
+    );
+  }
+
   /// Builds responsive overview cards showing account statistics:
   /// - Total accounts count
   /// - Admin accounts count
   /// - Accountant accounts count
   Widget _buildOverviewCards() {
-    final accountants = allAccounts
-        .where((account) => account.type == "محاسب")
+    final accountants = _accounts
+        .where((account) => account.type == "finance")
         .length;
 
     return LayoutBuilder(
@@ -170,7 +243,7 @@ class _AccountsPageState extends State<AccountsPage> {
               Expanded(
                 child: _buildOverviewCard(
                   "مجمل الحسابات",
-                  allAccounts.length.toString(),
+                  _accounts.length.toString(),
                   Icon(Icons.group_outlined, color: Colors.black, size: 32),
                 ),
               ),
@@ -178,7 +251,7 @@ class _AccountsPageState extends State<AccountsPage> {
               Expanded(
                 child: _buildOverviewCard(
                   "الإداريين",
-                  (allAccounts.length - accountants).toString(),
+                  (_accounts.length - accountants).toString(),
                   Icon(Icons.person_outline, color: Colors.blue, size: 32),
                 ),
               ),

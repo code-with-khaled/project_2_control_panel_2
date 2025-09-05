@@ -1,13 +1,16 @@
-import 'package:control_panel_2/widgets/other/nav_button.dart';
-import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/advanced_analysis.dart';
-import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/basic_filters.dart';
-import 'package:control_panel_2/widgets/promotions_page/sections/discounts/audience_sections/manual_selection.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/discount_service.dart';
+import 'package:control_panel_2/models/selected_course_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
+import 'package:control_panel_2/widgets/promotions_page/dialogs/select_course_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AddDiscountDialog extends StatefulWidget {
-  const AddDiscountDialog({super.key});
+  final VoidCallback callback;
+
+  const AddDiscountDialog({super.key, required this.callback});
 
   @override
   State<AddDiscountDialog> createState() => _AddDiscountDialogState();
@@ -18,62 +21,34 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for managing text input fields
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _valueController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
   // State variables
+  String? _selectedCourse;
+  int? _selectedCourseId;
   DateTime? _selectedDate;
-  String _activeFilter = 'جميع المستخدمين'; // Currently selected section
+  bool _isSubmitting = false;
+  String _discountType = 'percent';
 
-  // Tracks whether the discount applys on all courses
-  bool _isChecked = true; // Default value is true (apply on all courses)
-
-  final List<String> _allCourses = [
-    'React Fundamentals',
-    'JavaScript Advanced',
-    'Physics Fundamentals',
-    'Data Science',
-    'Computer Graphics',
-    'Python Basics',
-    'Mathematics 101',
-    'Web Development',
-    'Machine Learning',
-    'Database Design',
-  ];
-
-  final List<String> _selectedCourses = [
-    'Python Basics',
-    'Data Science',
-    'Database Design',
-  ];
-
-  void _toggleCourseSelection(String course) {
-    setState(() {
-      if (_selectedCourses.contains(course)) {
-        _selectedCourses.remove(course);
-      } else {
-        _selectedCourses.add(course);
-      }
-    });
-  }
-
-  /// Updates the active section filter
-  void _setFilter(String filter) {
-    setState(() {
-      _activeFilter = filter;
-    });
+  void _selectCourse(SelectedCourse? category) {
+    if (category != null) {
+      setState(() {
+        _selectedCourse = category.name;
+        _selectedCourseId = category.id;
+      });
+    }
   }
 
   // Date picker function
   Future<void> _selectDate(BuildContext context) async {
+    final now = DateTime.now();
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(now.year + 1, now.month, now.day),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -93,9 +68,93 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = DateFormat('MM/dd/yyyy').format(picked);
+        _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
+  }
+
+  Future<void> _createDiscount() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+
+      final discount = {
+        'discountable_id': _selectedCourseId,
+        'discountable_type': 'course',
+        'type': _discountType,
+        'value': _valueController.text.trim(),
+        'expiration_date': _selectedDate!.toIso8601String(),
+      };
+
+      await _discountService.createDiscount(token, discount);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء الحسم بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء الحسم'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  late DiscountService _discountService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+    _discountService = DiscountService(apiClient: apiClient);
+  }
+
+  // Validator for discount value based on type
+  String? _validateDiscountValue(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'يرجى إدخال القيمة';
+    }
+
+    final numericValue = double.tryParse(value);
+    if (numericValue == null) {
+      return 'يرجى إدخال رقم صحيح';
+    }
+
+    if (_discountType == 'percentage' &&
+        (numericValue <= 0 || numericValue > 100)) {
+      return 'النسبة يجب أن تكون بين 1 و 100';
+    }
+
+    if (_discountType == 'fixed' && numericValue <= 0) {
+      return 'القيمة يجب أن تكون أكبر من الصفر';
+    }
+
+    return null;
   }
 
   @override
@@ -106,7 +165,7 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 800,
+          maxWidth: 600,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Padding(
@@ -125,13 +184,6 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
 
                   // Discount details section
                   _buildDiscountDetails(),
-                  SizedBox(height: 25),
-
-                  _buildApplicableCourses(),
-                  SizedBox(height: 25),
-
-                  // Target audience selection section
-                  _buildTargetAudience(),
                   SizedBox(height: 25),
 
                   // Form submission button
@@ -182,39 +234,98 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
             style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 30),
-          _buildTitleField(),
+
+          _buildCourseField(),
           SizedBox(height: 25),
-          _buildDescriptionField(),
+
+          _buildDiscountTypeSelector(),
           SizedBox(height: 25),
+
           _buildDetailsRow(),
         ],
       ),
     );
   }
 
-  /// Builds the title input field
-  Widget _buildTitleField() => Column(
+  Widget _buildCourseField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("عنوان الحسم *", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أدخل عنوان الحسم",
-        controller: _titleController,
-        // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+      InkWell(
+        onTap: () => _selectCourseDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedCourse == null
+                  ? Text("اختر الدورة", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedCourse!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
+          ),
+        ),
       ),
     ],
   );
 
-  Widget _buildDescriptionField() => Column(
+  void _selectCourseDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectCourseDialog(callback: _selectCourse),
+  );
+
+  // Build discount type selector
+  Widget _buildDiscountTypeSelector() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("شرح عن الحسم *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "أدخل شرح بسيط عن الحسم",
-        controller: _descriptionController,
-        // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+      Text("نوع الحسم *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 10),
+      Row(
+        children: [
+          Expanded(
+            child: RadioListTile<String>(
+              title: Text("نسبة مئوية (%)"),
+              value: 'percent',
+              activeColor: Colors.green,
+              groupValue: _discountType,
+              onChanged: (value) {
+                setState(() {
+                  _discountType = value!;
+                  _formKey.currentState?.validate();
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+          SizedBox(width: 5),
+
+          Expanded(
+            child: RadioListTile<String>(
+              title: Text("قيمة مقطوعة"),
+              value: 'amount',
+              activeColor: Colors.blue,
+              groupValue: _discountType,
+              onChanged: (value) {
+                setState(() {
+                  _discountType = value!;
+                  _formKey.currentState?.validate();
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        ],
       ),
     ],
   );
@@ -223,8 +334,7 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
     children: [
       Expanded(child: _buildFinancialValue()),
       SizedBox(width: 10),
-      Expanded(child: _buildAvailabelQuality()),
-      SizedBox(width: 10),
+
       Expanded(child: _buildExpirationDate()),
     ],
   );
@@ -232,25 +342,15 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
   Widget _buildFinancialValue() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("القيمة المالية *", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 2),
-      CustomTextField(
-        hintText: "50",
-        controller: _valueController,
-        // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+      Text(
+        _discountType == 'percent' ? "النسبة المئوية %" : "القيمة المقطوعة \$",
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
-    ],
-  );
-
-  Widget _buildAvailabelQuality() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text("الكمية المتاحة *", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 2),
       CustomTextField(
-        hintText: "100",
-        controller: _quantityController,
-        // validator: (value) => _validateNotEmpty(value, "اسم الأب"),
+        hintText: _discountType == 'percent' ? "مثال: 30" : "مثال: 5000",
+        controller: _valueController,
+        validator: _validateDiscountValue,
       ),
     ],
   );
@@ -263,7 +363,7 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
       TextFormField(
         controller: _dateController,
         decoration: InputDecoration(
-          hintText: 'mm/dd/yyyy',
+          hintText: 'yyyy-mm-dd',
           suffixIcon: Icon(Icons.calendar_today),
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           enabledBorder: OutlineInputBorder(
@@ -277,187 +377,15 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
         ),
         readOnly: true,
         onTap: () => _selectDate(context),
-        // validator: _validateDate,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'يرجى اختيار تاريخ';
+          }
+          return null;
+        },
       ),
     ],
   );
-
-  Widget _buildApplicableCourses() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black26),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "الكورسات المطبق عليها *",
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-
-          Row(
-            children: [
-              Checkbox(
-                value: _isChecked,
-                checkColor: Colors.white,
-                activeColor: Colors.black,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isChecked = value ?? false;
-                  });
-                },
-              ),
-              Text("جميع الكورسات"),
-            ],
-          ),
-
-          ?_isChecked == false
-              ? Column(
-                  children: [
-                    Divider(),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 200),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // 2 items per row
-                          childAspectRatio:
-                              8, // Width/height ratio for each item
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                        ),
-                        itemCount: _allCourses.length,
-                        itemBuilder: (context, index) {
-                          final course = _allCourses[index];
-                          return Row(
-                            children: [
-                              Checkbox(
-                                value: _selectedCourses.contains(course),
-                                checkColor: Colors.white,
-                                activeColor: Colors.black,
-                                onChanged: (bool? value) {
-                                  _toggleCourseSelection(course);
-                                },
-                              ),
-                              Expanded(
-                                child: Text(
-                                  course,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                )
-              : null,
-        ],
-      ),
-    );
-  }
-
-  /// Builds the target audience selection section
-  Widget _buildTargetAudience() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black26),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "الفئة المستهدفة",
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-
-          // Navigation tabs for different sections
-          _buildNavigationTabs(),
-          SizedBox(height: 20),
-
-          // Dynamic content section
-          _buildCurrentSection(),
-        ],
-      ),
-    );
-  }
-
-  // Builds navigation tabs for profile sections
-  Widget _buildNavigationTabs() {
-    return Container(
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.blueGrey[50],
-      ),
-      child: Row(
-        children: [
-          // Overview tab
-          Expanded(
-            child: NavButton(
-              navkey: "جميع المستخدمين",
-              isActive: _activeFilter == "جميع المستخدمين",
-              onTap: () => _setFilter("جميع المستخدمين"),
-            ),
-          ),
-
-          // Receipts tab
-          Expanded(
-            child: NavButton(
-              navkey: "فلاتر أساسية",
-              isActive: _activeFilter == "فلاتر أساسية",
-              onTap: () => _setFilter("فلاتر أساسية"),
-            ),
-          ),
-
-          // Discounts tab
-          Expanded(
-            child: NavButton(
-              navkey: "تحليل بيانات",
-              isActive: _activeFilter == "تحليل بيانات",
-              onTap: () => _setFilter("تحليل بيانات"),
-            ),
-          ),
-
-          // Reviews tab
-          Expanded(
-            child: NavButton(
-              navkey: "اختيار يدوي",
-              isActive: _activeFilter == "اختيار يدوي",
-              onTap: () => _setFilter("اختيار يدوي"),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Returns the appropriate content section based on active filter
-  Widget _buildCurrentSection() {
-    switch (_activeFilter) {
-      case "فلاتر أساسية":
-        return BasicFilters();
-      case "تحليل بيانات":
-        return AdvancedAnalysis();
-      case "اختيار يدوي":
-        return ManualSelection();
-      default:
-        return Text(
-          "هذا الحسم سيكون متاحاً لجميع المستخدمين",
-          style: TextStyle(color: Colors.grey),
-        );
-    }
-  }
 
   /// Builds the form submission button
   Widget _buildCreateButton() => Row(
@@ -467,12 +395,46 @@ class _AddDiscountDialogState extends State<AddDiscountDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Add form submission logic here
+            if (_selectedCourse != null) {
+              if (_selectedCourse!.isNotEmpty) {
+                _createDiscount();
+              }
+            } else {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  shape: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  title: Text('خطأ في إنشاء الحسم'),
+                  content: Text('يرجى اخيار دورة'),
+                  actions: [
+                    TextButton(
+                      child: Text(
+                        'موافق',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء الحسم"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء الحسم"),
+              ),
       ),
     ],
   );

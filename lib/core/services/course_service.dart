@@ -6,6 +6,8 @@ import 'package:control_panel_2/models/course_feedback_model.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/models/course_receipt_mode.dart';
 import 'package:control_panel_2/models/lecture_model.dart';
+import 'package:control_panel_2/models/mark_model.dart';
+import 'package:control_panel_2/models/selected_course_model.dart';
 import 'package:http/http.dart' as http;
 
 class CourseService {
@@ -49,6 +51,22 @@ class CourseService {
         }
       });
       throw Exception('$message$detailedErrors');
+    }
+  }
+
+  Future<List<SelectedCourse>> fetchCoursesToSelect(String? token) async {
+    final response = await apiClient.get(
+      "dashboard/course-list/1",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> teachers = json['data'];
+
+      return teachers.map((json) => SelectedCourse.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch courses to select failed');
     }
   }
 
@@ -169,6 +187,22 @@ class CourseService {
       return data.map((json) => Attendance.fromJson(json)).toList();
     } else {
       throw Exception('Fetch lectures failed');
+    }
+  }
+
+  Future<List<Mark>> fetchCourseGrades(String? token, int id) async {
+    final response = await apiClient.get(
+      "dashboard/courses/$id/assessments",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<dynamic> data = json['data'];
+
+      return data.map((json) => Mark.fromJson(json)).toList();
+    } else {
+      throw Exception('Fetch course reciepts Failed');
     }
   }
 

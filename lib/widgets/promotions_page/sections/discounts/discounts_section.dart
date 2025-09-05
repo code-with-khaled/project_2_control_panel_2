@@ -1,28 +1,144 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/discount_service.dart';
+import 'package:control_panel_2/models/course_model.dart';
 import 'package:control_panel_2/models/discount_model.dart';
 import 'package:control_panel_2/widgets/promotions_page/dialogs/add_discount_dialog.dart';
-import 'package:control_panel_2/widgets/promotions_page/dialogs/edit_discount_dialog.dart';
+import 'package:control_panel_2/widgets/promotions_page/sections/discounts/discount_card.dart';
 import 'package:flutter/material.dart';
 
 /// Displays and manages discount coupons with:
 /// - Responsive grid layout
 /// - Discount details and statistics
 /// - Edit and deactivation functionality
-class DiscountsSection extends StatelessWidget {
+class DiscountsSection extends StatefulWidget {
   const DiscountsSection({super.key});
+
+  @override
+  State<DiscountsSection> createState() => _DiscountsSectionState();
+}
+
+class _DiscountsSectionState extends State<DiscountsSection> {
+  bool _isLoading = true;
+
+  List<Discount> _discounts = [
+    Discount(
+      id: 1,
+      value: 1,
+      type: "قيمة مقطوعة",
+      discountableId: 1,
+      course: Course(
+        id: 1,
+        name: "name",
+        image: 'image',
+        description: "description",
+        categoryName: "categoryName",
+        price: 1,
+        teacher: CourseTeacher(
+          id: 1,
+          firstName: "firstName",
+          lastName: "lastName",
+        ),
+        rating: 0,
+        startDate: DateTime.now(),
+        endDate: DateTime.now(),
+        level: "level",
+        enrollments: 1,
+        numberOfHours: 1,
+      ),
+      expirationDate: "2025-09-06",
+    ),
+  ];
+
+  Future<void> _loadDiscounts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final response = await _discountService.fetchDiscounts(token);
+
+      if (mounted) {
+        setState(() {
+          _discounts += response;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في تحميل الحسومات'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _refreshDiscounts() {
+    _loadDiscounts();
+  }
+
+  late DiscountService _discountService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+
+    _discountService = DiscountService(apiClient: apiClient);
+
+    _loadDiscounts();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context), // Section header with create button
-        SizedBox(height: 20),
-        _buildDiscounts(context), // Discount cards grid
+        if (_isLoading) _buildLoadingState(),
+
+        if (!_isLoading) ...[
+          _buildHeader(),
+          SizedBox(height: 20),
+
+          _buildDiscounts(),
+        ],
       ],
     );
   }
 
+  // Build loading state
+  Widget _buildLoadingState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
+      ),
+    );
+  }
+
   /// Builds section header with title and create button
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -34,7 +150,8 @@ class DiscountsSection extends StatelessWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => AddDiscountDialog(),
+              builder: (context) =>
+                  AddDiscountDialog(callback: _refreshDiscounts),
             );
           },
           child: Padding(
@@ -53,287 +170,46 @@ class DiscountsSection extends StatelessWidget {
   }
 
   /// Builds responsive grid of discount cards
-  Widget _buildDiscounts(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 885
-        ? Wrap(
-            // Wide screen layout (3 columns)
-            spacing: 25,
-            runSpacing: 25,
-            children: [
-              for (int i = 0; i < 6; i++)
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 410),
-                  child: _buildDiscount(context),
-                ),
-            ],
-          )
-        : Wrap(
-            // Narrow screen layout (1 column)
-            runSpacing: 25,
-            children: [for (int i = 0; i < 6; i++) _buildDiscount(context)],
+  Widget _buildDiscounts() {
+    return _discounts.isEmpty
+        ? _buildEmptyState()
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              // Calculate responsive column count
+              const double itemWidth = 300; // Minimum card width
+              int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
+              itemsPerRow = itemsPerRow.clamp(
+                1,
+                3,
+              ); // Limit between 1-3 columns
+
+              return Wrap(
+                spacing: 20, // Horizontal space between cards
+                runSpacing: 20, // Vertical space between rows
+                children: [
+                  for (var discount in _discounts)
+                    SizedBox(
+                      width:
+                          (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
+                          itemsPerRow,
+                      child: DiscountCard(
+                        callback: _refreshDiscounts,
+                        discount: discount,
+                      ),
+                    ),
+                ],
+              );
+            },
           );
   }
 
-  /// Builds individual discount card
-  Widget _buildDiscount(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDiscountHeader(), // Discount title and status
-          SizedBox(height: 10),
-          _buildDiscountValueAndUsage(), // Value and usage stats
-          SizedBox(height: 10),
-          _buildDiscountInfo(), // Additional info (dates, target etc.)
-          SizedBox(height: 10),
-          _buildFooter(context), // Action buttons
-        ],
-      ),
-    );
-  }
-
-  /// Builds discount header with title and active status
-  Widget _buildDiscountHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "عرض شتاء 2025",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            Text(
-              "حسم خاص على جميع كورسات البرمجة",
-              style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),
-          ],
-        ),
-        Chip(
-          label: Text(
-            "فعال",
-            style: TextStyle(color: Colors.white, fontSize: 11),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          backgroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Builds discount value and usage statistics
-  Widget _buildDiscountValueAndUsage() {
-    return Row(
-      children: [
-        Expanded(
-          // Discount value card
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              border: Border.all(color: Colors.black12),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "75\$",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "القيمة",
-                  style: TextStyle(color: Colors.grey, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(width: 10),
-        Expanded(
-          // Usage stats card
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              border: Border.all(color: Colors.black12),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "48/50",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "الاستخدام",
-                  style: TextStyle(color: Colors.grey, fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Builds additional discount information
-  Widget _buildDiscountInfo() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Expiry date
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.calendar_today_outlined, color: Colors.grey),
-                SizedBox(width: 5),
-                Text("تاريخ الانتهاء:", style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-            Text("2024-01-25"),
-          ],
-        ),
-        SizedBox(height: 5),
-
-        // Revenue generated
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.trending_up, color: Colors.grey),
-                SizedBox(width: 5),
-                Text("الدخل:", style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-            Text("3600\$"),
-          ],
-        ),
-        SizedBox(height: 5),
-
-        // Target audience
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.adjust, color: Colors.grey),
-                SizedBox(width: 5),
-                Text("الفئة المستهدفة:", style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-            Text("جميع المستخدمين"),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// Builds action buttons (edit and deactivate)
-  Widget _buildFooter(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        _buildEditButton(context),
-        SizedBox(width: 5),
-        _buildDeleteButton(),
-      ],
-    );
-  }
-
-  /// Builds edit discount button
-  Widget _buildEditButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => EditDiscountDialog(
-            discount: Discount(
-              title: "عرض شتاء 2025",
-              description: "حسم خاص على جميع كورسات البرمجة",
-              value: 75,
-              quantity: 50,
-              date: "2024-01-25",
-              allUsers: true,
-            ),
-          ),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        elevation: 0,
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-          side: BorderSide(color: Colors.black12),
-        ),
-      ),
+  Widget _buildEmptyState() {
+    return const Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.edit_outlined),
-            SizedBox(width: 3),
-            Flexible(child: Text("تعديل")),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Builds deactivate discount button
-  Widget _buildDeleteButton() {
-    return ElevatedButton(
-      onPressed: () {}, // TODO: Implement deactivation functionality
-      style: ElevatedButton.styleFrom(
-        elevation: 0,
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-          side: BorderSide(color: Colors.black12),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.block, color: Colors.red),
-            SizedBox(width: 3),
-            Flexible(
-              child: Text("إلغاء التفعيل", style: TextStyle(color: Colors.red)),
-            ),
-          ],
+        padding: EdgeInsets.all(40),
+        child: Text(
+          'لا يوجد حسومات',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
         ),
       ),
     );

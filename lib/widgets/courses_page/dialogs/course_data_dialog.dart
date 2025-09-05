@@ -140,9 +140,9 @@ class _CourseDataDialogState extends State<CourseDataDialog> {
   Widget _buildCurrentSection() {
     switch (_activeFilter) {
       case "الاختبارات":
-        return ExamsSection();
+        return ExamsSection(id: widget.course.id!);
       case "الإيصالات":
-        return StudentsReceiptsSection(id: widget.course.id!);
+        return CourseReceiptsSection(id: widget.course.id!);
       case "الاستبيانات والمراجعات":
         return CourseFeedbacksSection(id: widget.course.id!);
       default:

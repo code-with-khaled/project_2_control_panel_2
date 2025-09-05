@@ -1,6 +1,6 @@
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/pages/accounts_page.dart';
-import 'package:control_panel_2/pages/classifications_page.dart';
+import 'package:control_panel_2/pages/categories_page.dart';
 import 'package:control_panel_2/pages/courses_page.dart';
 import 'package:control_panel_2/pages/certificates_page.dart';
 import 'package:control_panel_2/pages/curriculums_page.dart';
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
         home: initialScreen,
         routes: {
           '/courses': (context) => CoursesPage(),
-          '/classifications': (context) => ClassificationsPage(),
+          '/classifications': (context) => CategoriesPage(),
           '/financial_reports': (context) => FinancialReportsPage(),
           '/students': (context) => StudentsPage(),
           '/teachers': (context) => TeachersPage(),

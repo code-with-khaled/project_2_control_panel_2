@@ -5,6 +5,9 @@ import 'package:control_panel_2/models/category_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+
 class EditCategoryDialog extends StatefulWidget {
   final Category category;
   final VoidCallback callback;
@@ -28,6 +31,30 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
 
   bool _isSubmitting = false;
 
+  // Variables for storing the advertisement image
+  String? _imageUrl;
+  String? _fileName;
+
+  Future<void> _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
+      });
+    });
+  }
+
   Future<void> _editCategory() async {
     if (_isSubmitting) return;
 
@@ -41,7 +68,17 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
         token,
         widget.category.id,
         _titleController.text.trim(),
+        _imageUrl,
+        _fileName,
       );
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم تعديل التصنيف بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (mounted) {
         showDialog(
@@ -101,6 +138,10 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
                   _buildHeader(),
                   SizedBox(height: 20),
 
+                  // Image field
+                  _buildImageSection(),
+                  SizedBox(height: 20),
+
                   // Notification content input section
                   _buildTitleField(),
                   SizedBox(height: 20),
@@ -139,6 +180,51 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
     );
   }
 
+  /// Builds the image upload section with preview capability
+  Widget _buildImageSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("صورة تصنيف *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 5),
+      InkWell(
+        onTap: _pickImage,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 50),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: _imageUrl == null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.file_upload_outlined,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                    Text(
+                      "اضغط لتحميل الصورة",
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.photo, color: Colors.black54),
+                    SizedBox(width: 10),
+                    Text(_fileName!, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+        ),
+      ),
+    ],
+  );
+
   /// Builds the title input field
   Widget _buildTitleField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +245,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             // Form is valid - process data
-            _editCategory;
+            _editCategory();
           }
         },
         child: _isSubmitting

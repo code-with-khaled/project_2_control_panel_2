@@ -217,7 +217,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('خطأ في إنشاء حساب الطالب الطالب'),
+            title: Text('خطأ في إنشاء حساب الطالب'),
             content: Text(e.toString().replaceFirst('Exception: ', '')),
             actions: [
               TextButton(

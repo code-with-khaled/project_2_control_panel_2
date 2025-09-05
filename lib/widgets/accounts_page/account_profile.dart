@@ -84,61 +84,65 @@ class _AccountProfileState extends State<AccountProfile> {
     ],
   );
 
-  Widget _buildAccountOverview() => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("الدور:", style: TextStyle(color: Colors.grey)),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-            decoration: BoxDecoration(
-              color: _getStatusBgColor(widget.account.type),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              widget.account.type,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                color: _getStatusColor(widget.account.type),
+  Widget _buildAccountOverview() {
+    final type = widget.account.type == "staff" ? "إداري" : "محاسب";
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("الدور:", style: TextStyle(color: Colors.grey)),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+              decoration: BoxDecoration(
+                color: _getStatusBgColor(widget.account.type!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                type,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: _getStatusColor(type),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      SizedBox(height: 10),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Text(
-              "المستوى الدراسي:",
-              style: TextStyle(color: Colors.grey),
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                "المستوى الدراسي:",
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
-          ),
-          Flexible(
-            child: Text(
-              widget.account.educationLevel,
+            Flexible(
+              child: Text(
+                widget.account.educationLevel,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("رقم الهاتف:", style: TextStyle(color: Colors.grey)),
+            Text(
+              widget.account.phone,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
-      ),
-      SizedBox(height: 10),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("رقم الهاتف:", style: TextStyle(color: Colors.grey)),
-          Text(
-            widget.account.phone,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    ],
-  );
+          ],
+        ),
+      ],
+    );
+  }
 
   Widget _buildViewButton() => Row(
     children: [

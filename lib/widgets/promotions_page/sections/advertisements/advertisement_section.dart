@@ -21,7 +21,15 @@ class AdvertisementSection extends StatefulWidget {
 
 class _AdvertisementSectionState extends State<AdvertisementSection> {
   bool _isLoading = false;
-  List<Advertisement> _ads = [];
+  List<Advertisement> _ads = [
+    Advertisement(
+      id: 1,
+      media: "media",
+      type: "type",
+      startDate: DateTime.now(),
+      endDate: DateTime.now(),
+    ),
+  ];
 
   Future<void> _loadAds() async {
     setState(() {
@@ -32,7 +40,7 @@ class _AdvertisementSectionState extends State<AdvertisementSection> {
       final token = TokenHelper.getToken();
       final response = await _advertisementsService.fetchAdvertisements(token);
       setState(() {
-        _ads = response;
+        _ads += response;
       });
     } catch (e) {
       if (mounted) {
@@ -84,6 +92,7 @@ class _AdvertisementSectionState extends State<AdvertisementSection> {
         if (!_isLoading) ...[
           _buildHeader(context),
           SizedBox(height: 20),
+
           _buildAds(),
         ],
       ],
@@ -135,30 +144,47 @@ class _AdvertisementSectionState extends State<AdvertisementSection> {
 
   /// Builds the grid of advertisement cards
   Widget _buildAds() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Calculate responsive column count
-        const double itemWidth = 300; // Minimum card width
-        int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
-        itemsPerRow = itemsPerRow.clamp(1, 3); // Limit between 1-3 columns
+    return _ads.isEmpty
+        ? _buildEmptyState()
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              // Calculate responsive column count
+              const double itemWidth = 300; // Minimum card width
+              int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
+              itemsPerRow = itemsPerRow.clamp(
+                1,
+                3,
+              ); // Limit between 1-3 columns
 
-        return Wrap(
-          spacing: 20, // Horizontal space between cards
-          runSpacing: 20, // Vertical space between rows
-          children: [
-            for (var advertisement in _ads)
-              SizedBox(
-                width:
-                    (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
-                    itemsPerRow,
-                child: AdvertisementCard(
-                  callback: _refreshAds,
-                  advertisement: advertisement,
-                ),
-              ),
-          ],
-        );
-      },
+              return Wrap(
+                spacing: 20, // Horizontal space between cards
+                runSpacing: 20, // Vertical space between rows
+                children: [
+                  for (var advertisement in _ads)
+                    SizedBox(
+                      width:
+                          (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
+                          itemsPerRow,
+                      child: AdvertisementCard(
+                        callback: _refreshAds,
+                        advertisement: advertisement,
+                      ),
+                    ),
+                ],
+              );
+            },
+          );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: Text(
+          'لا يوجد عروض ترويجية',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
     );
   }
 }

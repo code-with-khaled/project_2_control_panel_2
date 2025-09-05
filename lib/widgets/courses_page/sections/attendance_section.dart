@@ -17,8 +17,7 @@ class AttendanceSection extends StatefulWidget {
 }
 
 class _AttendanceSectionState extends State<AttendanceSection> {
-  // Variables for API integration
-  late CourseService _courseService;
+  bool _isLoading = true;
 
   List<Lecture> _lectures = [
     Lecture(
@@ -39,7 +38,8 @@ class _AttendanceSectionState extends State<AttendanceSection> {
       reason: "عدم حضور المدرس",
     ),
   ];
-  bool _isLoading = true;
+
+  late CourseService _courseService;
 
   Future<void> _loadLectures() async {
     setState(() {
@@ -52,14 +52,13 @@ class _AttendanceSectionState extends State<AttendanceSection> {
         token,
         widget.course.id!,
       );
-      setState(() {
-        _lectures += response;
-        _isLoading = false;
-      });
+
+      if (mounted) {
+        setState(() {
+          _lectures += response;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
       if (mounted) {
         showDialog(
           context: context,
@@ -67,10 +66,13 @@ class _AttendanceSectionState extends State<AttendanceSection> {
               AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-
-    // ignore: avoid_print
-    print(_lectures.toString());
   }
 
   @override

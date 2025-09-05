@@ -11,7 +11,7 @@ class Course {
   final DateTime endDate;
   final int price;
   final String level;
-  final String numberOfHours;
+  final int numberOfHours;
 
   const Course({
     this.id,

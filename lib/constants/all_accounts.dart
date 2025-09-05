@@ -10,6 +10,7 @@ final List<Account> allAccounts = [
     phone: '963-944-112-233+',
     educationLevel: 'بكالوريوس في المحاسبة',
     roleId: 2,
+    id: 1,
   ),
   Account(
     type: 'محاسب',
@@ -19,6 +20,7 @@ final List<Account> allAccounts = [
     phone: '963-933-445-566+',
     educationLevel: 'دبلوم في المالية',
     roleId: 2,
+    id: 2,
   ),
 
   // التنفيذيون
@@ -30,6 +32,7 @@ final List<Account> allAccounts = [
     phone: '963-991-223-344+',
     educationLevel: 'ماجستير إدارة أعمال',
     roleId: 1,
+    id: 3,
   ),
   Account(
     type: 'إداري',
@@ -39,6 +42,7 @@ final List<Account> allAccounts = [
     phone: '963-944-556-677+',
     educationLevel: 'بكالوريوس في إدارة الأعمال',
     roleId: 1,
+    id: 4,
   ),
   Account(
     type: 'إداري',
@@ -48,5 +52,6 @@ final List<Account> allAccounts = [
     phone: '963-955-667-788+',
     educationLevel: 'ماجستير في الإدارة',
     roleId: 1,
+    id: 5,
   ),
 ];

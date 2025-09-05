@@ -106,7 +106,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "التقارير المالية",
+          "الإيصالات المالية",
           style: GoogleFonts.montserrat(
             color: Colors.black,
             fontSize: 32,

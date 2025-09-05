@@ -34,6 +34,7 @@ class _LectureAttendanceDialogState extends State<LectureAttendanceDialog> {
               children: [
                 _buildHeader(),
                 SizedBox(height: 25),
+
                 _buildAttendanceTable(),
               ],
             ),

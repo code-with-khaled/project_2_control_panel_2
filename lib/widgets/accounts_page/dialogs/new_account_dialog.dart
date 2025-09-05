@@ -1,11 +1,19 @@
 import 'dart:typed_data';
 
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/account_service.dart';
+import 'package:control_panel_2/models/account_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+
 class NewAccountDialog extends StatefulWidget {
-  const NewAccountDialog({super.key});
+  final VoidCallback callback;
+
+  const NewAccountDialog({super.key, required this.callback});
 
   @override
   State<NewAccountDialog> createState() => _NewAccountDialogState();
@@ -29,6 +37,7 @@ class _NewAccountDialogState extends State<NewAccountDialog> {
   Uint8List? _imageBytes;
   String? _selectAccountType;
   String? _selectedEducationLevel;
+  bool _isSubmitting = false;
 
   void _showPassword() {
     setState(() {
@@ -36,17 +45,42 @@ class _NewAccountDialogState extends State<NewAccountDialog> {
     });
   }
 
-  // Image picker function
-  Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: true,
-    );
-    if (result != null && result.files.single.bytes != null) {
-      setState(() {
-        _imageBytes = result.files.single.bytes;
-      });
+  String _getEducationLevel(String? level) {
+    switch (level) {
+      case "إعدادي":
+        return "preparatory";
+      case "ثانوي":
+        return "secondary";
+      case "جامعي":
+        return "university";
+      case "دراسات عليا":
+        return "postgraduate";
+      default:
+        return "other";
     }
+  }
+
+  String? _imageUrl;
+  String? _fileName;
+
+  Future<void> _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      final reader = html.FileReader();
+
+      reader.readAsDataUrl(file!); // This reads the file as a Base64 string
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _imageUrl = reader.result as String;
+          _fileName = file.name;
+        });
+      });
+    });
   }
 
   // Validation functions
@@ -82,6 +116,78 @@ class _NewAccountDialogState extends State<NewAccountDialog> {
       return 'أدخل رقم جوال صحيح';
     }
     return null;
+  }
+
+  Future<void> _createAccount() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final firstName = _firstNameController.text.trim();
+      final lastName = _lastNameController.text.trim();
+      final username = _usernameController.text.trim();
+      final phone = _mobileNumberController.text.trim();
+      final password = _passwordController.text.trim();
+      final educationLevel = _getEducationLevel(_selectedEducationLevel);
+      final roleId = _selectAccountType == "staff" ? 2 : 3;
+
+      final account = Account(
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        phone: phone,
+        educationLevel: educationLevel,
+        password: password,
+        roleId: roleId,
+      );
+
+      await _accountService.createAccount(token, account, _imageUrl, _fileName);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء الحساب بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء الحساب'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  late AccountService _accountService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+
+    _accountService = AccountService(apiClient: apiClient);
   }
 
   @override
@@ -342,7 +448,7 @@ class _NewAccountDialogState extends State<NewAccountDialog> {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        items: ['دبلوم', 'بكالوريوس', 'ماجستير', 'دكتوراه', 'أخرى'].map((
+        items: ['إعدادي', 'ثانوي', 'جامعي', 'دراسات عليا', 'غير ذلك'].map((
           String value,
         ) {
           return DropdownMenuItem<String>(value: value, child: Text(value));
@@ -379,7 +485,7 @@ class _NewAccountDialogState extends State<NewAccountDialog> {
           ),
         ),
         maxLines: 1,
-        obsecure: true,
+        obsecure: _obsecure,
         validator: _validatePassword,
       ),
     ],
@@ -430,12 +536,22 @@ class _NewAccountDialogState extends State<NewAccountDialog> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               // Form is valid - process data
+              _createAccount();
             }
           },
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Text("إنشاء الحساب"),
-          ),
+          child: _isSubmitting
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Text("إنشاء الحساب"),
+                ),
         ),
       ),
     ],

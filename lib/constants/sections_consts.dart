@@ -67,7 +67,7 @@ final List<Map<String, dynamic>> sections = [
   },
   {
     "icon": Icon(Icons.shield_outlined, color: Colors.red),
-    "title": "صلاحيات المدير",
+    "title": "إدارة الحسابات",
     "description": "إنشاء وإدارة الحسابات وتحديد الصلاحيات المختلفة.",
     "route": "/accounts",
   },

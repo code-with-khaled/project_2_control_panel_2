@@ -203,35 +203,38 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
         ],
       ),
       SizedBox(height: 20),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "القيمة الأصلية:",
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-          ),
-          Text(
-            widget.receipt.amount.toString(),
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-      SizedBox(height: 10),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "قيمة الحسم:",
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-          ),
-          Text(
-            "${5000}-",
-            style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-      SizedBox(height: 10),
-      Divider(),
+
+      // Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     Text(
+      //       "القيمة الأصلية:",
+      //       style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+      //     ),
+      //     Text(
+      //       widget.receipt.amount.toString(),
+      //       style: TextStyle(fontWeight: FontWeight.bold),
+      //     ),
+      //   ],
+      // ),
+      // SizedBox(height: 10),
+
+      // Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     Text(
+      //       "قيمة الحسم:",
+      //       style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+      //     ),
+      //     Text(
+      //       "${5000}-",
+      //       style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+      //     ),
+      //   ],
+      // ),
+      // SizedBox(height: 10),
+
+      // Divider(),
       Container(
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -242,7 +245,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "القيمة بعد الحسم:",
+              "القيمة:",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(

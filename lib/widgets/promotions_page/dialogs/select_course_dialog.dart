@@ -1,39 +1,38 @@
 import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
-import 'package:control_panel_2/core/services/teacher_service.dart';
-import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
+import 'package:control_panel_2/models/selected_course_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:flutter/material.dart';
 
-class SelectTeacherDialog extends StatefulWidget {
-  final Function(SelectedTeacher?) callback;
+class SelectCourseDialog extends StatefulWidget {
+  final Function(SelectedCourse?) callback;
 
-  const SelectTeacherDialog({super.key, required this.callback});
+  const SelectCourseDialog({super.key, required this.callback});
 
   @override
-  State<SelectTeacherDialog> createState() => _SelectTeacherDialogState();
+  State<SelectCourseDialog> createState() => _SelectCourseDialogState();
 }
 
-class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
+class _SelectCourseDialogState extends State<SelectCourseDialog> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   // Variables for API integration
-  late TeacherService teacherService;
-  List<SelectedTeacher> _teachers = [];
-  SelectedTeacher? _selectedTeacher;
+  late CourseService courseService;
+  List<SelectedCourse> _courses = [];
+  SelectedCourse? _selectedCourse;
   bool _isLoading = true;
 
-  List<SelectedTeacher> get _filteredTeachers {
-    List<SelectedTeacher> result = _teachers;
+  List<SelectedCourse> get _filteredCourses {
+    List<SelectedCourse> result = _courses;
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
-      result = _teachers.where((teacher) {
-        final name = teacher.fullName.toString().toLowerCase();
-        // final username = teacher.username.toString().toLowerCase();
+      result = _courses.where((course) {
+        final name = course.name.toString().toLowerCase();
+        final teacherName = course.teacher.fullName.toString().toLowerCase();
         final query = _searchQuery.toLowerCase();
-        // return name.contains(query) || username.contains(query);
-        return name.contains(query);
+        return name.contains(query) || teacherName.contains(query);
       }).toList();
     }
 
@@ -47,9 +46,9 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
 
     try {
       final token = TokenHelper.getToken();
-      final response = await teacherService.fetchTeachersToSelect(token);
+      final response = await courseService.fetchCoursesToSelect(token);
       setState(() {
-        _teachers = response;
+        _courses = response;
         _isLoading = false;
       });
     } catch (e) {
@@ -66,7 +65,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     }
 
     // ignore: avoid_print
-    print(_teachers);
+    print(_courses);
   }
 
   @override
@@ -75,7 +74,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
 
     final apiClient = ApiHelper.getClient();
 
-    teacherService = TeacherService(apiClient: apiClient);
+    courseService = CourseService(apiClient: apiClient);
 
     _loadTeachers();
 
@@ -112,27 +111,27 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
 
                       SearchField(
                         controller: _searchController,
-                        hintText: "ابحث عن المعلمين بالاسم أو اسم المستخدم",
+                        hintText: "ابحث عن الدورات بالاسم أو اسم المدرس",
                       ),
                       SizedBox(height: 20),
 
                       // Teachers list
-                      if (_filteredTeachers.isEmpty)
-                        Center(child: Text('لا يوجد معلمين'))
+                      if (_filteredCourses.isEmpty)
+                        Center(child: Text('لا يوجد دورات'))
                       else
                         ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: 300),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: _filteredTeachers.length,
+                            itemCount: _filteredCourses.length,
                             itemBuilder: (BuildContext context, int index) {
-                              final teacher = _filteredTeachers[index];
+                              final course = _filteredCourses[index];
                               final isSelected =
-                                  _selectedTeacher?.id == teacher.id;
+                                  _selectedCourse?.id == course.id;
 
                               return ListTile(
-                                title: Text(teacher.fullName),
-                                // subtitle: Text(teacher.username),
+                                title: Text(course.name),
+                                subtitle: Text(course.teacher.fullName),
                                 leading: isSelected
                                     ? Icon(
                                         Icons.check_circle,
@@ -142,18 +141,16 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
                                 tileColor: isSelected ? Colors.blue[50] : null,
                                 onTap: () {
                                   setState(() {
-                                    _selectedTeacher = teacher;
+                                    _selectedCourse = course;
                                   });
-
-                                  // widget.onMessageChanged(teacher.id);
                                 },
                               );
                             },
                           ),
                         ),
 
-                      if (_selectedTeacher != null) SizedBox(height: 16),
-                      if (_selectedTeacher != null)
+                      if (_selectedCourse != null) SizedBox(height: 16),
+                      if (_selectedCourse != null)
                         _buildSelectedTeacherSection(),
 
                       SizedBox(height: 25),
@@ -170,7 +167,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        "اختر مدرس الدورة",
+        "اختر الدورة",
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       Spacer(),
@@ -188,7 +185,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'المعلم المحدد:',
+          'الدورة المحددة:',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         SizedBox(height: 8),
@@ -208,11 +205,11 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _selectedTeacher!.fullName,
+                      _selectedCourse!.name,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
 
-                    // Text('@${_selectedTeacher!.username}'),
+                    Text('${_selectedCourse!.teacher.fullName}'),
                   ],
                 ),
               ),
@@ -220,10 +217,8 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
                 icon: Icon(Icons.close, size: 20),
                 onPressed: () {
                   setState(() {
-                    _selectedTeacher = null;
+                    _selectedCourse = null;
                   });
-
-                  // widget.onMessageChanged(null);
                 },
               ),
             ],
@@ -238,7 +233,7 @@ class _SelectTeacherDialogState extends State<SelectTeacherDialog> {
     children: [
       ElevatedButton(
         onPressed: () {
-          widget.callback(_selectedTeacher);
+          widget.callback(_selectedCourse);
           Navigator.pop(context);
         },
         child: Padding(
