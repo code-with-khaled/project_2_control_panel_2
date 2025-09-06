@@ -1,11 +1,20 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/account_service.dart';
 import 'package:control_panel_2/models/account_model.dart';
 import 'package:control_panel_2/widgets/accounts_page/dialogs/account_profile_details.dart';
+import 'package:control_panel_2/widgets/accounts_page/dialogs/edit_account_dialog.dart';
 import 'package:flutter/material.dart';
 
 class AccountProfile extends StatefulWidget {
   final Account account;
+  final VoidCallback callback;
 
-  const AccountProfile({super.key, required this.account});
+  const AccountProfile({
+    super.key,
+    required this.account,
+    required this.callback,
+  });
 
   @override
   State<AccountProfile> createState() => _AccountProfileState();
@@ -13,6 +22,73 @@ class AccountProfile extends StatefulWidget {
 
 class _AccountProfileState extends State<AccountProfile> {
   bool isHovered = false; // Tracks hover state for visual feedback
+  bool _isDeleting = false;
+
+  late AccountService _accountService;
+
+  Future<void> _deleteAccount() async {
+    if (_isDeleting) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(6),
+          borderSide: BorderSide.none,
+        ),
+        title: Text('تأكيد الحذف'),
+        content: Text(
+          'هل أنت متأكد من رغبتك في حذف حساب ${widget.account.fullName}؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      _accountService.deleteAccount(token, widget.account.id!);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم حذف الحساب بنجاح')));
+
+        widget.callback();
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+
+    _accountService = AccountService(apiClient: apiClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +173,7 @@ class _AccountProfileState extends State<AccountProfile> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
               decoration: BoxDecoration(
-                color: _getStatusBgColor(widget.account.type!),
+                color: _getStatusBgColor(type),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -175,6 +251,48 @@ class _AccountProfileState extends State<AccountProfile> {
             ],
           ),
         ),
+      ),
+      SizedBox(width: 5),
+
+      ElevatedButton(
+        onPressed: () => showDialog(
+          context: context,
+          builder: (context) => EditAccountDialog(
+            account: widget.account,
+            callback: widget.callback,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          padding: EdgeInsets.symmetric(vertical: 17.5),
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        child: Icon(Icons.edit, color: Colors.green),
+      ),
+      SizedBox(width: 5),
+
+      ElevatedButton(
+        onPressed: () {
+          _deleteAccount();
+        },
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          padding: EdgeInsets.symmetric(vertical: 17.5),
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        child: _isDeleting
+            ? CircularProgressIndicator(strokeWidth: 2)
+            : Icon(Icons.delete_forever_outlined, color: Colors.red),
       ),
     ],
   );

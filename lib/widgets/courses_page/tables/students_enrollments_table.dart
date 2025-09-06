@@ -1,3 +1,5 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:flutter/material.dart';
 import 'package:control_panel_2/constants/all_students.dart';
 import 'package:intl/intl.dart';
@@ -30,6 +32,21 @@ class _StudentsEnrollmentsTableState extends State<StudentsEnrollmentsTable> {
 
       return name.contains(query) || id.contains(query);
     }).toList();
+  }
+
+  Future<void> _loadCourseStudents() async {}
+
+  // ignore: unused_field
+  late CourseService _courseService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+    _courseService = CourseService(apiClient: apiClient);
+
+    _loadCourseStudents();
   }
 
   @override

@@ -2,9 +2,12 @@ import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class Step3 extends StatefulWidget {
-  final bool isReturn;
+  final Function(int) onValueChanged; // Simplified callback
 
-  const Step3({super.key, required this.isReturn});
+  const Step3({
+    super.key,
+    required this.onValueChanged, // Only amount callback
+  });
 
   @override
   State<Step3> createState() => _Step3State();
@@ -12,7 +15,6 @@ class Step3 extends StatefulWidget {
 
 class _Step3State extends State<Step3> {
   late TextEditingController _valueController;
-  final TextEditingController _reasonController = TextEditingController();
 
   // State variables
   late int _value;
@@ -22,6 +24,7 @@ class _Step3State extends State<Step3> {
     setState(() {
       _value += 500;
       _valueController.text = _value.toString();
+      widget.onValueChanged(_value); // Notify parent with amount only
     });
   }
 
@@ -30,6 +33,7 @@ class _Step3State extends State<Step3> {
       setState(() {
         _value -= 500;
         _valueController.text = _value.toString();
+        widget.onValueChanged(_value); // Notify parent with amount only
       });
     }
   }
@@ -57,6 +61,7 @@ class _Step3State extends State<Step3> {
       if (newValue != _value) {
         setState(() {
           _value = newValue;
+          widget.onValueChanged(_value); // Notify parent with amount only
         });
       }
     }
@@ -65,7 +70,6 @@ class _Step3State extends State<Step3> {
   @override
   void dispose() {
     _valueController.dispose();
-    _reasonController.dispose();
     super.dispose();
   }
 
@@ -86,10 +90,7 @@ class _Step3State extends State<Step3> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 25),
-
           _buildFinancialValueField(),
-
-          if (widget.isReturn) _buildReasonField(),
         ],
       ),
     );
@@ -119,22 +120,6 @@ class _Step3State extends State<Step3> {
             ),
           ],
         ),
-        validator: (value) => _validateNotEmpty(value, "القيمة المالية"),
-      ),
-    ],
-  );
-
-  Widget _buildReasonField() => Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      SizedBox(height: 20),
-      Text("سبب الارتجاع", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      CustomTextField(
-        hintText: "اشرح سبب الارتجاع...",
-        controller: _reasonController,
-        maxLines: 2,
         validator: (value) => _validateNotEmpty(value, "القيمة المالية"),
       ),
     ],

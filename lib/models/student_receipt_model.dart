@@ -1,5 +1,29 @@
 class StudentReceipt {
   final int id;
+  final String name;
+  final int amount;
+  final String status;
+  final DateTime date;
+
+  StudentReceipt({
+    required this.id,
+    required this.name,
+    required this.amount,
+    required this.status,
+    required this.date,
+  });
+
+  factory StudentReceipt.fromJson(Map<String, dynamic> json) => StudentReceipt(
+    id: json['id'],
+    name: json['name'],
+    amount: json['amount'],
+    status: json['status'],
+    date: DateTime.parse(json['date']),
+  );
+}
+
+class StudentReceiptDetails {
+  final int id;
   final String firstName;
   final String lastName;
   final String phone;
@@ -10,7 +34,7 @@ class StudentReceipt {
   final DateTime date;
   final String status;
 
-  StudentReceipt({
+  StudentReceiptDetails({
     required this.id,
     required this.firstName,
     required this.lastName,
@@ -23,8 +47,8 @@ class StudentReceipt {
     required this.status,
   });
 
-  factory StudentReceipt.fromJson(Map<String, dynamic> json) {
-    return StudentReceipt(
+  factory StudentReceiptDetails.fromJson(Map<String, dynamic> json) {
+    return StudentReceiptDetails(
       id: json['id'] as int,
       firstName: json['first_name'] as String,
       lastName: json['last_name'] as String,

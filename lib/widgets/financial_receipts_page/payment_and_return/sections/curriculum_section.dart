@@ -1,5 +1,5 @@
 import 'package:control_panel_2/constants/all_curriculums.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
+// import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
 import 'package:flutter/material.dart';
 
 class CurriculumSection extends StatefulWidget {
@@ -41,7 +41,7 @@ class _CurriculumSectionState extends State<CurriculumSection> {
         ),
         SizedBox(height: 20),
 
-        if (_selectedCurriculum != null) Step3(isReturn: widget.isReturn),
+        // if (_selectedCurriculum != null) Step3(isReturn: widget.isReturn),
       ],
     );
   }

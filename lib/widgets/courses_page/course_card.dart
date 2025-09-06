@@ -126,6 +126,10 @@ class _CourseCardState extends State<CourseCard> {
                 ),
                 child: Image.network(
                   "http://127.0.0.1:8000/${widget.course.image}",
+                  // headers: const {
+                  //   "ngrok-skip-browser-warning": 'true',
+                  //   'Accept': 'application/json',
+                  // },
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Center(

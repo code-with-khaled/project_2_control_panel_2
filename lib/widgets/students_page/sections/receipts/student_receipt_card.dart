@@ -26,7 +26,7 @@ class _StudentReceiptCardState extends State<StudentReceiptCard> {
       child: InkWell(
         onTap: () => showDialog(
           context: context,
-          builder: (context) => ReceiptDetailsDialog(receipt: receipt),
+          builder: (context) => ReceiptDetailsDialog(id: receipt.id),
         ),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
@@ -60,11 +60,11 @@ class _StudentReceiptCardState extends State<StudentReceiptCard> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(receipt.type),
+                      color: _getTypeColor(receipt.status),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      receipt.type,
+                      receipt.status,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
@@ -108,7 +108,7 @@ class _StudentReceiptCardState extends State<StudentReceiptCard> {
 
   Color _getTypeColor(String status) {
     switch (status) {
-      case "دفع":
+      case "مدفوع":
         return Colors.green.shade900;
       default:
         return Colors.yellow.shade900;

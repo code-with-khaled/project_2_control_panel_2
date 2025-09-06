@@ -1,13 +1,17 @@
-import 'package:control_panel_2/constants/all_students.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/book_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/certificate_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/course_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/curriculum_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/sections/trip_section.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/receipt_service.dart';
+import 'package:control_panel_2/models/selected_course_model.dart';
+import 'package:control_panel_2/models/student_model.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/select_student_dialog.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
+import 'package:control_panel_2/widgets/promotions_page/dialogs/select_course_dialog.dart';
 import 'package:flutter/material.dart';
 
 class AddPaymentDialog extends StatefulWidget {
-  const AddPaymentDialog({super.key});
+  final VoidCallback callback;
+
+  const AddPaymentDialog({super.key, required this.callback});
 
   @override
   State<AddPaymentDialog> createState() => _AddPaymentDialogState();
@@ -15,8 +19,97 @@ class AddPaymentDialog extends StatefulWidget {
 
 class _AddPaymentDialogState extends State<AddPaymentDialog> {
   // State variables
-  String? _selectedStudent;
-  String? _selectedType;
+  Student? _selectedStudent;
+  String? _selectedCourse;
+  int? _selectedCourseId;
+  int _paymentAmount = 0;
+
+  bool _isSubmitting = false;
+
+  void _selectStudent(Student? student) {
+    if (student != null) {
+      setState(() {
+        _selectedStudent = student;
+      });
+    }
+  }
+
+  void _selectCourse(SelectedCourse? category) {
+    if (category != null) {
+      setState(() {
+        _selectedCourse = category.name;
+        _selectedCourseId = category.id;
+      });
+    }
+  }
+
+  void _onStep3ValueChanged(int amount) {
+    setState(() {
+      _paymentAmount = amount;
+    });
+  }
+
+  Future<void> _createReceipt() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final receipt = {
+        "student_id": _selectedStudent!.id,
+        "receiptable_type": "course",
+        "receiptable_id": _selectedCourseId,
+        "amount": _paymentAmount,
+        "type": "payment",
+      };
+
+      await _receiptService.createReceipt(token, receipt);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء الإيصال بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء الإيصال'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  late ReceiptService _receiptService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+
+    _receiptService = ReceiptService(apiClient: apiClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +135,6 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                 SizedBox(height: 25),
 
                 _buildStep1(),
-                SizedBox(height: 20),
-
-                _buildStep2(),
                 SizedBox(height: 20),
 
                 _buildSubmitButton(),
@@ -92,7 +182,11 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
         _buildStudentField(),
         SizedBox(height: 20),
 
-        _buildTypeField(),
+        _buildCourseField(),
+        SizedBox(height: 20),
+
+        if (_selectedCourse != null && _selectedStudent != null)
+          Step3(onValueChanged: _onStep3ValueChanged),
       ],
     ),
   );
@@ -100,66 +194,77 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
   Widget _buildStudentField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("اسم الطالب", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("اختر طالب", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
-      DropdownButtonFormField<String>(
-        value: _selectedStudent,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر الطالب',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
+      InkWell(
+        onTap: () => _selectStudentDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedStudent == null
+                  ? Text("اضغط لاختيار طالب", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedStudent!.fullName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
           ),
         ),
-        items: allStudents.map((value) {
-          return DropdownMenuItem<String>(
-            value: value['name'],
-            child: Text(value['name']),
-          );
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedStudent = newValue);
-        },
-        // validator: _validateGender,
       ),
     ],
   );
 
-  Widget _buildTypeField() => Column(
+  void _selectStudentDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectStudentDialog(callback: _selectStudent),
+  );
+
+  Widget _buildCourseField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("نوع الإيصال", style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 5),
-      DropdownButtonFormField<String>(
-        value: _selectedType,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر نوع الإيصال',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
+      Text("الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      InkWell(
+        onTap: () => _selectCourseDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedCourse == null
+                  ? Text("اختر الدورة", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedCourse!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
           ),
         ),
-        items: ['شهادة', 'كورس', 'رحلة', 'كتاب', 'مناهج'].map((String value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedType = newValue);
-        },
-        // validator: _validateGender,
       ),
     ],
+  );
+
+  void _selectCourseDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectCourseDialog(callback: _selectCourse),
   );
 
   Widget _buildSubmitButton() => Row(
@@ -184,32 +289,39 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
       SizedBox(width: 10),
       ElevatedButton(
         onPressed: () {
-          // if (_formKey.currentState!.validate()) {
-          //   // Form is valid - process data
-          // }
+          _createReceipt();
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء الإيصال"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء الإيصال"),
+              ),
       ),
     ],
   );
 
-  Widget _buildStep2() {
-    switch (_selectedType) {
-      case 'شهادة':
-        return CertificateSection(isReturn: false);
-      case 'كورس':
-        return CourseSection(isReturn: false);
-      case 'رحلة':
-        return TripSection(isReturn: false);
-      case 'كتاب':
-        return BookSection(isReturn: false);
-      case 'مناهج':
-        return CurriculumSection(isReturn: false);
-      default:
-        return Text("");
-    }
-  }
+  // Widget _buildStep2() {
+  //   switch (_selectedType) {
+  //     case 'شهادة':
+  //       return CertificateSection(isReturn: false);
+  //     case 'كورس':
+  //       return CourseSection(isReturn: false);
+  //     case 'رحلة':
+  //       return TripSection(isReturn: false);
+  //     case 'كتاب':
+  //       return BookSection(isReturn: false);
+  //     case 'مناهج':
+  //       return CurriculumSection(isReturn: false);
+  //     default:
+  //       return Text("");
+  //   }
+  // }
 }

@@ -144,6 +144,25 @@ class StudentService {
     }
   }
 
+  Future<StudentReceiptDetails> fetchStudentRecieptDetails(
+    String? token,
+    int id,
+  ) async {
+    final response = await apiClient.get(
+      "dashboard/receipts/$id",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final Map<String, dynamic> data = json['data'];
+
+      return StudentReceiptDetails.fromJson(data);
+    } else {
+      throw Exception('Fetch student reciept details Failed');
+    }
+  }
+
   Future<List<StudentCourse>> fetchStudentCourses(String? token, int id) async {
     final response = await apiClient.get(
       "dashboard/students/$id/courses",

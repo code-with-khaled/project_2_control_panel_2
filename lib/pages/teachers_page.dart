@@ -1,5 +1,5 @@
 import 'package:control_panel_2/constants/custom_colors.dart';
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
@@ -9,7 +9,6 @@ import 'package:control_panel_2/widgets/teachers_page/dialogs/add_teacher_dialog
 import 'package:control_panel_2/widgets/teachers_page/teacher_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 
 class TeachersPage extends StatefulWidget {
   const TeachersPage({super.key});
@@ -39,10 +38,7 @@ class _TeachersPageState extends State<TeachersPage> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     teachersService = TeacherService(apiClient: apiClient);
 

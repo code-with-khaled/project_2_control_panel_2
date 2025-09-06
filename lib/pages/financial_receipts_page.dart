@@ -1,4 +1,3 @@
-import 'package:control_panel_2/constants/all_financial_receipts.dart';
 import 'package:control_panel_2/constants/custom_colors.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/dialogs/add_disbursement_dialog.dart';
 import 'package:control_panel_2/widgets/financial_receipts_page/dialogs/add_payment_dialog.dart';
@@ -16,6 +15,15 @@ class FinancialReceiptsPage extends StatefulWidget {
 }
 
 class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
+  final GlobalKey<FinancialReceiptsTableState> _tableKey = GlobalKey();
+
+  void _refreshTable() {
+    setState(() {
+      // This will trigger a rebuild of the table
+      _tableKey.currentState?.refreshReceipts(); // Call the table's load method
+    });
+  }
+
   // Controllers for all form fields
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
@@ -23,9 +31,26 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
   // State variables
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
+  DateTime? _filteredStartDate;
+  DateTime? _filteredEndDate;
 
   // Currently selected filter value from dropdown
   String? dropdownValue = "جميع الأنواع";
+
+  bool _isLoadingTotal = true;
+  late int _totalRevenue;
+  late int _paymentNo;
+  late int _returnNo;
+  late int _orderNo;
+  void _calculateTotal(int total, int paymentNo, int returnNo, int orderNo) {
+    setState(() {
+      _totalRevenue = total;
+      _paymentNo = paymentNo;
+      _returnNo = returnNo;
+      _orderNo = orderNo;
+      _isLoadingTotal = false;
+    });
+  }
 
   // Date picker function
   Future<void> _selectDate(
@@ -33,11 +58,13 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
     bool isStartDate,
     TextEditingController controller,
   ) async {
+    final now = DateTime.now();
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      lastDate: DateTime(now.year + 1, now.month, now.day),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -140,7 +167,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
     return ElevatedButton(
       onPressed: () => showDialog(
         context: context,
-        builder: (context) => AddPaymentDialog(),
+        builder: (context) => AddPaymentDialog(callback: _refreshTable),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -159,8 +186,10 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
   // Builds reurn action button
   Widget _buildAddReturnButton() {
     return ElevatedButton(
-      onPressed: () =>
-          showDialog(context: context, builder: (context) => AddReturnDialog()),
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => AddReturnDialog(callback: _refreshTable),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -190,11 +219,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
     return ElevatedButton(
       onPressed: () => showDialog(
         context: context,
-        builder: (context) => AddDisbursementDialog(
-          onAddDisbursement: () {
-            setState(() {});
-          },
-        ),
+        builder: (context) => AddDisbursementDialog(callback: _refreshTable),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueGrey.shade100,
@@ -216,30 +241,14 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
   }
 
   Widget _buildOverviewCards() {
-    final paymentReceipts = allReceipts.where(
-      (receipt) => receipt.type == "دفع",
-    );
-    final returnReceipts = allReceipts.where(
-      (receipt) => receipt.type == "ارتجاع",
-    );
-    final disbursementReceipts = allReceipts.where(
-      (receipt) => receipt.type == "صرف",
-    );
-
-    int calculateTotalFund() {
-      int total = 0;
-
-      for (var receipt in allReceipts) {
-        int amount = int.tryParse(receipt.ammount) ?? 0;
-
-        if (receipt.type == 'دفع' || receipt.type == 'ارتجاع') {
-          total += amount;
-        } else if (receipt.type == 'صرف') {
-          total -= amount;
-        }
-      }
-
-      return total;
+    if (_isLoadingTotal) {
+      return Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Colors.blue,
+          padding: EdgeInsets.all(20),
+        ),
+      );
     }
 
     return LayoutBuilder(
@@ -250,33 +259,24 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
               Expanded(
                 child: _buildOverviewCard(
                   "مجمل العائدات",
-                  calculateTotalFund(),
+                  _totalRevenue,
                   Icon(Icons.receipt_outlined, color: Colors.grey, size: 25),
                 ),
               ),
               SizedBox(width: 15),
+
               Expanded(
-                child: _buildOverviewCard(
-                  "أيصالات الدفع",
-                  paymentReceipts.length,
-                  null,
-                ),
+                child: _buildOverviewCard("أيصالات الدفع", _paymentNo, null),
               ),
               SizedBox(width: 15),
+
               Expanded(
-                child: _buildOverviewCard(
-                  "إيصالات الارتجاع",
-                  returnReceipts.length,
-                  null,
-                ),
+                child: _buildOverviewCard("إيصالات الارتجاع", _returnNo, null),
               ),
               SizedBox(width: 15),
+
               Expanded(
-                child: _buildOverviewCard(
-                  "أوامر الصرف",
-                  disbursementReceipts.length,
-                  null,
-                ),
+                child: _buildOverviewCard("أوامر الصرف", _orderNo, null),
               ),
             ],
           );
@@ -289,7 +289,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                   Expanded(
                     child: _buildOverviewCard(
                       "مجمل العائدات",
-                      calculateTotalFund(),
+                      _totalRevenue,
                       Icon(
                         Icons.receipt_outlined,
                         color: Colors.grey,
@@ -301,7 +301,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                   Expanded(
                     child: _buildOverviewCard(
                       "أيصالات الدفع",
-                      paymentReceipts.length,
+                      _paymentNo,
                       null,
                     ),
                   ),
@@ -313,17 +313,13 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                   Expanded(
                     child: _buildOverviewCard(
                       "إيصالات الارتجاع",
-                      returnReceipts.length,
+                      _returnNo,
                       null,
                     ),
                   ),
                   SizedBox(width: 15),
                   Expanded(
-                    child: _buildOverviewCard(
-                      "أوامر الصرف",
-                      disbursementReceipts.length,
-                      null,
-                    ),
+                    child: _buildOverviewCard("أوامر الصرف", _orderNo, null),
                   ),
                 ],
               ),
@@ -390,6 +386,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                 children: [
                   Icon(Icons.filter_alt_outlined),
                   SizedBox(width: 10),
+
                   Text(
                     "فلترة الإيصالات",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
@@ -408,13 +405,21 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                   children: [
                     Expanded(child: _buildFilters()),
                     SizedBox(width: 15),
+
                     Expanded(child: _buildStartDate()),
                     SizedBox(width: 15),
+
                     Expanded(child: _buildEndDate()),
                     SizedBox(width: 15),
+
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            _filteredStartDate = _selectedStartDate;
+                            _filteredEndDate = _selectedEndDate;
+                          });
+                        },
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.all(21.5),
                         ),
@@ -423,6 +428,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                           children: [
                             Icon(Icons.filter_alt_outlined),
                             SizedBox(width: 10),
+
                             Text("تطبيق الفلاتر"),
                           ],
                         ),
@@ -436,19 +442,27 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                   children: [
                     Row(children: [Expanded(child: _buildFilters())]),
                     SizedBox(height: 10),
+
                     Row(
                       children: [
                         Expanded(child: _buildStartDate()),
                         SizedBox(width: 10),
+
                         Expanded(child: _buildEndDate()),
                       ],
                     ),
                     SizedBox(height: 15),
+
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                _filteredStartDate = _selectedStartDate;
+                                _filteredEndDate = _selectedEndDate;
+                              });
+                            },
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.all(21.5),
                             ),
@@ -457,6 +471,7 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
                               children: [
                                 Icon(Icons.filter_alt_outlined),
                                 SizedBox(width: 10),
+
                                 Text("تطبيق الفلاتر"),
                               ],
                             ),
@@ -588,7 +603,15 @@ class _FinancialReceiptsPageState extends State<FinancialReceiptsPage> {
           SizedBox(height: 20),
           Row(
             children: [
-              Expanded(child: FinancialReceiptsTable(filter: dropdownValue!)),
+              Expanded(
+                child: FinancialReceiptsTable(
+                  key: _tableKey,
+                  filter: dropdownValue!,
+                  callback: _calculateTotal,
+                  startDate: _filteredStartDate,
+                  endDate: _filteredEndDate,
+                ),
+              ),
             ],
           ),
         ],

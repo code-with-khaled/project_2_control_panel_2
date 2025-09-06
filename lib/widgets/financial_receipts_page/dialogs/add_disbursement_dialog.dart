@@ -1,16 +1,17 @@
-import 'package:control_panel_2/constants/all_financial_receipts.dart';
-import 'package:control_panel_2/models/financial_receipt_model.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/employee_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/purchase_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/teacher_section.dart';
-import 'package:control_panel_2/widgets/financial_receipts_page/disbursement/sections/transfer_section.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/receipt_service.dart';
+import 'package:control_panel_2/models/selected_course_model.dart';
+import 'package:control_panel_2/models/selected_teacher_model.dart';
+import 'package:control_panel_2/widgets/courses_page/dialogs/select_teacher_dialog.dart';
+import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
+import 'package:control_panel_2/widgets/promotions_page/dialogs/select_course_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class AddDisbursementDialog extends StatefulWidget {
-  final VoidCallback onAddDisbursement;
+  final VoidCallback callback;
 
-  const AddDisbursementDialog({super.key, required this.onAddDisbursement});
+  const AddDisbursementDialog({super.key, required this.callback});
 
   @override
   State<AddDisbursementDialog> createState() => _AddDisbursementDialogState();
@@ -18,7 +19,95 @@ class AddDisbursementDialog extends StatefulWidget {
 
 class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
   // State variables
-  String? _selectedType;
+  SelectedTeacher? _selectedTeacher;
+  String? _selectedCourse;
+  int? _selectedCourseId;
+  int _paymentAmount = 0;
+
+  bool _isSubmitting = false;
+
+  void _selectTeacher(SelectedTeacher? teacher) {
+    if (teacher != null) {
+      setState(() {
+        _selectedTeacher = teacher;
+      });
+    }
+  }
+
+  void _selectCourse(SelectedCourse? category) {
+    if (category != null) {
+      setState(() {
+        _selectedCourse = category.name;
+        _selectedCourseId = category.id;
+      });
+    }
+  }
+
+  void _onStep3ValueChanged(int amount) {
+    setState(() {
+      _paymentAmount = amount;
+    });
+  }
+
+  Future<void> _createReceipt() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final disbursement = {
+        "teacher_id": _selectedTeacher!.id,
+        "course_id": _selectedCourseId,
+        "amount": _paymentAmount,
+      };
+
+      await _receiptService.createDisbursement(token, disbursement);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم إنشاء الإيصال بنجاح')));
+        widget.callback();
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('خطأ في إنشاء الإيصال'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            actions: [
+              TextButton(
+                child: Text('موافق'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  late ReceiptService _receiptService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+
+    _receiptService = ReceiptService(apiClient: apiClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +135,6 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
                 _buildStep1(),
                 SizedBox(height: 20),
 
-                _buildStep2(),
-                SizedBox(height: 20),
-
                 _buildSubmitButton(),
               ],
             ),
@@ -62,7 +148,7 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        "إنشاء أمر صرف",
+        "إنشاء إيصال دفع",
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       Spacer(),
@@ -86,47 +172,97 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "خطوة 1: نوع أمر الصرف",
+          "خطوة 1: المعلومات الأساسية",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 25),
 
-        _buildTypeField(),
+        _buildTeacherField(),
+        SizedBox(height: 20),
+
+        _buildCourseField(),
+        SizedBox(height: 20),
+
+        if (_selectedCourse != null && _selectedTeacher != null)
+          Step3(onValueChanged: _onStep3ValueChanged),
       ],
     ),
   );
 
-  Widget _buildTypeField() => Column(
+  Widget _buildTeacherField() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text("نوع الإيصال", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text("اختر مدرس", style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 5),
-      DropdownButtonFormField<String>(
-        value: _selectedType,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'اختر نوع الإيصال',
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black26),
+      InkWell(
+        onTap: () => _selectTeacherDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(6),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black87),
-            borderRadius: BorderRadius.circular(6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedTeacher == null
+                  ? Text("اضغط لاختيار مدرس", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedTeacher!.fullName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
           ),
         ),
-        items: ['راتب موظف', 'راتب مدرس', 'عملية تحويل', 'عملية شراء'].map((
-          String value,
-        ) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() => _selectedType = newValue);
-        },
-        // validator: _validateGender,
       ),
     ],
+  );
+
+  void _selectTeacherDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectTeacherDialog(callback: _selectTeacher),
+  );
+
+  Widget _buildCourseField() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text("الدورة *", style: TextStyle(fontWeight: FontWeight.bold)),
+      SizedBox(height: 2),
+      InkWell(
+        onTap: () => _selectCourseDialog(),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _selectedCourse == null
+                  ? Text("اختر الدورة", style: TextStyle(fontSize: 16))
+                  : Text(
+                      _selectedCourse!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+              Icon(Icons.arrow_drop_down_rounded),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+
+  void _selectCourseDialog() => showDialog(
+    context: context,
+    builder: (context) => SelectCourseDialog(callback: _selectCourse),
   );
 
   Widget _buildSubmitButton() => Row(
@@ -151,48 +287,39 @@ class _AddDisbursementDialogState extends State<AddDisbursementDialog> {
       SizedBox(width: 10),
       ElevatedButton(
         onPressed: () {
-          // if (_formKey.currentState!.validate()) {
-          //   // Form is valid - process data
-          // }
-
-          setState(() {
-            allReceipts.add(
-              FinancialReceipt(
-                reason: null,
-                number: "FR00${allReceipts.length + 1}",
-                type: "أمر صرف",
-                date: DateFormat('').format(DateTime.now()),
-                person: "",
-                item: "",
-                service: null,
-                ammount: "new ammount",
-              ),
-            );
-          });
-
-          widget.onAddDisbursement();
-          Navigator.pop(context);
+          _createReceipt();
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("إنشاء الإيصال"),
-        ),
+        child: _isSubmitting
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text("إنشاء الإيصال"),
+              ),
       ),
     ],
   );
 
-  Widget _buildStep2() {
-    switch (_selectedType) {
-      case 'راتب موظف':
-        return EmployeeSection();
-      case 'راتب مدرس':
-        return TeacherSection();
-      case 'عملية تحويل':
-        return TransferSection();
-      case 'عملية شراء':
-        return PurchaseSection();
-      default:
-        return Text("");
-    }
-  }
+  // Widget _buildStep2() {
+  //   switch (_selectedType) {
+  //     case 'شهادة':
+  //       return CertificateSection(isReturn: false);
+  //     case 'كورس':
+  //       return CourseSection(isReturn: false);
+  //     case 'رحلة':
+  //       return TripSection(isReturn: false);
+  //     case 'كتاب':
+  //       return BookSection(isReturn: false);
+  //     case 'مناهج':
+  //       return CurriculumSection(isReturn: false);
+  //     default:
+  //       return Text("");
+  //   }
+  // }
 }

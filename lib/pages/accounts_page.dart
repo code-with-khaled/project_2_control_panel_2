@@ -26,7 +26,7 @@ class _AccountsPageState extends State<AccountsPage> {
   String _searchQuery = '';
 
   List<Account> _accounts = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   // Currently selected filter value from dropdown
   String? dropdownValue = "جميع الحسابات";
@@ -61,13 +61,17 @@ class _AccountsPageState extends State<AccountsPage> {
   }
 
   Future<void> _loadAccounts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final token = TokenHelper.getToken();
       final response = await _accountService.fetchAccounts(token);
 
       if (mounted) {
         setState(() {
-          _accounts += response;
+          _accounts = response;
         });
       }
     } catch (e) {
@@ -383,7 +387,7 @@ class _AccountsPageState extends State<AccountsPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Calculate number of columns based on available width
-        const double itemWidth = 270; // Minimum card width
+        const double itemWidth = 290; // Minimum card width
         int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
         itemsPerRow = itemsPerRow.clamp(1, 3); // Limit between 1-3 columns
 
@@ -404,7 +408,10 @@ class _AccountsPageState extends State<AccountsPage> {
                 width:
                     (constraints.maxWidth - (20 * (itemsPerRow - 1))) /
                     itemsPerRow,
-                child: AccountProfile(account: account),
+                child: AccountProfile(
+                  account: account,
+                  callback: _refreshAccounts,
+                ),
               ),
           ],
         );

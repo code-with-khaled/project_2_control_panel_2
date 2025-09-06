@@ -1,9 +1,8 @@
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/course_model.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 /// Displays a table of available courses with enrollment capability
 ///
@@ -45,10 +44,7 @@ class _CoursesTableState extends State<CoursesTable> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
     _courseService = CourseService(apiClient: apiClient);
 
     _fetchCourses();
@@ -57,7 +53,12 @@ class _CoursesTableState extends State<CoursesTable> {
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.blue,
+            ),
+          )
         : Container(
             padding: EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(

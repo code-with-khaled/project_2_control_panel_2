@@ -17,20 +17,7 @@ class ReceiptsSection extends StatefulWidget {
 class _ReceiptsSectionState extends State<ReceiptsSection> {
   bool _isLoading = false;
 
-  List<StudentReceipt> _receipts = [
-    StudentReceipt(
-      id: 1,
-      firstName: "firstName",
-      lastName: "lastName",
-      phone: "phone",
-      type: "دورة",
-      name: "name",
-      transactionId: 1,
-      amount: 500000.00,
-      date: DateTime.now(),
-      status: "status",
-    ),
-  ];
+  List<StudentReceipt> _receipts = [];
 
   late StudentService _studentService;
 
@@ -41,7 +28,7 @@ class _ReceiptsSectionState extends State<ReceiptsSection> {
 
     try {
       final token = TokenHelper.getToken();
-      _receipts += await _studentService.fetchStudentReciepts(token, widget.id);
+      _receipts = await _studentService.fetchStudentReciepts(token, widget.id);
     } catch (e) {
       if (mounted) {
         showDialog(

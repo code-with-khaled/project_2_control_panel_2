@@ -1,4 +1,4 @@
-import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
+// import 'package:control_panel_2/widgets/financial_receipts_page/payment_and_return/other/step3.dart';
 import 'package:flutter/material.dart';
 
 class TripSection extends StatefulWidget {
@@ -40,7 +40,7 @@ class _TripSectionState extends State<TripSection> {
         ),
         SizedBox(height: 20),
 
-        if (_selectedTrip != null) Step3(isReturn: widget.isReturn),
+        // if (_selectedTrip != null) Step3(isReturn: widget.isReturn),
       ],
     );
   }

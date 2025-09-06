@@ -1,18 +1,69 @@
+import 'package:control_panel_2/core/helper/api_helper.dart';
+import 'package:control_panel_2/core/helper/token_helper.dart';
+import 'package:control_panel_2/core/services/student_service.dart';
 import 'package:control_panel_2/models/student_receipt_model.dart';
 import 'package:control_panel_2/widgets/students_page/sections/receipts/receipt_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ReceiptDetailsDialog extends StatefulWidget {
-  final StudentReceipt receipt;
+  final int id;
 
-  const ReceiptDetailsDialog({super.key, required this.receipt});
+  const ReceiptDetailsDialog({super.key, required this.id});
 
   @override
   State<ReceiptDetailsDialog> createState() => _ReceiptDetailsDialogState();
 }
 
 class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
+  bool _isLoading = true;
+  StudentReceiptDetails? _receipt;
+
+  Future<void> _fetchReceiptDetails(int id) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final token = TokenHelper.getToken();
+      final response = await _studentService.fetchStudentRecieptDetails(
+        token,
+        id,
+      );
+
+      setState(() {
+        _receipt = response;
+      });
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) =>
+              AlertDialog(title: Text('خطأ'), content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  late StudentService _studentService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final apiClient = ApiHelper.getClient();
+
+    _studentService = StudentService(apiClient: apiClient);
+
+    _fetchReceiptDetails(widget.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -28,23 +79,31 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
           padding: EdgeInsets.only(left: 2),
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header section with close button
-                _buildHeader(),
-                SizedBox(height: 25),
+            child: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.blue,
+                      padding: EdgeInsets.all(20),
+                    ),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header section with close button
+                      _buildHeader(),
+                      SizedBox(height: 25),
 
-                _buildReceiptInfo(),
+                      _buildReceiptInfo(),
 
-                SizedBox(height: 20),
-                Divider(),
-                SizedBox(height: 20),
+                      SizedBox(height: 20),
+                      Divider(),
+                      SizedBox(height: 20),
 
-                _buildFinancialBreakdown(),
-              ],
-            ),
+                      _buildFinancialBreakdown(),
+                    ],
+                  ),
           ),
         ),
       ),
@@ -108,10 +167,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      DateFormat(
-                        'MMM dd, yyyy',
-                        'ar',
-                      ).format(widget.receipt.date),
+                      DateFormat('MMM dd, yyyy', 'ar').format(_receipt!.date),
                     ),
                   ],
                 ),
@@ -139,7 +195,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(widget.receipt.type),
+                    Text(_receipt!.type),
                   ],
                 ),
               ],
@@ -149,7 +205,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
       ),
       SizedBox(height: 10),
 
-      _switchItem(widget.receipt.type),
+      _switchItem(_receipt!.type),
     ],
   );
 
@@ -159,31 +215,31 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
         return ReceiptItem(
           icon: Icon(Icons.menu_book_outlined),
           title: "عنوان الدورة",
-          content: widget.receipt.name,
+          content: _receipt!.name,
         );
       case "رحلة":
         return ReceiptItem(
           icon: Icon(Icons.card_travel),
           title: "عنوان الرحلة",
-          content: widget.receipt.name,
+          content: _receipt!.name,
         );
       case "كتاب":
         return ReceiptItem(
           icon: Icon(Icons.book_outlined),
           title: "عنوان الكتاب",
-          content: widget.receipt.name,
+          content: _receipt!.name,
         );
       case "مناهج":
         return ReceiptItem(
           icon: Icon(Icons.import_contacts),
           title: "عنوان المنهاج",
-          content: widget.receipt.name,
+          content: _receipt!.name,
         );
       default:
         return ReceiptItem(
           icon: Icon(Icons.military_tech_outlined),
           title: "عنوان الشهادة",
-          content: widget.receipt.name,
+          content: _receipt!.name,
         );
     }
   }
@@ -249,7 +305,7 @@ class _ReceiptDetailsDialogState extends State<ReceiptDetailsDialog> {
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
-              (int.parse(widget.receipt.amount.toString()) - 5000).toString(),
+              _receipt!.amount.toString(),
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
             ),
           ],

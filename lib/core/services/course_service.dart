@@ -153,9 +153,29 @@ class CourseService {
     }
   }
 
-  Future<void> enrollStudent(String? token, int id) async {
-    // ignore: unused_local_variable
-    final response = await apiClient.delete("dashboard/enroll", token: token);
+  Future<void> enrollStudent(String? token, int studentId, int courseId) async {
+    final response = await apiClient.post(
+      "dashboard/enroll",
+      token: token,
+      body: {
+        "enrollmentable_type": "course",
+        "student_id": studentId,
+        "enrollmentable_id": courseId,
+      },
+    );
+
+    if (response.statusCode != 200) {
+      final responseBody = json.decode(response.body);
+
+      // Get the error message from either 'message' or the first error in 'errors'
+      final errorMessage =
+          responseBody['message'] ??
+          (responseBody['errors'] is Map
+              ? (responseBody['errors'] as Map).values.first?.toString()
+              : 'Unknown error');
+
+      throw Exception(errorMessage.toString());
+    }
   }
 
   Future<List<Lecture>> fetchLectures(String? token, int id) async {

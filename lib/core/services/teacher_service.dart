@@ -5,6 +5,7 @@ import 'package:control_panel_2/models/selected_teacher_model.dart';
 import 'package:control_panel_2/models/teacher_disbursement_model.dart';
 import 'package:control_panel_2/models/teacher_feedback_model.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
+import 'package:control_panel_2/models/teacher_stat_mode.dart';
 
 class TeacherService {
   final ApiClient apiClient;
@@ -199,6 +200,22 @@ class TeacherService {
       return data.map((json) => TeacherDisbursement.fromJson(json)).toList();
     } else {
       throw Exception('Fetch student reciepts Failed');
+    }
+  }
+
+  Future<TeacherStat> fetchTeacherStatistics(String? token, int id) async {
+    final response = await apiClient.get(
+      'dashboard/teachers/$id/statistics',
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final Map<String, dynamic> data = body['data'];
+
+      return TeacherStat.fromJson(data);
+    } else {
+      throw Exception('Fetch teacher stats failed');
     }
   }
 }

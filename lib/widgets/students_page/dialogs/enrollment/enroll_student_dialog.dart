@@ -1,13 +1,12 @@
 // ignore_for_file: unused_local_variable
 
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/course_service.dart';
 import 'package:control_panel_2/models/student_model.dart';
 import 'package:control_panel_2/widgets/search_widgets/search_field.dart';
 import 'package:control_panel_2/widgets/students_page/dialogs/enrollment/enroll_in_course_table.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 /// Dialog for enrolling a student in available courses
 ///
@@ -25,7 +24,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
   // Controller for course search functionality
   final TextEditingController _searchController = TextEditingController();
 
-  Future<bool> _enrollStudent(int id, String courseName) async {
+  Future<bool> _enrollStudent(int courseId, String courseName) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -33,7 +32,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
           borderRadius: BorderRadius.circular(6),
           borderSide: BorderSide.none,
         ),
-        title: Text('تأكيد الحذف'),
+        title: Text('تأكيد الستجيل'),
         content: Text(
           'هل أنت متأكد من رغبتك في تسجيل ${widget.student.fullName} في دورة $courseName ؟',
         ),
@@ -53,7 +52,11 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
       if (confirmed == true) {
         try {
           final token = TokenHelper.getToken();
-          final response = await _courseService.enrollStudent(token, id);
+          final response = await _courseService.enrollStudent(
+            token,
+            widget.student.id!,
+            courseId,
+          );
 
           if (mounted) {
             showCustomToast(
@@ -77,10 +80,7 @@ class _EnrollStudentDialogState extends State<EnrollStudentDialog> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _courseService = CourseService(apiClient: apiClient);
   }

@@ -48,7 +48,7 @@ class _StudentFeedbacksSectionState extends State<StudentFeedbacksSection> {
         widget.id,
       );
 
-      _feedbacks += result['feedbacks'];
+      _feedbacks = result['feedbacks'];
       _feedbackCount = result['count'];
       _feedbackAverage = result['average'];
     } catch (e) {

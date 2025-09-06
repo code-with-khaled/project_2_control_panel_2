@@ -32,7 +32,6 @@ class AccountService {
     final request = http.MultipartRequest('POST', uri);
 
     request.headers['Accept'] = 'application/json';
-    request.headers['Content-Type'] = 'application/json';
 
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
@@ -63,6 +62,68 @@ class AccountService {
     if (response.statusCode == 200) {
     } else {
       throw Exception('فشل إنشاء الحساب');
+    }
+  }
+
+  Future<void> editAccount(
+    String? token,
+    Map<String, String> account,
+    int id,
+    String? imageUrl,
+    String? filename,
+  ) async {
+    final uri = Uri.parse("http://127.0.0.1:8000/api/dashboard/employees/$id");
+    final request = http.MultipartRequest('POST', uri);
+
+    request.headers['Accept'] = 'application/json';
+
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    request.fields.addAll(account);
+    request.fields['_method'] = "PUT";
+
+    if (imageUrl != null) {
+      final List<int> imageBytes = base64Decode(imageUrl.split(',').last);
+      request.files.add(
+        http.MultipartFile.fromBytes('media', imageBytes, filename: filename),
+      );
+    }
+
+    final response = await request.send();
+
+    final responseBody = await response.stream.bytesToString();
+
+    // ignore: avoid_print
+    print(jsonDecode(responseBody));
+
+    if (response.statusCode == 200) {
+    } else {
+      throw Exception('فشل إنشاء الحساب');
+    }
+  }
+
+  Future<void> deleteAccount(String? token, int id) async {
+    final response = await apiClient.delete(
+      "dashboard/employees/$id",
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+    } else {
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'حدث خطأ غير متوقع';
+      final errors = errorData['errors'] as Map<String, dynamic>?;
+      String detailedErrors = '';
+      errors?.forEach((field, messages) {
+        if (messages is List) {
+          for (var msg in messages) {
+            detailedErrors += '\n• $msg';
+          }
+        }
+      });
+      throw Exception('$message$detailedErrors');
     }
   }
 }

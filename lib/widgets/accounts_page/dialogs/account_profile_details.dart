@@ -175,98 +175,102 @@ class _AccountProfileDetailsState extends State<AccountProfileDetails> {
     ],
   );
 
-  Widget _buildProfessionalInfo() => Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.school_outlined),
-          SizedBox(width: 5),
-          Text(
-            "المعلومات المهنية",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-          ),
-        ],
-      ),
-      SizedBox(height: 20),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("الدور:", style: TextStyle(color: Colors.grey)),
-          Text(
-            widget.account.type!,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-      SizedBox(height: 20),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("المستوى الدراسي:", style: TextStyle(color: Colors.grey)),
-          Text(
-            widget.account.educationLevel,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-      SizedBox(height: 20),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("رقم المعرف:", style: TextStyle(color: Colors.grey)),
-          Text(
-            widget.account.type == "إداري" ? '2' : '3',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    ],
-  );
+  Widget _buildProfessionalInfo() {
+    final type = widget.account.type == "finance" ? "محاسب" : "إداري";
 
-  Widget _buildAccountPermissions() => Container(
-    padding: EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.grey.shade100,
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.shield_outlined, size: 16),
-        SizedBox(width: 8),
-        Flexible(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "صلاحيات الحساب",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              widget.account.type == "إداري"
-                  ? Text(
-                      "للإداري صلاحية الوصول لجميع الأمور الإدارية التي تخص الطلاب، الكورسات، والدورات ودورات المناهج وكذلك للعروض الترويجية والإشعارات.",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    )
-                  : Text(
-                      "المحاسب له صلاحية كاملة على الشؤون المالية وعرض التقارير المالية وتحديد رواتب المدرسين.",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-            ],
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.school_outlined),
+            SizedBox(width: 5),
+            Text(
+              "المعلومات المهنية",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("الدور:", style: TextStyle(color: Colors.grey)),
+            Text(type, style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("المستوى الدراسي:", style: TextStyle(color: Colors.grey)),
+            Text(
+              widget.account.educationLevel,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("رقم المعرف:", style: TextStyle(color: Colors.grey)),
+            Text(
+              widget.account.type == "إداري" ? '2' : '3',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ],
-    ),
-  );
+    );
+  }
+
+  Widget _buildAccountPermissions() {
+    final type = widget.account.type == "finance" ? "محاسب" : "إداري";
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.shield_outlined, size: 16),
+          SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "صلاحيات الحساب",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                type == "إداري"
+                    ? Text(
+                        "للإداري صلاحية الوصول لجميع الأمور الإدارية التي تخص الطلاب، الكورسات، والدورات ودورات المناهج وكذلك للعروض الترويجية والإشعارات.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      )
+                    : Text(
+                        "المحاسب له صلاحية كاملة على الشؤون المالية وعرض التقارير المالية وتحديد رواتب المدرسين.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSubmitButton() => Row(
     children: [

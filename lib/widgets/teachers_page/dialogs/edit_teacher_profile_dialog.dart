@@ -1,13 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:control_panel_2/core/api/api_client.dart';
+import 'package:control_panel_2/core/helper/api_helper.dart';
 import 'package:control_panel_2/core/helper/token_helper.dart';
 import 'package:control_panel_2/core/services/teacher_service.dart';
 import 'package:control_panel_2/models/teacher_model.dart';
 import 'package:control_panel_2/widgets/other/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 /// Dialog for editing teacher profile information
 class EditTeacherProfileDialog extends StatefulWidget {
@@ -184,10 +183,7 @@ class _EditTeacherProfileDialogState extends State<EditTeacherProfileDialog> {
 
     _addControllerListeners();
 
-    final apiClient = ApiClient(
-      baseUrl: "http://127.0.0.1:8000/api",
-      httpClient: http.Client(),
-    );
+    final apiClient = ApiHelper.getClient();
 
     _teachersService = TeacherService(apiClient: apiClient);
   }

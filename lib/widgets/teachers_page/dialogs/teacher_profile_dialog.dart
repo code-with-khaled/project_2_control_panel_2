@@ -104,7 +104,9 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
         // Profile avatar
         CircleAvatar(
           radius: 40,
-          backgroundImage: NetworkImage(widget.teacher.fullImageUrl),
+          backgroundImage: widget.teacher.image != null
+              ? NetworkImage(_getSafeImageUrl(widget.teacher.fullImageUrl))
+              : null,
         ),
         SizedBox(width: 16),
 
@@ -199,9 +201,14 @@ class _TeacherProfileDialogState extends State<TeacherProfileDialog> {
       case "الفواتير":
         return TeacherDisbursementsSection(id: widget.teacher.id!);
       case "اللوحة الإحصائية":
-        return TeacherStatPanelSection();
+        return TeacherStatPanelSection(id: widget.teacher.id!);
       default:
         return TeacherInfoSection(teacher: widget.teacher);
     }
+  }
+
+  String _getSafeImageUrl(String url) {
+    // Use CORS proxy for web
+    return 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
   }
 }
